@@ -139,6 +139,22 @@
     .puzzle-piece.placed{ pointer-events:none; }
     @media (max-width:600px){ .puzzle-piece{ width:76px; height:76px; font-size:42px; } }
 
+    /* Fichas visuales didácticas (Fase 19) */
+    .ficha-stage{ margin-top:14px; display:flex; flex-direction:column; align-items:center; gap:22px; }
+    .ficha-card{ width:100%; max-width:360px; min-height:280px; border-radius:26px; background:var(--card); border:2px solid rgba(15,23,42,.12); box-shadow:var(--shadow); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:18px; padding:26px; cursor:pointer; }
+    .ficha-swatch{ width:140px; height:140px; border-radius:50%; box-shadow:0 14px 26px rgba(2,6,23,.18); border:4px solid rgba(255,255,255,.85); }
+    .ficha-emoji{ font-size:96px; line-height:1; }
+    .ficha-number{ font-size:96px; font-weight:950; color:var(--blue); line-height:1; }
+    .ficha-dots{ font-size:28px; letter-spacing:6px; color:var(--blue); }
+    .ficha-label{ font-size:26px; font-weight:950; text-align:center; }
+    .ficha-nav{ display:flex; gap:14px; }
+    .ficha-btn{ border:none; border-radius:18px; min-width:74px; min-height:74px; font-size:30px; cursor:pointer; background:#fff; box-shadow:0 14px 26px rgba(2,6,23,.18); }
+    @media (max-width:600px){
+      .ficha-card{ min-height:240px; padding:20px; }
+      .ficha-swatch{ width:110px; height:110px; }
+      .ficha-emoji,.ficha-number{ font-size:72px; }
+    }
+
     /* Memotest */
     .bar{margin-top:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
     .stats{display:flex;gap:10px;flex-wrap:wrap;}
@@ -398,15 +414,32 @@
       </div>
     </section>
 
-    <!-- FICHAS DE APRENDIZAJE (contenido completo en una fase futura) -->
+    <!-- FICHAS DE APRENDIZAJE (Fase 19) -->
     <section id="viewFichas" class="view" aria-label="Fichas de aprendizaje">
-      <div class="top-actions" style="margin-bottom:6px;">
-        <button class="btn ghost" id="fichasHome">⬅️ Centro de juegos</button>
+      <div class="bar">
+        <div class="stats">
+          <div class="stat"><span id="fichaIndex">1</span><small>de <span id="fichaTotal">6</span></small></div>
+        </div>
+        <div class="top-actions">
+          <span class="pill">Categoría:
+            <button class="btn small" id="fichaColores">🎨</button>
+            <button class="btn small" id="fichaNumeros">🔢</button>
+            <button class="btn small" id="fichaFormas">🔺</button>
+            <button class="btn small" id="fichaRutina">🌞</button>
+          </span>
+          <button class="btn ghost" id="fichasHome">⬅️ Centro de juegos</button>
+        </div>
       </div>
-      <div class="soon-card">
-        <div class="soon-emoji">📚</div>
-        <div class="soon-title">Fichas de aprendizaje</div>
-        <div class="soon-text">Muy pronto vamos a tener nuevas fichas para aprender 💛</div>
+      <div class="ficha-stage">
+        <div class="ficha-card" id="fichaCard">
+          <div class="ficha-visual" id="fichaVisual"></div>
+          <div class="ficha-label" id="fichaLabel"></div>
+        </div>
+        <div class="ficha-nav">
+          <button class="ficha-btn" id="fichaPrev" aria-label="Anterior">⬅️</button>
+          <button class="ficha-btn" id="fichaRepeat" aria-label="Escuchar de nuevo">🔊</button>
+          <button class="ficha-btn" id="fichaNext" aria-label="Siguiente">➡️</button>
+        </div>
       </div>
     </section>
 
@@ -771,7 +804,7 @@
 
     document.getElementById('goSimples').addEventListener('click', () => { showView('simples'); speak('Juegos simples.'); });
     document.getElementById('goDidacticos').addEventListener('click', () => { showView('didacticos'); speak('Juegos didácticos.'); });
-    document.getElementById('goFichas').addEventListener('click', () => { showView('fichas'); speak('Fichas de aprendizaje. Muy pronto.'); });
+    document.getElementById('goFichas').addEventListener('click', () => { showView('fichas'); window.__fichasStart && window.__fichasStart(); });
     document.getElementById('goComunicacion').addEventListener('click', () => { showView('comunicacion'); speak('Comunicación. Muy pronto.'); });
     document.getElementById('goHistorias').addEventListener('click', () => { showView('historias'); speak('Historias sociales. Muy pronto.'); });
 
@@ -2776,6 +2809,141 @@
       window.__puzzleStart = function(){
         startPuzzle();
         speak('Arrastrá cada pieza a su casillero.');
+      };
+    })();
+
+    // --- Fichas visuales didácticas (Fase 19) ---
+    (function(){
+      const FICHAS = {
+        colores: [
+          { type:'color', hex:'#ef4444', label:'Rojo' },
+          { type:'color', hex:'#3b82f6', label:'Azul' },
+          { type:'color', hex:'#f59e0b', label:'Amarillo' },
+          { type:'color', hex:'#22c55e', label:'Verde' },
+          { type:'color', hex:'#a855f7', label:'Violeta' },
+          { type:'color', hex:'#fb923c', label:'Naranja' }
+        ],
+        numeros: [
+          { type:'numero', n:1, label:'Uno' },
+          { type:'numero', n:2, label:'Dos' },
+          { type:'numero', n:3, label:'Tres' },
+          { type:'numero', n:4, label:'Cuatro' },
+          { type:'numero', n:5, label:'Cinco' }
+        ],
+        formas: [
+          { type:'emoji', emoji:'🔵', label:'Círculo' },
+          { type:'emoji', emoji:'🟥', label:'Cuadrado' },
+          { type:'emoji', emoji:'🔺', label:'Triángulo' },
+          { type:'emoji', emoji:'⭐', label:'Estrella' },
+          { type:'emoji', emoji:'❤️', label:'Corazón' }
+        ],
+        rutina: [
+          { type:'emoji', emoji:'🌞', label:'Despertarse' },
+          { type:'emoji', emoji:'🦷', label:'Cepillarse los dientes' },
+          { type:'emoji', emoji:'🍽️', label:'Comer' },
+          { type:'emoji', emoji:'🛁', label:'Bañarse' },
+          { type:'emoji', emoji:'🌙', label:'Dormir' }
+        ]
+      };
+
+      const card     = document.getElementById('fichaCard');
+      const visualEl = document.getElementById('fichaVisual');
+      const labelEl  = document.getElementById('fichaLabel');
+      const indexEl  = document.getElementById('fichaIndex');
+      const totalEl  = document.getElementById('fichaTotal');
+      const prevBtn  = document.getElementById('fichaPrev');
+      const nextBtn  = document.getElementById('fichaNext');
+      const repeatBtn= document.getElementById('fichaRepeat');
+      const catBtns = {
+        colores: document.getElementById('fichaColores'),
+        numeros: document.getElementById('fichaNumeros'),
+        formas:  document.getElementById('fichaFormas'),
+        rutina:  document.getElementById('fichaRutina')
+      };
+      const tick = makeStarTicker(6);
+
+      let currentCat = 'colores';
+      let currentIdx = 0;
+
+      function updateCatButtons(){
+        Object.keys(catBtns).forEach(k => {
+          if (catBtns[k]) catBtns[k].classList.toggle('active', k === currentCat);
+        });
+      }
+
+      function renderFicha(){
+        const list = FICHAS[currentCat];
+        const item = list[currentIdx];
+        if (indexEl) indexEl.textContent = String(currentIdx + 1);
+        if (totalEl) totalEl.textContent = String(list.length);
+        if (!visualEl) return;
+        visualEl.innerHTML = '';
+        if (item.type === 'color'){
+          const sw = document.createElement('div');
+          sw.className = 'ficha-swatch';
+          sw.style.background = item.hex;
+          visualEl.appendChild(sw);
+        } else if (item.type === 'numero'){
+          const num = document.createElement('div');
+          num.className = 'ficha-number';
+          num.textContent = String(item.n);
+          visualEl.appendChild(num);
+          const dots = document.createElement('div');
+          dots.className = 'ficha-dots';
+          dots.textContent = '●'.repeat(item.n);
+          visualEl.appendChild(dots);
+        } else {
+          const em = document.createElement('div');
+          em.className = 'ficha-emoji';
+          em.textContent = item.emoji;
+          visualEl.appendChild(em);
+        }
+        if (labelEl) labelEl.textContent = item.label;
+      }
+
+      function sayCurrent(){
+        const item = FICHAS[currentCat][currentIdx];
+        speak(item.label);
+      }
+
+      function showFicha(){
+        renderFicha();
+        sayCurrent();
+      }
+
+      function goNext(){
+        const list = FICHAS[currentCat];
+        currentIdx = (currentIdx + 1) % list.length;
+        showFicha();
+        if (tick()) setTimeout(() => speak('¡Muy bien explorando, Samuel!'), 700);
+      }
+      function goPrev(){
+        const list = FICHAS[currentCat];
+        currentIdx = (currentIdx - 1 + list.length) % list.length;
+        showFicha();
+      }
+
+      function setCategory(cat){
+        currentCat = cat;
+        currentIdx = 0;
+        updateCatButtons();
+        showFicha();
+      }
+
+      if (nextBtn)   nextBtn.addEventListener('click', goNext);
+      if (prevBtn)   prevBtn.addEventListener('click', goPrev);
+      if (repeatBtn) repeatBtn.addEventListener('click', sayCurrent);
+      if (card)      card.addEventListener('click', sayCurrent);
+      if (catBtns.colores) catBtns.colores.addEventListener('click', () => setCategory('colores'));
+      if (catBtns.numeros) catBtns.numeros.addEventListener('click', () => setCategory('numeros'));
+      if (catBtns.formas)  catBtns.formas.addEventListener('click', () => setCategory('formas'));
+      if (catBtns.rutina)  catBtns.rutina.addEventListener('click', () => setCategory('rutina'));
+
+      window.__fichasStart = function(){
+        currentCat = 'colores';
+        currentIdx = 0;
+        updateCatButtons();
+        showFicha();
       };
     })();
   </script>
