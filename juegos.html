@@ -139,6 +139,15 @@
     .puzzle-piece.placed{ pointer-events:none; }
     @media (max-width:600px){ .puzzle-piece{ width:76px; height:76px; font-size:42px; } }
 
+    /* Comunicación aumentativa (Fase 20) */
+    .comm-last{ margin-top:14px; border:2px solid rgba(14,165,164,.35); background:rgba(14,165,164,.10); border-radius:18px; padding:14px 18px; font-weight:950; text-align:center; }
+    .comm-grid{ margin-top:16px; display:grid; gap:14px; grid-template-columns:repeat(auto-fit, minmax(170px, 1fr)); }
+    .frase-btn{ border:2px solid rgba(14,165,164,.35); border-radius:22px; background:var(--card); box-shadow:var(--shadow); padding:20px 14px; display:flex; flex-direction:column; align-items:center; gap:10px; cursor:pointer; font-weight:950; font-size:18px; color:inherit; }
+    .frase-btn .femoji{ font-size:46px; line-height:1; }
+    .frase-btn.tapped{ animation:fraseTap .45s ease; }
+    @keyframes fraseTap{ 0%{ transform:scale(1); } 35%{ transform:scale(1.08); background:rgba(14,165,164,.16); } 100%{ transform:scale(1); } }
+    @media (max-width:600px){ .frase-btn{ padding:16px 10px; font-size:16px; } .frase-btn .femoji{ font-size:38px; } }
+
     /* Fichas visuales didácticas (Fase 19) */
     .ficha-stage{ margin-top:14px; display:flex; flex-direction:column; align-items:center; gap:22px; }
     .ficha-card{ width:100%; max-width:360px; min-height:280px; border-radius:26px; background:var(--card); border:2px solid rgba(15,23,42,.12); box-shadow:var(--shadow); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:18px; padding:26px; cursor:pointer; }
@@ -443,15 +452,24 @@
       </div>
     </section>
 
-    <!-- COMUNICACIÓN (contenido completo en una fase futura) -->
+    <!-- COMUNICACIÓN AUMENTATIVA (Fase 20) -->
     <section id="viewComunicacion" class="view" aria-label="Comunicación">
       <div class="top-actions" style="margin-bottom:6px;">
         <button class="btn ghost" id="comunicacionHome">⬅️ Centro de juegos</button>
       </div>
-      <div class="soon-card">
-        <div class="soon-emoji">🗣️</div>
-        <div class="soon-title">Comunicación</div>
-        <div class="soon-text">Muy pronto vamos a tener nuevas frases acá 💛</div>
+      <div class="comm-last" id="comunicacionLast">Tocá una frase para decirla 🗣️</div>
+      <div class="comm-grid" id="comunicacionGrid">
+        <button class="frase-btn" data-text="Quiero agua"><span class="femoji">💧</span>Quiero agua</button>
+        <button class="frase-btn" data-text="Tengo hambre"><span class="femoji">🍽️</span>Tengo hambre</button>
+        <button class="frase-btn" data-text="Tengo sueño"><span class="femoji">😴</span>Tengo sueño</button>
+        <button class="frase-btn" data-text="Quiero jugar"><span class="femoji">🧸</span>Quiero jugar</button>
+        <button class="frase-btn" data-text="Necesito ayuda"><span class="femoji">🆘</span>Necesito ayuda</button>
+        <button class="frase-btn" data-text="Quiero descansar"><span class="femoji">🛌</span>Quiero descansar</button>
+        <button class="frase-btn" data-text="Estoy contento"><span class="femoji">😊</span>Estoy contento</button>
+        <button class="frase-btn" data-text="Estoy enojado"><span class="femoji">😠</span>Estoy enojado</button>
+        <button class="frase-btn" data-text="Me duele"><span class="femoji">🤕</span>Me duele</button>
+        <button class="frase-btn" data-text="Quiero ir al baño"><span class="femoji">🚽</span>Quiero ir al baño</button>
+        <button class="frase-btn" data-text="Te quiero mucho"><span class="femoji">💖</span>Te quiero mucho</button>
       </div>
     </section>
 
@@ -805,7 +823,7 @@
     document.getElementById('goSimples').addEventListener('click', () => { showView('simples'); speak('Juegos simples.'); });
     document.getElementById('goDidacticos').addEventListener('click', () => { showView('didacticos'); speak('Juegos didácticos.'); });
     document.getElementById('goFichas').addEventListener('click', () => { showView('fichas'); window.__fichasStart && window.__fichasStart(); });
-    document.getElementById('goComunicacion').addEventListener('click', () => { showView('comunicacion'); speak('Comunicación. Muy pronto.'); });
+    document.getElementById('goComunicacion').addEventListener('click', () => { showView('comunicacion'); window.__comunicacionStart && window.__comunicacionStart(); });
     document.getElementById('goHistorias').addEventListener('click', () => { showView('historias'); speak('Historias sociales. Muy pronto.'); });
 
     document.getElementById('goBurbujas').addEventListener('click', () => { showView('burbujas'); window.__burbujasStart && window.__burbujasStart(); });
@@ -885,10 +903,10 @@
       if (!el) return;
       el.textContent = '⭐ ' + (loadProgressJ().stars || 0);
     }
-    function addStarJ(){
+    function addStarJ(missionKey){
       const p = loadProgressJ();
       p.stars = (p.stars || 0) + 1;
-      p.jugar = true;
+      p[missionKey || 'jugar'] = true;
       saveProgressJ(p);
       updateStarsBadgeJ();
       const el = document.getElementById('starsBadge');
@@ -2944,6 +2962,33 @@
         currentIdx = 0;
         updateCatButtons();
         showFicha();
+      };
+    })();
+
+    // --- Comunicación aumentativa (Fase 20) ---
+    (function(){
+      const lastEl = document.getElementById('comunicacionLast');
+      const grid = document.getElementById('comunicacionGrid');
+      if (!grid) return;
+
+      function decirFrase(btn, text){
+        speak(text);
+        try{ localStorage.setItem('samuel_last_phrase', text); }catch(e){/* ignore */}
+        if (lastEl) lastEl.textContent = 'Dijiste: ' + text;
+        addStarJ('hablar');
+        btn.classList.remove('tapped');
+        void btn.offsetWidth;
+        btn.classList.add('tapped');
+      }
+
+      grid.querySelectorAll('.frase-btn').forEach(btn => {
+        btn.addEventListener('click', () => decirFrase(btn, btn.dataset.text));
+      });
+
+      window.__comunicacionStart = function(){
+        let last = null;
+        try{ last = localStorage.getItem('samuel_last_phrase'); }catch(e){/* ignore */}
+        if (lastEl) lastEl.textContent = last ? ('Última frase: ' + last) : 'Tocá una frase para decirla 🗣️';
       };
     })();
   </script>
