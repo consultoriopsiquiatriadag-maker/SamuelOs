@@ -100,6 +100,20 @@
     @media (max-width:600px){ .luces-grid{ grid-template-columns:repeat(2,1fr); } }
     .luz-btn{ border:none; border-radius:18px; min-height:110px; cursor:pointer; box-shadow:0 14px 26px rgba(2,6,23,.35); }
 
+    .btn.small.active{ background:var(--blue); color:#fff; border-color:transparent; }
+
+    /* Juegos de asociación (Fase 16) */
+    .classify-stage{ margin-top:14px; display:flex; flex-direction:column; align-items:center; gap:28px; padding:30px 16px; border-radius:22px; background:#f8fafc; border:2px solid rgba(15,23,42,.10); }
+    .classify-object{ width:140px; height:140px; border-radius:50%; box-shadow:0 14px 26px rgba(2,6,23,.18); border:4px solid rgba(255,255,255,.85); transition:background .2s ease; }
+    .classify-colors{ display:grid; grid-template-columns:repeat(4,1fr); gap:16px; width:100%; max-width:520px; }
+    @media (max-width:600px){ .classify-colors{ grid-template-columns:repeat(2,1fr); } }
+    .color-btn{ border:none; border-radius:18px; min-height:90px; cursor:pointer; box-shadow:0 14px 26px rgba(2,6,23,.18); }
+
+    .dragdrop-stage{ position:relative; margin-top:14px; height:420px; border-radius:22px; background:linear-gradient(180deg,#f0fdf4,#dcfce7); border:2px solid rgba(15,23,42,.12); overflow:hidden; touch-action:none; display:flex; align-items:flex-start; justify-content:space-between; padding:18px; }
+    .drop-zone{ width:42%; height:120px; border-radius:18px; border:3px dashed rgba(15,23,42,.25); display:flex; align-items:center; justify-content:center; font-size:22px; font-weight:950; color:var(--muted); background:rgba(255,255,255,.5); transition:background .15s ease, border-color .15s ease; text-align:center; }
+    .drop-zone.hover{ border-color:rgba(37,99,235,.6); background:rgba(37,99,235,.14); color:var(--text); }
+    .drag-object{ position:absolute; width:84px; height:84px; display:flex; align-items:center; justify-content:center; font-size:56px; cursor:grab; touch-action:none; user-select:none; filter:drop-shadow(0 10px 14px rgba(2,6,23,.18)); }
+
     /* Memotest */
     .bar{margin-top:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
     .stats{display:flex;gap:10px;flex-wrap:wrap;}
@@ -329,13 +343,23 @@
       <div class="grid">
         <button class="game" id="goMemo">
           <div class="gtitle">🧠 Memotest</div>
-          <div class="gdesc">Encontrá las parejas. Atención y memoria.</div>
+          <div class="gdesc">Encontrá las parejas. Elegí animales, vehículos o emociones.</div>
+        </button>
+
+        <button class="game" id="goClasificar">
+          <div class="gtitle">🎨 Clasificar colores</div>
+          <div class="gdesc">Mirá el color y tocá la canasta correcta.</div>
+        </button>
+
+        <button class="game" id="goArrastrar">
+          <div class="gtitle">🧩 Arrastrar a su lugar</div>
+          <div class="gdesc">Arrastrá cada cosa a su lugar correcto.</div>
         </button>
       </div>
       <div class="soon-card">
         <div class="soon-emoji">💡</div>
         <div class="soon-title">Pronto vamos a sumar más juegos para pensar</div>
-        <div class="soon-text">Asociación, rompecabezas y más actividades llegarán pronto.</div>
+        <div class="soon-text">Tetris y rompecabezas para Samuel llegarán pronto.</div>
       </div>
     </section>
 
@@ -435,6 +459,11 @@
         </div>
 
         <div class="top-actions">
+          <span class="pill">Tema:
+            <button class="btn small" id="themeAnimales">🐶</button>
+            <button class="btn small" id="themeVehiculos">🚗</button>
+            <button class="btn small" id="themeEmociones">😊</button>
+          </span>
           <span class="pill">Nivel:
             <button class="btn small" id="lvl6">6</button>
             <button class="btn small" id="lvl8">8</button>
@@ -447,6 +476,29 @@
 
       <div id="memoWin" class="win" role="status" aria-live="polite">🎉 ¡Excelente, Samuel! Encontraste todas las parejas.</div>
       <div id="memoBoard" class="board" aria-label="Tablero memotest"></div>
+    </section>
+
+    <!-- CLASIFICAR COLORES (Fase 16) -->
+    <section id="viewClasificar" class="view" aria-label="Clasificar colores">
+      <div class="top-actions" style="margin-bottom:6px;">
+        <button class="btn ghost" id="clasificarHome">⬅️ Juegos didácticos</button>
+      </div>
+      <div class="classify-stage">
+        <div class="classify-object" id="classifyObject"></div>
+        <div class="classify-colors" id="classifyColors"></div>
+      </div>
+    </section>
+
+    <!-- ARRASTRAR OBJETO A SU LUGAR (Fase 16) -->
+    <section id="viewArrastrar" class="view" aria-label="Arrastrar objeto a su lugar">
+      <div class="top-actions" style="margin-bottom:6px;">
+        <button class="btn ghost" id="arrastrarHome">⬅️ Juegos didácticos</button>
+      </div>
+      <div class="dragdrop-stage" id="dragdropStage">
+        <div class="drop-zone" id="zoneAnimales">🐾 Animales</div>
+        <div class="drag-object" id="dragObject"></div>
+        <div class="drop-zone" id="zoneVehiculos">🚗 Vehículos</div>
+      </div>
     </section>
 
     <!-- SONIDOS ANIMALES -->
@@ -618,6 +670,8 @@
       pianoAnimales: document.getElementById('viewPianoAnimales'),
       pianoVehiculos: document.getElementById('viewPianoVehiculos'),
       memo: document.getElementById('viewMemo'),
+      clasificar: document.getElementById('viewClasificar'),
+      arrastrar: document.getElementById('viewArrastrar'),
       sound: document.getElementById('viewSound'),
       cars: document.getElementById('viewCars'),
       race: document.getElementById('viewRace'),
@@ -661,6 +715,10 @@
     document.getElementById('historiasHome').addEventListener('click', () => showView('home'));
 
     document.getElementById('goMemo').addEventListener('click', () => { showView('memo'); startMemo(currentPairs); });
+    document.getElementById('goClasificar').addEventListener('click', () => { showView('clasificar'); window.__clasificarStart && window.__clasificarStart(); });
+    document.getElementById('goArrastrar').addEventListener('click', () => { showView('arrastrar'); window.__arrastrarStart && window.__arrastrarStart(); });
+    document.getElementById('clasificarHome').addEventListener('click', () => showView('didacticos'));
+    document.getElementById('arrastrarHome').addEventListener('click', () => showView('didacticos'));
     document.getElementById('goSound').addEventListener('click', () => { showView('sound'); renderAnimals(); });
     document.getElementById('goCars').addEventListener('click', () => { showView('cars'); renderCars(); });
     document.getElementById('goRace').addEventListener('click', () => { showView('race'); resetRace(); speak('Semáforo. Verde: avanzar. Amarillo: cuidado. Rojo: parar.'); startSemaforo(); });
@@ -840,20 +898,63 @@
     const memoHitsEl  = document.getElementById('memoHits');
     const memoWinEl   = document.getElementById('memoWin');
 
-    const icons = [
-      { id:'dog',   emoji:'🐶', label:'Perro' },
-      { id:'cat',   emoji:'🐱', label:'Gato' },
-      { id:'cow',   emoji:'🐮', label:'Vaca' },
-      { id:'bird',  emoji:'🐦', label:'Pájaro' },
-      { id:'car',   emoji:'🚗', label:'Auto' },
-      { id:'bus',   emoji:'🚌', label:'Colectivo' },
-      { id:'truck', emoji:'🚚', label:'Camión' },
-      { id:'moto',  emoji:'🏍️', label:'Moto' },
-      { id:'star',  emoji:'⭐', label:'Estrella' },
-      { id:'train', emoji:'🚂', label:'Tren' },
-      { id:'fish',  emoji:'🐟', label:'Pez' },
-      { id:'plane', emoji:'✈️', label:'Avión' }
+    // Memotest temático (Fase 16): animales / vehículos / emociones
+    const iconsAnimales = [
+      { id:'dog',    emoji:'🐶', label:'Perro' },
+      { id:'cat',    emoji:'🐱', label:'Gato' },
+      { id:'cow',    emoji:'🐮', label:'Vaca' },
+      { id:'bird',   emoji:'🐦', label:'Pájaro' },
+      { id:'horse',  emoji:'🐴', label:'Caballo' },
+      { id:'lion',   emoji:'🦁', label:'León' },
+      { id:'frog',   emoji:'🐸', label:'Rana' },
+      { id:'duck',   emoji:'🦆', label:'Pato' },
+      { id:'sheep',  emoji:'🐑', label:'Oveja' },
+      { id:'pig',    emoji:'🐷', label:'Cerdo' }
     ];
+    const iconsVehiculos = [
+      { id:'car',    emoji:'🚗',  label:'Auto' },
+      { id:'race',   emoji:'🏎️',  label:'Auto de carrera' },
+      { id:'bus',    emoji:'🚌',  label:'Colectivo' },
+      { id:'truck',  emoji:'🚚',  label:'Camión' },
+      { id:'moto',   emoji:'🏍️',  label:'Moto' },
+      { id:'police', emoji:'🚓',  label:'Policía' },
+      { id:'ambul',  emoji:'🚑',  label:'Ambulancia' },
+      { id:'fire',   emoji:'🚒',  label:'Bomberos' },
+      { id:'train',  emoji:'🚂',  label:'Tren' },
+      { id:'plane',  emoji:'✈️',  label:'Avión' }
+    ];
+    const iconsEmociones = [
+      { id:'feliz',       emoji:'😄', label:'Feliz' },
+      { id:'triste',       emoji:'😢', label:'Triste' },
+      { id:'enojado',       emoji:'😠', label:'Enojado' },
+      { id:'sorprendido',  emoji:'😲', label:'Sorprendido' },
+      { id:'asustado',     emoji:'😨', label:'Asustado' },
+      { id:'tranquilo',    emoji:'😌', label:'Tranquilo' },
+      { id:'cansado',      emoji:'😪', label:'Cansado' },
+      { id:'contento',     emoji:'☺️', label:'Contento' },
+      { id:'pensativo',    emoji:'🤔', label:'Pensativo' },
+      { id:'riendo',       emoji:'😂', label:'Riendo' }
+    ];
+
+    let currentTheme = 'animales';
+    function getThemeIcons(theme){
+      if (theme === 'vehiculos') return iconsVehiculos;
+      if (theme === 'emociones') return iconsEmociones;
+      return iconsAnimales;
+    }
+    function updateThemeButtons(){
+      document.getElementById('themeAnimales').classList.toggle('active', currentTheme === 'animales');
+      document.getElementById('themeVehiculos').classList.toggle('active', currentTheme === 'vehiculos');
+      document.getElementById('themeEmociones').classList.toggle('active', currentTheme === 'emociones');
+    }
+    function setTheme(theme){
+      currentTheme = theme;
+      updateThemeButtons();
+      startMemo(currentPairs);
+    }
+    document.getElementById('themeAnimales').addEventListener('click', () => setTheme('animales'));
+    document.getElementById('themeVehiculos').addEventListener('click', () => setTheme('vehiculos'));
+    document.getElementById('themeEmociones').addEventListener('click', () => setTheme('emociones'));
 
     function shuffle(arr){
       const a = arr.slice();
@@ -879,14 +980,17 @@
 
     function startMemo(pairs){
       memoWinEl.classList.remove('show');
-      memoPairsEl.textContent = String(pairs);
       moves = 0; hits = 0;
       memoMovesEl.textContent = '0';
       memoHitsEl.textContent = '0';
       revealed = [];
       lock = false;
 
-      const pick = shuffle(icons).slice(0, pairs);
+      const themeIcons = getThemeIcons(currentTheme);
+      const usablePairs = Math.min(pairs, themeIcons.length);
+      memoPairsEl.textContent = String(usablePairs);
+
+      const pick = shuffle(themeIcons).slice(0, usablePairs);
       const doubled = shuffle([...pick, ...pick].map((x, idx) => ({
         key: x.id + '-' + idx,
         id: x.id,
@@ -897,6 +1001,7 @@
       })));
       deck = doubled;
 
+      updateThemeButtons();
       renderMemo();
       speak('Memotest. Encontrá las parejas.');
     }
@@ -2046,6 +2151,166 @@
       });
       speak('Sonidos de vehículos. Tocá para escuchar.');
     }
+
+    // ====== FASE 16: Juegos de asociación ======
+
+    // --- Clasificar colores ---
+    (function(){
+      const objectEl = document.getElementById('classifyObject');
+      const colorsEl = document.getElementById('classifyColors');
+      const tick = makeStarTicker(5);
+      const COLORS = [
+        { name:'Rojo',     hex:'#ef4444' },
+        { name:'Azul',     hex:'#3b82f6' },
+        { name:'Amarillo', hex:'#f59e0b' },
+        { name:'Verde',    hex:'#22c55e' }
+      ];
+      let current = null;
+
+      function renderButtons(){
+        if (!colorsEl) return;
+        colorsEl.innerHTML = '';
+        COLORS.forEach(c => {
+          const b = document.createElement('button');
+          b.className = 'color-btn';
+          b.style.background = c.hex;
+          b.setAttribute('aria-label', c.name);
+          b.addEventListener('click', () => handlePick(c));
+          colorsEl.appendChild(b);
+        });
+      }
+
+      function nextObject(){
+        let c;
+        do { c = COLORS[Math.floor(Math.random()*COLORS.length)]; } while (current && c.hex === current.hex);
+        current = c;
+        if (objectEl) objectEl.style.background = c.hex;
+      }
+
+      function handlePick(c){
+        ensureAudio();
+        if (current && c.hex === current.hex){
+          playTone({ type:'sine', f0:600, f1:1000, dur:0.2, gain:0.5 });
+          if (tick()) speak('¡Muy bien, Samuel!');
+          setTimeout(nextObject, 500);
+        } else {
+          playTone({ type:'sine', f0:280, f1:220, dur:0.18, gain:0.4 });
+          speak('Probemos otra vez');
+        }
+      }
+
+      window.__clasificarStart = function(){
+        renderButtons();
+        nextObject();
+        speak('Mirá el color y tocá la canasta correcta.');
+      };
+    })();
+
+    // --- Arrastrar objeto a su lugar ---
+    (function(){
+      const stage = document.getElementById('dragdropStage');
+      const dragEl = document.getElementById('dragObject');
+      const zoneAnimales = document.getElementById('zoneAnimales');
+      const zoneVehiculos = document.getElementById('zoneVehiculos');
+      const tick = makeStarTicker(4);
+
+      const ITEMS = [
+        { emoji:'🐶', cat:'animales' },
+        { emoji:'🐱', cat:'animales' },
+        { emoji:'🐮', cat:'animales' },
+        { emoji:'🐦', cat:'animales' },
+        { emoji:'🚗', cat:'vehiculos' },
+        { emoji:'🚌', cat:'vehiculos' },
+        { emoji:'🚚', cat:'vehiculos' },
+        { emoji:'🏍️', cat:'vehiculos' }
+      ];
+
+      let current = null;
+      let dragging = false;
+      let pointerOffsetX = 0, pointerOffsetY = 0;
+
+      function placeAtStart(){
+        if (!stage || !dragEl) return;
+        const r = stage.getBoundingClientRect();
+        const left = r.width/2 - dragEl.offsetWidth/2;
+        const top = r.height/2 - dragEl.offsetHeight/2;
+        dragEl.style.left = left + 'px';
+        dragEl.style.top = top + 'px';
+      }
+
+      function nextItem(){
+        let it;
+        do { it = ITEMS[Math.floor(Math.random()*ITEMS.length)]; } while (current && it.emoji === current.emoji);
+        current = it;
+        if (dragEl) dragEl.textContent = it.emoji;
+        placeAtStart();
+      }
+
+      function rectsOverlapCenter(elRect, zoneRect){
+        const cx = elRect.left + elRect.width/2;
+        const cy = elRect.top + elRect.height/2;
+        return cx >= zoneRect.left && cx <= zoneRect.right && cy >= zoneRect.top && cy <= zoneRect.bottom;
+      }
+
+      function onPointerDown(e){
+        if (!stage || !dragEl) return;
+        e.preventDefault();
+        dragging = true;
+        try{ dragEl.setPointerCapture(e.pointerId); }catch(_){}
+        const r = dragEl.getBoundingClientRect();
+        pointerOffsetX = e.clientX - r.left;
+        pointerOffsetY = e.clientY - r.top;
+      }
+      function onPointerMove(e){
+        if (!dragging || !stage || !dragEl) return;
+        const stageRect = stage.getBoundingClientRect();
+        let left = e.clientX - stageRect.left - pointerOffsetX;
+        let top = e.clientY - stageRect.top - pointerOffsetY;
+        left = Math.max(0, Math.min(stageRect.width - dragEl.offsetWidth, left));
+        top = Math.max(0, Math.min(stageRect.height - dragEl.offsetHeight, top));
+        dragEl.style.left = left + 'px';
+        dragEl.style.top = top + 'px';
+
+        const elRect = dragEl.getBoundingClientRect();
+        if (zoneAnimales) zoneAnimales.classList.toggle('hover', rectsOverlapCenter(elRect, zoneAnimales.getBoundingClientRect()));
+        if (zoneVehiculos) zoneVehiculos.classList.toggle('hover', rectsOverlapCenter(elRect, zoneVehiculos.getBoundingClientRect()));
+      }
+      function onPointerUp(e){
+        if (!dragging || !dragEl) return;
+        dragging = false;
+        try{ dragEl.releasePointerCapture(e.pointerId); }catch(_){}
+        if (zoneAnimales) zoneAnimales.classList.remove('hover');
+        if (zoneVehiculos) zoneVehiculos.classList.remove('hover');
+        if (!current) return;
+
+        const elRect = dragEl.getBoundingClientRect();
+        const overAnimales = zoneAnimales ? rectsOverlapCenter(elRect, zoneAnimales.getBoundingClientRect()) : false;
+        const overVehiculos = zoneVehiculos ? rectsOverlapCenter(elRect, zoneVehiculos.getBoundingClientRect()) : false;
+
+        ensureAudio();
+        if ((overAnimales && current.cat==='animales') || (overVehiculos && current.cat==='vehiculos')){
+          playTone({ type:'sine', f0:600, f1:1000, dur:0.2, gain:0.5 });
+          if (tick()) speak('¡Lo lograste, Samuel!');
+          setTimeout(nextItem, 450);
+        } else if (overAnimales || overVehiculos){
+          speak('Probemos otra vez');
+          placeAtStart();
+        } else {
+          placeAtStart();
+        }
+      }
+
+      if (dragEl){
+        dragEl.addEventListener('pointerdown', onPointerDown);
+        window.addEventListener('pointermove', onPointerMove);
+        window.addEventListener('pointerup', onPointerUp);
+      }
+
+      window.__arrastrarStart = function(){
+        nextItem();
+        speak('Arrastrá cada cosa a su lugar correcto.');
+      };
+    })();
   </script>
 </body>
 </html>
