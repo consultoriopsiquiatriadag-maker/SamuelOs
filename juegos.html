@@ -29,6 +29,9 @@
     h1{margin:0;font-size:28px;letter-spacing:-.02em;}
     .hint{margin-top:6px;color:var(--muted);font-weight:750;}
 
+    #starsBadge{transition:transform .25s ease;}
+    #starsBadge.pulse-stars{transform:scale(1.15);}
+
     .top-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
     .btn{border:2px solid rgba(15,23,42,.12); background:#fff; padding:12px 16px; border-radius:16px; font-weight:900; cursor:pointer; text-decoration:none; color:var(--text); display:inline-flex; align-items:center; gap:10px; box-shadow:0 14px 28px rgba(2,6,23,.10);}
     .btn.primary{background:var(--blue); color:#fff; border-color:transparent;}
@@ -75,6 +78,27 @@
     .soon-emoji{ font-size:64px; margin-bottom:8px; }
     .soon-title{ font-size:22px; font-weight:950; margin-bottom:6px; }
     .soon-text{ color:var(--muted); font-weight:800; }
+
+    /* Juegos causa-efecto (Fase 15) */
+    .bubble-stage{ position:relative; margin-top:14px; height:420px; border-radius:22px; background:linear-gradient(180deg,#e0f2fe,#bfe3fb); border:2px solid rgba(15,23,42,.12); overflow:hidden; touch-action:manipulation; }
+    .bubble{ position:absolute; border-radius:50%; background:radial-gradient(circle at 30% 30%, rgba(255,255,255,.9), rgba(125,211,252,.6)); border:2px solid rgba(255,255,255,.85); box-shadow:0 8px 18px rgba(2,6,23,.12); cursor:pointer; transition:transform .18s ease, opacity .18s ease; }
+    .bubble.pop{ transform:scale(1.5); opacity:0; }
+
+    .balloon-stage{ position:relative; margin-top:14px; height:420px; border-radius:22px; background:linear-gradient(180deg,#fef3c7,#fde68a); border:2px solid rgba(15,23,42,.12); overflow:hidden; touch-action:manipulation; }
+    .balloon{ position:absolute; bottom:-90px; width:70px; height:90px; border-radius:50% 50% 50% 50% / 60% 60% 40% 40%; cursor:pointer; animation-name: floatUp; animation-timing-function: linear; animation-fill-mode: forwards; box-shadow:0 8px 16px rgba(2,6,23,.18); }
+    .balloon::after{ content:''; position:absolute; left:50%; bottom:-14px; width:2px; height:14px; background:rgba(15,23,42,.35); transform:translateX(-50%); }
+    @keyframes floatUp{ from{ transform:translateY(0); } to{ transform:translateY(-520px); } }
+    .balloon.pop{ animation:none; transform:scale(1.6); opacity:0; transition:transform .18s, opacity .18s; }
+
+    .stars-stage{ position:relative; margin-top:14px; height:420px; border-radius:22px; background:linear-gradient(180deg,#1e1b4b,#312e81); border:2px solid rgba(15,23,42,.12); overflow:hidden; cursor:pointer; touch-action:manipulation; }
+    .pop-star{ position:absolute; font-size:42px; transform:translate(-50%,-50%) scale(0); opacity:1; pointer-events:none; transition:transform .35s ease, opacity .5s ease .25s; }
+    .pop-star.show{ transform:translate(-50%,-50%) scale(1.3); }
+    .pop-star.fade{ opacity:0; }
+
+    .luces-stage{ margin-top:14px; border-radius:22px; padding:30px; border:2px solid rgba(15,23,42,.12); background:#0f172a; transition:background .25s ease; }
+    .luces-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+    @media (max-width:600px){ .luces-grid{ grid-template-columns:repeat(2,1fr); } }
+    .luz-btn{ border:none; border-radius:18px; min-height:110px; cursor:pointer; box-shadow:0 14px 26px rgba(2,6,23,.35); }
 
     /* Memotest */
     .bar{margin-top:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
@@ -204,6 +228,7 @@
         </div>
       </div>
       <div class="top-actions">
+        <div class="pill" id="starsBadge">⭐ 0</div>
         <a class="btn primary" href="./child.html">⬅️ Volver</a>
       </div>
     </header>
@@ -263,6 +288,36 @@
           <div class="gtitle">🛣️ Esquivar en la calle</div>
           <div class="gdesc">Esquivá objetos por 30 segundos. Atención y seguridad vial.</div>
         </button>
+
+        <button class="game" id="goBurbujas">
+          <div class="gtitle">🫧 Tocar burbujas</div>
+          <div class="gdesc">Tocá las burbujas para hacerlas explotar.</div>
+        </button>
+
+        <button class="game" id="goGlobos">
+          <div class="gtitle">🎈 Explotar globos</div>
+          <div class="gdesc">Los globos suben. ¡Tocalos para explotarlos!</div>
+        </button>
+
+        <button class="game" id="goEstrellas">
+          <div class="gtitle">⭐ Estrellas mágicas</div>
+          <div class="gdesc">Tocá la pantalla y aparecen estrellas.</div>
+        </button>
+
+        <button class="game" id="goLuces">
+          <div class="gtitle">🌈 Luces y colores</div>
+          <div class="gdesc">Tocá un color, mirá y escuchá.</div>
+        </button>
+
+        <button class="game" id="goPianoAnimales">
+          <div class="gtitle">🐾 Piano de animales</div>
+          <div class="gdesc">Tocá rápido y escuchá a cada animal.</div>
+        </button>
+
+        <button class="game" id="goPianoVehiculos">
+          <div class="gtitle">🚓 Sonidos de vehículos</div>
+          <div class="gdesc">Tocá rápido y escuchá cada vehículo.</div>
+        </button>
       </div>
     </section>
 
@@ -318,6 +373,56 @@
         <div class="soon-title">Historias sociales</div>
         <div class="soon-text">Muy pronto vamos a tener nuevas historias acá 💛</div>
       </div>
+    </section>
+
+    <!-- BURBUJAS (Fase 15) -->
+    <section id="viewBurbujas" class="view" aria-label="Tocar burbujas">
+      <div class="top-actions" style="margin-bottom:6px;">
+        <button class="btn ghost" id="burbujasHome">⬅️ Juegos simples</button>
+      </div>
+      <div class="bubble-stage" id="bubbleStage" aria-label="Área de burbujas"></div>
+    </section>
+
+    <!-- GLOBOS (Fase 15) -->
+    <section id="viewGlobos" class="view" aria-label="Explotar globos">
+      <div class="top-actions" style="margin-bottom:6px;">
+        <button class="btn ghost" id="globosHome">⬅️ Juegos simples</button>
+      </div>
+      <div class="balloon-stage" id="balloonStage" aria-label="Área de globos"></div>
+    </section>
+
+    <!-- ESTRELLAS (Fase 15) -->
+    <section id="viewEstrellas" class="view" aria-label="Estrellas mágicas">
+      <div class="top-actions" style="margin-bottom:6px;">
+        <button class="btn ghost" id="estrellasHome">⬅️ Juegos simples</button>
+      </div>
+      <div class="stars-stage" id="starsStage" aria-label="Tocá para hacer aparecer estrellas"></div>
+    </section>
+
+    <!-- LUCES Y COLORES (Fase 15) -->
+    <section id="viewLuces" class="view" aria-label="Luces y colores">
+      <div class="top-actions" style="margin-bottom:6px;">
+        <button class="btn ghost" id="lucesHome">⬅️ Juegos simples</button>
+      </div>
+      <div class="luces-stage" id="lucesStage">
+        <div class="luces-grid" id="lucesGrid"></div>
+      </div>
+    </section>
+
+    <!-- PIANO DE ANIMALES (Fase 15) -->
+    <section id="viewPianoAnimales" class="view" aria-label="Piano de animales">
+      <div class="top-actions" style="margin-bottom:6px;">
+        <button class="btn ghost" id="pianoAnimalesHome">⬅️ Juegos simples</button>
+      </div>
+      <div id="pianoAnimalesGrid" class="sound-grid" aria-label="Piano de animales"></div>
+    </section>
+
+    <!-- PIANO DE VEHÍCULOS (Fase 15) -->
+    <section id="viewPianoVehiculos" class="view" aria-label="Sonidos de vehículos">
+      <div class="top-actions" style="margin-bottom:6px;">
+        <button class="btn ghost" id="pianoVehiculosHome">⬅️ Juegos simples</button>
+      </div>
+      <div id="pianoVehiculosGrid" class="sound-grid" aria-label="Sonidos de vehículos"></div>
     </section>
 
     <!-- MEMOTEST -->
@@ -506,6 +611,12 @@
       fichas: document.getElementById('viewFichas'),
       comunicacion: document.getElementById('viewComunicacion'),
       historias: document.getElementById('viewHistorias'),
+      burbujas: document.getElementById('viewBurbujas'),
+      globos: document.getElementById('viewGlobos'),
+      estrellas: document.getElementById('viewEstrellas'),
+      luces: document.getElementById('viewLuces'),
+      pianoAnimales: document.getElementById('viewPianoAnimales'),
+      pianoVehiculos: document.getElementById('viewPianoVehiculos'),
       memo: document.getElementById('viewMemo'),
       sound: document.getElementById('viewSound'),
       cars: document.getElementById('viewCars'),
@@ -515,7 +626,9 @@
     function showView(key){
       // detener juegos con loops/timers
       try{ if (window.__driveStop) window.__driveStop(); }catch(e){}
-      try{ if (window.__raceStop) window.__raceStop(); }catch(e){} 
+      try{ if (window.__raceStop) window.__raceStop(); }catch(e){}
+      try{ if (window.__burbujasStop) window.__burbujasStop(); }catch(e){}
+      try{ if (window.__globosStop) window.__globosStop(); }catch(e){}
       Object.values(views).forEach(v => v.classList.remove('active'));
       views[key].classList.add('active');
       window.scrollTo({ top: 0, behavior: 'instant' });
@@ -526,6 +639,20 @@
     document.getElementById('goFichas').addEventListener('click', () => { showView('fichas'); speak('Fichas de aprendizaje. Muy pronto.'); });
     document.getElementById('goComunicacion').addEventListener('click', () => { showView('comunicacion'); speak('Comunicación. Muy pronto.'); });
     document.getElementById('goHistorias').addEventListener('click', () => { showView('historias'); speak('Historias sociales. Muy pronto.'); });
+
+    document.getElementById('goBurbujas').addEventListener('click', () => { showView('burbujas'); window.__burbujasStart && window.__burbujasStart(); });
+    document.getElementById('goGlobos').addEventListener('click', () => { showView('globos'); window.__globosStart && window.__globosStart(); });
+    document.getElementById('goEstrellas').addEventListener('click', () => { showView('estrellas'); window.__estrellasStart && window.__estrellasStart(); });
+    document.getElementById('goLuces').addEventListener('click', () => { showView('luces'); window.__lucesStart && window.__lucesStart(); });
+    document.getElementById('goPianoAnimales').addEventListener('click', () => { showView('pianoAnimales'); renderPianoAnimales(); });
+    document.getElementById('goPianoVehiculos').addEventListener('click', () => { showView('pianoVehiculos'); renderPianoVehiculos(); });
+
+    document.getElementById('burbujasHome').addEventListener('click', () => { window.__burbujasStop && window.__burbujasStop(); showView('simples'); });
+    document.getElementById('globosHome').addEventListener('click', () => { window.__globosStop && window.__globosStop(); showView('simples'); });
+    document.getElementById('estrellasHome').addEventListener('click', () => showView('simples'));
+    document.getElementById('lucesHome').addEventListener('click', () => showView('simples'));
+    document.getElementById('pianoAnimalesHome').addEventListener('click', () => showView('simples'));
+    document.getElementById('pianoVehiculosHome').addEventListener('click', () => showView('simples'));
 
     document.getElementById('simplesHome').addEventListener('click', () => showView('home'));
     document.getElementById('didacticosHome').addEventListener('click', () => showView('home'));
@@ -559,6 +686,48 @@
         window.speechSynthesis.speak(u);
       }catch(e){/* ignore */}
     }
+
+    // --- Estrellas y progreso (Fase 15) ---
+    // Comparte la misma clave/forma de localStorage que child.html: samuel_progress_YYYY-MM-DD
+    function todayKeyJ(){
+      const d = new Date();
+      return 'samuel_progress_' + d.toISOString().slice(0,10);
+    }
+    function loadProgressJ(){
+      try{
+        const raw = localStorage.getItem(todayKeyJ());
+        return raw ? JSON.parse(raw) : { stars:0, jugar:false, hablar:false, descansar:false };
+      }catch(e){
+        return { stars:0, jugar:false, hablar:false, descansar:false };
+      }
+    }
+    function saveProgressJ(p){
+      try{ localStorage.setItem(todayKeyJ(), JSON.stringify(p)); }catch(e){/* ignore */}
+    }
+    function updateStarsBadgeJ(){
+      const el = document.getElementById('starsBadge');
+      if (!el) return;
+      el.textContent = '⭐ ' + (loadProgressJ().stars || 0);
+    }
+    function addStarJ(){
+      const p = loadProgressJ();
+      p.stars = (p.stars || 0) + 1;
+      p.jugar = true;
+      saveProgressJ(p);
+      updateStarsBadgeJ();
+      const el = document.getElementById('starsBadge');
+      if (el){ el.classList.remove('pulse-stars'); void el.offsetWidth; el.classList.add('pulse-stars'); }
+    }
+    // Cada `threshold` aciertos suma 1 estrella real. Sin castigos: nunca resta ni penaliza.
+    function makeStarTicker(threshold = 5){
+      let n = 0;
+      return function(){
+        n++;
+        if (n >= threshold){ n = 0; addStarJ(); return true; }
+        return false;
+      };
+    }
+    updateStarsBadgeJ();
 
     // --- Audio engine ---
     let audioCtx = null;
@@ -1675,6 +1844,208 @@
     window.addEventListener('resize', () => {
       if (views.race.classList.contains('active')) moveCar();
     });
+
+    // ====== FASE 15: Juegos causa-efecto ======
+
+    // --- Tocar burbujas ---
+    (function(){
+      const stage = document.getElementById('bubbleStage');
+      let timer = null;
+      const tick = makeStarTicker(5);
+
+      function spawnBubble(){
+        if (!stage || stage.childElementCount >= 6) return;
+        const size = 60 + Math.random()*60;
+        const b = document.createElement('div');
+        b.className = 'bubble';
+        b.style.width = size + 'px';
+        b.style.height = size + 'px';
+        const maxX = Math.max(10, stage.clientWidth - size - 10);
+        const maxY = Math.max(10, stage.clientHeight - size - 10);
+        b.style.left = (10 + Math.random()*maxX) + 'px';
+        b.style.top = (10 + Math.random()*maxY) + 'px';
+        b.addEventListener('click', () => popBubble(b));
+        stage.appendChild(b);
+      }
+      function popBubble(b){
+        if (b.classList.contains('pop')) return;
+        b.classList.add('pop');
+        ensureAudio();
+        playTone({ type:'sine', f0:500, f1:900, dur:0.16, gain:0.5 });
+        if (tick()) speak('¡Muy bien, Samuel!');
+        setTimeout(() => b.remove(), 200);
+      }
+      function startBurbujas(){
+        stopBurbujas();
+        stage.innerHTML = '';
+        ensureAudio();
+        timer = setInterval(spawnBubble, 900);
+        spawnBubble();
+        speak('Tocá las burbujas para hacerlas explotar.');
+      }
+      function stopBurbujas(){
+        if (timer){ clearInterval(timer); timer = null; }
+      }
+      window.__burbujasStart = startBurbujas;
+      window.__burbujasStop = stopBurbujas;
+    })();
+
+    // --- Explotar globos ---
+    (function(){
+      const stage = document.getElementById('balloonStage');
+      let timer = null;
+      const tick = makeStarTicker(5);
+      const colores = ['#ef4444','#3b82f6','#22c55e','#f59e0b','#a855f7','#ec4899'];
+
+      function spawnBalloon(){
+        if (!stage || stage.childElementCount >= 5) return;
+        const b = document.createElement('div');
+        b.className = 'balloon';
+        b.style.background = colores[Math.floor(Math.random()*colores.length)];
+        b.style.left = (5 + Math.random()*80) + '%';
+        const dur = 5 + Math.random()*3;
+        b.style.animationDuration = dur + 's';
+        b.addEventListener('animationend', () => b.remove());
+        b.addEventListener('click', () => popBalloon(b));
+        stage.appendChild(b);
+      }
+      function popBalloon(b){
+        if (b.classList.contains('pop')) return;
+        b.classList.add('pop');
+        ensureAudio();
+        playTone({ type:'square', f0:300, f1:120, dur:0.18, gain:0.5 });
+        if (tick()) speak('¡Lo lograste, Samuel!');
+        setTimeout(() => b.remove(), 220);
+      }
+      function startGlobos(){
+        stopGlobos();
+        stage.innerHTML = '';
+        ensureAudio();
+        timer = setInterval(spawnBalloon, 1300);
+        spawnBalloon();
+        speak('Tocá los globos para explotarlos.');
+      }
+      function stopGlobos(){
+        if (timer){ clearInterval(timer); timer = null; }
+      }
+      window.__globosStart = startGlobos;
+      window.__globosStop = stopGlobos;
+    })();
+
+    // --- Estrellas mágicas ---
+    (function(){
+      const stage = document.getElementById('starsStage');
+      const tick = makeStarTicker(5);
+
+      function spawnStar(x, y){
+        const s = document.createElement('div');
+        s.className = 'pop-star';
+        s.textContent = '⭐';
+        s.style.left = x + 'px';
+        s.style.top = y + 'px';
+        stage.appendChild(s);
+        requestAnimationFrame(() => s.classList.add('show'));
+        setTimeout(() => s.classList.add('fade'), 350);
+        setTimeout(() => s.remove(), 900);
+      }
+      function handleTap(e){
+        ensureAudio();
+        const rect = stage.getBoundingClientRect();
+        const point = (e.touches && e.touches[0]) ? e.touches[0] : e;
+        const x = point.clientX - rect.left;
+        const y = point.clientY - rect.top;
+        spawnStar(x, y);
+        playTone({ type:'triangle', f0:660, f1:990, dur:0.22, gain:0.55 });
+        if (tick()) speak('¡Muy bien, Samuel!');
+      }
+      if (stage) stage.addEventListener('click', handleTap);
+      window.__estrellasStart = function(){
+        speak('Tocá la pantalla para hacer aparecer estrellas.');
+      };
+    })();
+
+    // --- Luces y colores ---
+    (function(){
+      const grid = document.getElementById('lucesGrid');
+      const stage = document.getElementById('lucesStage');
+      const tick = makeStarTicker(5);
+      const colores = [
+        { name:'Rojo',     hex:'#ef4444', f:392 },
+        { name:'Azul',     hex:'#3b82f6', f:440 },
+        { name:'Amarillo', hex:'#f59e0b', f:494 },
+        { name:'Verde',    hex:'#22c55e', f:523 },
+        { name:'Naranja',  hex:'#fb923c', f:587 },
+        { name:'Violeta',  hex:'#a855f7', f:659 }
+      ];
+      function renderLuces(){
+        if (!grid) return;
+        grid.innerHTML = '';
+        colores.forEach(c => {
+          const b = document.createElement('button');
+          b.className = 'luz-btn';
+          b.style.background = c.hex;
+          b.setAttribute('aria-label', c.name);
+          b.addEventListener('click', () => activarLuz(c));
+          grid.appendChild(b);
+        });
+      }
+      function activarLuz(c){
+        ensureAudio();
+        if (stage) stage.style.background = c.hex;
+        playTone({ type:'sine', f0:c.f, dur:0.4, gain:0.5 });
+        speak(c.name);
+        if (tick()) setTimeout(() => speak('¡Muy bien, Samuel!'), 700);
+        setTimeout(() => { if (stage) stage.style.background = '#0f172a'; }, 500);
+      }
+      window.__lucesStart = function(){
+        renderLuces();
+        speak('Tocá un color para ver y escuchar.');
+      };
+    })();
+
+    // --- Piano de animales (reutiliza animals/playAnimal) ---
+    function renderPianoAnimales(){
+      const grid = document.getElementById('pianoAnimalesGrid');
+      if (!grid) return;
+      stopAll();
+      ensureAudio();
+      grid.innerHTML = '';
+      const tick = makeStarTicker(6);
+      animals.forEach(a => {
+        const b = document.createElement('button');
+        b.className = 'sound';
+        b.setAttribute('aria-label', a.name);
+        b.innerHTML = `<div class="emoji">${a.emoji}</div><div class="label">${a.name}</div>`;
+        b.addEventListener('click', () => {
+          playAnimal(a);
+          if (tick()) setTimeout(() => speak('¡Muy bien, Samuel!'), 900);
+        });
+        grid.appendChild(b);
+      });
+      speak('Piano de animales. Tocá para escuchar.');
+    }
+
+    // --- Sonidos de vehículos (reutiliza cars/playCar) ---
+    function renderPianoVehiculos(){
+      const grid = document.getElementById('pianoVehiculosGrid');
+      if (!grid) return;
+      stopAll();
+      ensureAudio();
+      grid.innerHTML = '';
+      const tick = makeStarTicker(6);
+      cars.forEach(v => {
+        const b = document.createElement('button');
+        b.className = 'sound';
+        b.setAttribute('aria-label', v.name);
+        b.innerHTML = `<div class="emoji">${v.emoji}</div><div class="label">${v.name}</div>`;
+        b.addEventListener('click', () => {
+          playCar(v);
+          if (tick()) setTimeout(() => speak('¡Muy bien, Samuel!'), 900);
+        });
+        grid.appendChild(b);
+      });
+      speak('Sonidos de vehículos. Tocá para escuchar.');
+    }
   </script>
 </body>
 </html>
