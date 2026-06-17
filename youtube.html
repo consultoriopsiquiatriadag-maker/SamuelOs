@@ -630,6 +630,20 @@
     location.href = './child.html';
   }
 
+  // ============================================================
+  // Control suave de tiempo de video (Fase 6)
+  // Si pasaron 30 min desde que entró a esta sección, vuelve solo
+  // a child.html (que se encarga de avisar con audio + mensaje amable).
+  // ============================================================
+  function checkVideoTimeLimit() {
+    const startTime = localStorage.getItem('video_start_time');
+    if (!startTime) return;
+    const limit = 30 * 60 * 1000; // 30 minutos
+    if (Date.now() - startTime >= limit) {
+      goHome();
+    }
+  }
+
   function backToHome() {
     stopPlayer();
     catActual = null;
@@ -787,6 +801,8 @@
   // ============================================================
   (function init() {
     checkOnline();
+    checkVideoTimeLimit();
+    setInterval(checkVideoTimeLimit, 15000); // chequeo suave cada 15s
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('./sw-aac.js');
     }

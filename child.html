@@ -362,6 +362,77 @@
         .gate-cancel { background: #EEE; color: #777; }
         .gate-ok { background: var(--color-hablar); color: white; }
 
+        /* --- Modal Fin de Videos (transición amable) --- */
+        #videoLimitModal {
+            position: fixed;
+            inset: 0;
+            background: rgba(20,20,30,0.55);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 250;
+            animation: zoomIn 0.25s ease-out;
+        }
+
+        .vl-box {
+            background: white;
+            border-radius: 30px;
+            padding: 35px 30px;
+            width: min(400px, 90vw);
+            text-align: center;
+            box-shadow: var(--shadow-card);
+        }
+
+        .vl-emoji {
+            font-size: 60px;
+            margin-bottom: 6px;
+        }
+
+        .vl-title {
+            font-weight: 900;
+            font-size: 1.3rem;
+            margin-bottom: 6px;
+        }
+
+        .vl-sub {
+            font-weight: 700;
+            color: #888;
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+        }
+
+        .vl-actions {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .vl-btn {
+            flex: 1;
+            padding: 18px 10px;
+            border-radius: 20px;
+            border: none;
+            font-weight: 900;
+            font-size: 1.05rem;
+            cursor: pointer;
+            color: white;
+            transition: var(--transition);
+        }
+
+        .vl-btn:active { transform: scale(0.95); }
+        .vl-jugar { background: var(--color-jugar); }
+        .vl-hablar { background: var(--color-hablar); }
+
+        .vl-dismiss {
+            background: none;
+            border: none;
+            color: #aaa;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            padding: 6px;
+        }
+
         /* --- Animaciones --- */
         @keyframes fadeInDown {
             from { opacity: 0; transform: translateY(-20px); }
@@ -453,6 +524,19 @@
                 <button class="gate-cancel" onclick="closeGate()">Cancelar</button>
                 <button class="gate-ok" onclick="checkGate()">Entrar</button>
             </div>
+        </div>
+    </div>
+
+    <div id="videoLimitModal">
+        <div class="vl-box">
+            <div class="vl-emoji">🎬</div>
+            <div class="vl-title">¡Se terminó el tiempito de videos!</div>
+            <div class="vl-sub">¿Qué te gustaría hacer ahora?</div>
+            <div class="vl-actions">
+                <button class="vl-btn vl-jugar" onclick="closeVideoLimitModal(); navigate('juegos.html')">🎮 Jugar</button>
+                <button class="vl-btn vl-hablar" onclick="closeVideoLimitModal(); openHablar()">🗣️ Hablar</button>
+            </div>
+            <button class="vl-dismiss" onclick="closeVideoLimitModal()">Está bien 👍</button>
         </div>
     </div>
 
@@ -674,12 +758,23 @@
             if (startTime) {
                 const limit = 30 * 60 * 1000; // 30 minutos
                 const elapsed = Date.now() - startTime;
-                
+
                 if (elapsed >= limit) {
                     localStorage.removeItem('video_start_time');
                     playParentAudio('tiempoVideos');
+                    // Pequeña pausa para que se escuche el audio antes de mostrar el mensaje
+                    setTimeout(showVideoLimitModal, 600);
                 }
             }
+        }
+
+        // --- Modal de transición amable al terminar el tiempo de videos ---
+        function showVideoLimitModal() {
+            document.getElementById('videoLimitModal').style.display = 'flex';
+        }
+
+        function closeVideoLimitModal() {
+            document.getElementById('videoLimitModal').style.display = 'none';
         }
 
         // --- Modal Hablar ---
