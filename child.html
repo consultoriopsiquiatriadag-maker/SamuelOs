@@ -233,6 +233,28 @@
         .btn-parents:active, .phrase-btn:active, .gate-actions button:active { transform: scale(0.95); }
         .phrase-btn, .gate-actions button { transition: var(--transition); }
 
+        /* --- Zona de Papás: acceso discreto (Fase 7) --- */
+        /* Sin texto ni color llamativo: un ícono chico y apagado para que no
+           atraiga la atención de Samuel, pero sigue siendo tappeable por un adulto. */
+        .zona-papas-discreet {
+            background: none;
+            border: none;
+            color: #ccc;
+            font-size: 1.3rem;
+            padding: 10px 12px;
+            cursor: pointer;
+            opacity: 0.45;
+            transition: var(--transition);
+        }
+
+        .zona-papas-discreet:hover,
+        .zona-papas-discreet:focus {
+            opacity: 1;
+            color: #999;
+        }
+
+        .zona-papas-discreet:active { transform: scale(0.95); }
+
         /* --- Estrella flotante (feedback al ganar puntos) --- */
         .floating-star {
             position: fixed;
@@ -503,7 +525,7 @@
         <div class="last-phrase" id="status-bar">
             <span>⭐</span> <span id="lastText">¡Listo para empezar!</span>
         </div>
-        <button onclick="openGate()" class="btn-parents">Zona de Papás</button>
+        <button onclick="openGate()" class="zona-papas-discreet" aria-label="Zona de Papás">⚙️</button>
     </footer>
 
     <div id="speakModal">
