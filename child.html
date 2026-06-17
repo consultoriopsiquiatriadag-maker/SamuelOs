@@ -422,7 +422,7 @@
             <span class="card-label">Hablar</span>
         </button>
 
-        <button class="card card-ayuda" onclick="playParentalAudio('ayuda')">
+        <button class="card card-ayuda" onclick="handleAyuda()">
             <span class="card-icon">❤️</span>
             <span class="card-label">Ayuda</span>
         </button>
@@ -461,7 +461,20 @@
         const parentalAudios = {
             bienvenido: 'audio/bienvenido.mp3',
             tiempoVideos: 'audio/tiempo-videos.mp3',
+            cambiarActividad: 'audio/cambiar-actividad.mp3',
+            vamosAJugar: 'audio/vamos-a-jugar.mp3',
+            descanso: 'audio/descanso.mp3',
             ayuda: 'audio/ayuda.mp3'
+        };
+
+        // Textos de respaldo (si el archivo de audio no existe, se usa voz sintetizada)
+        const parentalFallbackTexts = {
+            bienvenido: "¡Hola Samuel! Qué bueno verte.",
+            tiempoVideos: "Samuel, ya pasaste mucho tiempo mirando videos. Ahora vamos a cambiar de actividad.",
+            cambiarActividad: "¡Muy bien Samuel! Cambiaste de actividad.",
+            vamosAJugar: "¡Vamos a jugar!",
+            descanso: "Es un buen momento para descansar un poquito.",
+            ayuda: "Mamá y Papá ya vienen a ayudarte."
         };
 
         // --- Sistema de Sonido (WebAudio API Simulado con Audio) ---
@@ -545,10 +558,12 @@
         }
 
         // Detecta cambio de actividad (variedad = +2 estrellas, suma a la misión "Descansar")
-        function registerActivity(name) {
+        // notify=false evita superponer el audio "cambiar de actividad" con otro audio que ya se va a reproducir
+        function registerActivity(name, notify = true) {
             const last = localStorage.getItem('samuel_last_activity');
             if (last && last !== name) {
                 addStars(2, 'descansar');
+                if (notify) playParentAudio('cambiarActividad');
             }
             localStorage.setItem('samuel_last_activity', name);
         }
@@ -579,42 +594,59 @@
             setTimeout(() => badge.classList.remove('pulse-stars'), 300);
         }
 
-        // --- Reproductor de Voz ---
-        function say(text, emoji) {
-            playTapSound();
-            registerActivity('hablar');
-            addStars(1, 'hablar');
+        // --- Voz sintetizada (sin lógica de puntos, uso interno) ---
+        function speak(text, emoji) {
             document.getElementById('lastText').innerText = text;
-            
+
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = 'es-ES';
             utterance.rate = 0.9; // Un poco más lento para mejor comprensión
             utterance.pitch = 1.2; // Tono más infantil/amigable
             window.speechSynthesis.speak(utterance);
 
-            if(emoji) {
+            if (emoji) {
                 // Flash visual al hablar
                 document.querySelector('.avatar').innerText = emoji;
                 setTimeout(() => document.querySelector('.avatar').innerText = '👦', 2000);
             }
         }
 
-        // --- Audios Grabados (Parentales) ---
-        function playParentalAudio(type) {
+        // --- Frase elegida por Samuel (suma estrella + registra actividad) ---
+        function say(text, emoji) {
             playTapSound();
-            if (type === 'ayuda') registerActivity('ayuda');
+            registerActivity('hablar');
+            addStars(1, 'hablar');
+            speak(text, emoji);
+        }
+
+        // --- Audios Parentales Grabados ---
+        // Reproduce un audio grabado por los papás (audio/<nombreArchivo>.mp3).
+        // Si el archivo no existe, falla en silencio y usa voz sintetizada de respaldo.
+        function playParentAudio(type) {
             const audioPath = parentalAudios[type];
-            const audio = new Audio(audioPath);
-            
-            audio.play().catch(e => {
-                console.log("Audio file not found, using synthesis fallback");
-                const fallbackTexts = {
-                    bienvenido: "¡Hola Samuel! Qué bueno verte.",
-                    tiempoVideos: "Samuel, ya pasaste mucho tiempo mirando videos. Ahora vamos a cambiar de actividad.",
-                    ayuda: "Mamá y Papá ya vienen a ayudarte."
-                };
-                say(fallbackTexts[type]);
-            });
+            if (!audioPath) return;
+            try {
+                const audio = new Audio(audioPath);
+                audio.play().catch(() => {
+                    const fallback = parentalFallbackTexts[type];
+                    if (fallback) speak(fallback);
+                });
+            } catch (e) {
+                const fallback = parentalFallbackTexts[type];
+                if (fallback) speak(fallback);
+            }
+        }
+
+        // Alias de compatibilidad (nombre usado en fases anteriores)
+        function playParentalAudio(type) {
+            playParentAudio(type);
+        }
+
+        // Botón "Ayuda": tap + aviso a los papás, sin disparar el audio de "cambiar de actividad"
+        function handleAyuda() {
+            playTapSound();
+            registerActivity('ayuda', false);
+            playParentAudio('ayuda');
         }
 
         // --- Navegación y Timer ---
@@ -645,7 +677,7 @@
                 
                 if (elapsed >= limit) {
                     localStorage.removeItem('video_start_time');
-                    playParentalAudio('tiempoVideos');
+                    playParentAudio('tiempoVideos');
                 }
             }
         }
@@ -716,7 +748,7 @@
             checkVideoLimit();
             // Audio de bienvenida después de una pequeña interacción o carga
             setTimeout(() => {
-                playParentalAudio('bienvenido');
+                playParentAudio('bienvenido');
             }, 1000);
         };
     </script>
