@@ -129,6 +129,16 @@
       .tetris-btn{ min-width:68px; min-height:68px; font-size:26px; }
     }
 
+    /* Rompecabezas infantil (Fase 18) */
+    .puzzle-stage{ position:relative; margin-top:14px; min-height:480px; border-radius:22px; background:linear-gradient(180deg,#fdf4ff,#f3e8ff); border:2px solid rgba(15,23,42,.12); touch-action:none; padding:18px; }
+    .puzzle-slots{ display:grid; grid-template-columns:repeat(2,140px); grid-template-rows:repeat(2,140px); gap:14px; justify-content:center; margin:0 auto; }
+    @media (max-width:600px){ .puzzle-slots{ grid-template-columns:repeat(2,110px); grid-template-rows:repeat(2,110px); } }
+    .puzzle-slot{ border:3px dashed rgba(15,23,42,.28); border-radius:18px; display:flex; align-items:center; justify-content:center; font-size:64px; opacity:.32; background:rgba(255,255,255,.55); transition:opacity .2s ease, border-style .2s ease, background .2s ease; }
+    .puzzle-slot.filled{ opacity:1; border-style:solid; border-color:transparent; background:#fff; box-shadow:0 14px 26px rgba(2,6,23,.18); }
+    .puzzle-piece{ position:absolute; width:96px; height:96px; border-radius:50%; background:#fff; box-shadow:0 14px 26px rgba(2,6,23,.18); display:flex; align-items:center; justify-content:center; font-size:54px; cursor:grab; touch-action:none; user-select:none; border:4px solid rgba(255,255,255,.9); }
+    .puzzle-piece.placed{ pointer-events:none; }
+    @media (max-width:600px){ .puzzle-piece{ width:76px; height:76px; font-size:42px; } }
+
     /* Memotest */
     .bar{margin-top:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
     .stats{display:flex;gap:10px;flex-wrap:wrap;}
@@ -375,11 +385,16 @@
           <div class="gtitle">🟦 Tetris de Samuel</div>
           <div class="gdesc">Movés el bloque y armás una línea completa.</div>
         </button>
+
+        <button class="game" id="goPuzzle">
+          <div class="gtitle">🧩 Rompecabezas</div>
+          <div class="gdesc">Arrastrá cada pieza a su casillero. Elegí granja, cielo o transporte.</div>
+        </button>
       </div>
       <div class="soon-card">
         <div class="soon-emoji">💡</div>
         <div class="soon-title">Pronto vamos a sumar más juegos para pensar</div>
-        <div class="soon-text">Rompecabezas para Samuel llegará pronto.</div>
+        <div class="soon-text">¡Vamos a seguir sumando sorpresas para Samuel!</div>
       </div>
     </section>
 
@@ -539,6 +554,28 @@
           <button class="tetris-btn" id="tetrisDown" aria-label="Bajar rápido">⬇️</button>
           <button class="tetris-btn" id="tetrisRight" aria-label="Mover a la derecha">➡️</button>
         </div>
+      </div>
+    </section>
+
+    <!-- ROMPECABEZAS INFANTIL (Fase 18) -->
+    <section id="viewPuzzle" class="view" aria-label="Rompecabezas">
+      <div class="bar">
+        <div class="stats">
+          <div class="stat"><span id="puzzlePlaced">0</span><small>Piezas</small></div>
+        </div>
+        <div class="top-actions">
+          <span class="pill">Tema:
+            <button class="btn small" id="puzzleGranja">🐮</button>
+            <button class="btn small" id="puzzleCielo">☀️</button>
+            <button class="btn small" id="puzzleTransporte">🚗</button>
+          </span>
+          <button class="btn" id="puzzleReset">🔄 Reiniciar</button>
+          <button class="btn ghost" id="puzzleHome">⬅️ Juegos didácticos</button>
+        </div>
+      </div>
+      <div id="puzzleWin" class="win" role="status" aria-live="polite">🎉 ¡Armaste el rompecabezas, Samuel!</div>
+      <div class="puzzle-stage" id="puzzleStage">
+        <div class="puzzle-slots" id="puzzleSlots"></div>
       </div>
     </section>
 
@@ -714,6 +751,7 @@
       clasificar: document.getElementById('viewClasificar'),
       arrastrar: document.getElementById('viewArrastrar'),
       tetris: document.getElementById('viewTetris'),
+      puzzle: document.getElementById('viewPuzzle'),
       sound: document.getElementById('viewSound'),
       cars: document.getElementById('viewCars'),
       race: document.getElementById('viewRace'),
@@ -764,6 +802,8 @@
     document.getElementById('clasificarHome').addEventListener('click', () => showView('didacticos'));
     document.getElementById('arrastrarHome').addEventListener('click', () => showView('didacticos'));
     document.getElementById('tetrisHome').addEventListener('click', () => { window.__tetrisStop && window.__tetrisStop(); showView('didacticos'); });
+    document.getElementById('goPuzzle').addEventListener('click', () => { showView('puzzle'); window.__puzzleStart && window.__puzzleStart(); });
+    document.getElementById('puzzleHome').addEventListener('click', () => showView('didacticos'));
     document.getElementById('goSound').addEventListener('click', () => { showView('sound'); renderAnimals(); });
     document.getElementById('goCars').addEventListener('click', () => { showView('cars'); renderCars(); });
     document.getElementById('goRace').addEventListener('click', () => { showView('race'); resetRace(); speak('Semáforo. Verde: avanzar. Amarillo: cuidado. Rojo: parar.'); startSemaforo(); });
@@ -2536,6 +2576,207 @@
 
       window.__tetrisStart = tetrisStart;
       window.__tetrisStop = tetrisStop;
+    })();
+
+    // --- Rompecabezas infantil (Fase 18) ---
+    (function(){
+      const PUZZLE_THEMES = {
+        granja: [
+          { id:'vaca',     emoji:'🐮' },
+          { id:'gallina',  emoji:'🐔' },
+          { id:'cerdo',    emoji:'🐷' },
+          { id:'oveja',    emoji:'🐑' }
+        ],
+        cielo: [
+          { id:'sol',      emoji:'☀️' },
+          { id:'nube',     emoji:'☁️' },
+          { id:'luna',     emoji:'🌙' },
+          { id:'estrella', emoji:'⭐' }
+        ],
+        transporte: [
+          { id:'auto',  emoji:'🚗' },
+          { id:'avion', emoji:'✈️' },
+          { id:'barco', emoji:'🚢' },
+          { id:'tren',  emoji:'🚂' }
+        ]
+      };
+
+      const stage    = document.getElementById('puzzleStage');
+      const slotsEl  = document.getElementById('puzzleSlots');
+      const winEl    = document.getElementById('puzzleWin');
+      const placedEl = document.getElementById('puzzlePlaced');
+      const resetBtn = document.getElementById('puzzleReset');
+      const themeBtns = {
+        granja:      document.getElementById('puzzleGranja'),
+        cielo:       document.getElementById('puzzleCielo'),
+        transporte:  document.getElementById('puzzleTransporte')
+      };
+
+      let currentTheme = 'granja';
+      let pieces = [];
+      let slotEls = [];
+      let activePiece = null;
+
+      function updateThemeButtons(){
+        Object.keys(themeBtns).forEach(k => {
+          if (themeBtns[k]) themeBtns[k].classList.toggle('active', k === currentTheme);
+        });
+      }
+
+      function rectsOverlapCenter(elRect, zoneRect){
+        const cx = elRect.left + elRect.width/2;
+        const cy = elRect.top + elRect.height/2;
+        return cx >= zoneRect.left && cx <= zoneRect.right && cy >= zoneRect.top && cy <= zoneRect.bottom;
+      }
+
+      function shufflePuz(arr){
+        const a = arr.slice();
+        for (let i = a.length - 1; i > 0; i--){
+          const j = Math.floor(Math.random() * (i + 1));
+          [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
+      }
+
+      function clearStage(){
+        activePiece = null;
+        pieces.forEach(p => { if (p.el && p.el.parentNode) p.el.parentNode.removeChild(p.el); });
+        pieces = [];
+      }
+
+      function scatterPositions(stageRect, count){
+        const positions = [];
+        const usableWidth = Math.max(0, stageRect.width - 110);
+        const startY = Math.max(0, stageRect.height - 130);
+        for (let i = 0; i < count; i++){
+          const x = 14 + (usableWidth / Math.max(1, count - 1)) * i;
+          positions.push({ x, y: startY });
+        }
+        return positions;
+      }
+
+      function buildSlots(items){
+        slotsEl.innerHTML = '';
+        slotEls = [];
+        items.forEach(item => {
+          const s = document.createElement('div');
+          s.className = 'puzzle-slot';
+          s.textContent = item.emoji;
+          s.dataset.id = item.id;
+          slotsEl.appendChild(s);
+          slotEls.push(s);
+        });
+      }
+
+      function buildPieces(items){
+        clearStage();
+        const stageRect = stage.getBoundingClientRect();
+        const order = shufflePuz(items);
+        const positions = scatterPositions(stageRect, order.length);
+        order.forEach((item, idx) => {
+          const el = document.createElement('div');
+          el.className = 'puzzle-piece';
+          el.textContent = item.emoji;
+          el.style.left = positions[idx].x + 'px';
+          el.style.top  = positions[idx].y + 'px';
+          stage.appendChild(el);
+
+          const piece = { id: item.id, emoji: item.emoji, el, placed:false, offX:0, offY:0 };
+          el.addEventListener('pointerdown', (e) => {
+            if (piece.placed) return;
+            e.preventDefault();
+            activePiece = piece;
+            try{ el.setPointerCapture(e.pointerId); }catch(_){}
+            const r = el.getBoundingClientRect();
+            piece.offX = e.clientX - r.left;
+            piece.offY = e.clientY - r.top;
+            el.style.zIndex = 5;
+          });
+          pieces.push(piece);
+        });
+      }
+
+      window.addEventListener('pointermove', (e) => {
+        const piece = activePiece;
+        if (!piece) return;
+        const stageRect = stage.getBoundingClientRect();
+        let left = e.clientX - stageRect.left - piece.offX;
+        let top  = e.clientY - stageRect.top  - piece.offY;
+        left = Math.max(0, Math.min(stageRect.width  - piece.el.offsetWidth,  left));
+        top  = Math.max(0, Math.min(stageRect.height - piece.el.offsetHeight, top));
+        piece.el.style.left = left + 'px';
+        piece.el.style.top  = top + 'px';
+      });
+
+      window.addEventListener('pointerup', (e) => {
+        const piece = activePiece;
+        if (!piece) return;
+        activePiece = null;
+        try{ piece.el.releasePointerCapture(e.pointerId); }catch(_){}
+        piece.el.style.zIndex = '';
+
+        const elRect = piece.el.getBoundingClientRect();
+        let droppedSlot = null;
+        for (const s of slotEls){
+          if (rectsOverlapCenter(elRect, s.getBoundingClientRect())){ droppedSlot = s; break; }
+        }
+        if (!droppedSlot) return;
+
+        ensureAudio();
+        if (droppedSlot.dataset.id === piece.id && !droppedSlot.classList.contains('filled')){
+          snapIntoSlot(piece, droppedSlot);
+        } else {
+          speak('Probemos otra vez');
+          playTone({ type:'sine', f0:280, f1:220, dur:0.18, gain:0.4 });
+        }
+      });
+
+      function snapIntoSlot(piece, slotEl){
+        const slotRect = slotEl.getBoundingClientRect();
+        const stageRect = stage.getBoundingClientRect();
+        piece.el.style.left   = (slotRect.left - stageRect.left) + 'px';
+        piece.el.style.top    = (slotRect.top  - stageRect.top)  + 'px';
+        piece.el.style.width  = slotRect.width  + 'px';
+        piece.el.style.height = slotRect.height + 'px';
+        piece.el.classList.add('placed');
+        piece.placed = true;
+        slotEl.classList.add('filled');
+        playTone({ type:'sine', f0:600, f1:1000, dur:0.2, gain:0.5 });
+
+        const placedCount = pieces.filter(p => p.placed).length;
+        if (placedEl) placedEl.textContent = String(placedCount);
+
+        if (placedCount >= pieces.length){
+          if (winEl) winEl.classList.add('show');
+          addStarJ();
+          speak('¡Armaste el rompecabezas, Samuel!');
+        } else {
+          speak('¡Muy bien!');
+        }
+      }
+
+      function startPuzzle(){
+        if (winEl) winEl.classList.remove('show');
+        if (placedEl) placedEl.textContent = '0';
+        const items = PUZZLE_THEMES[currentTheme];
+        buildSlots(items);
+        updateThemeButtons();
+        requestAnimationFrame(() => buildPieces(items));
+      }
+
+      function setTheme(theme){
+        currentTheme = theme;
+        startPuzzle();
+      }
+      if (themeBtns.granja)     themeBtns.granja.addEventListener('click', () => setTheme('granja'));
+      if (themeBtns.cielo)      themeBtns.cielo.addEventListener('click', () => setTheme('cielo'));
+      if (themeBtns.transporte) themeBtns.transporte.addEventListener('click', () => setTheme('transporte'));
+      if (resetBtn) resetBtn.addEventListener('click', () => startPuzzle());
+
+      window.__puzzleStart = function(){
+        startPuzzle();
+        speak('Arrastrá cada pieza a su casillero.');
+      };
     })();
   </script>
 </body>
