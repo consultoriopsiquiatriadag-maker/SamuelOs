@@ -150,6 +150,69 @@
             gap: 10px;
         }
 
+        /* --- Misión del día / Estrellas --- */
+        .mission-bar {
+            margin: 0 40px 10px 40px;
+            padding: 12px 20px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--shadow-soft);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            flex-wrap: wrap;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        .mission-title {
+            font-weight: 900;
+            font-size: 0.95rem;
+            color: var(--text-color);
+            white-space: nowrap;
+        }
+
+        .mission-items {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .mission-item {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #999;
+            background: #F2F3F8;
+            padding: 6px 14px;
+            border-radius: 30px;
+            transition: var(--transition);
+        }
+
+        .mission-item.done {
+            color: white;
+            background: var(--color-ayuda);
+        }
+
+        .stars-badge {
+            font-size: 1.1rem;
+            font-weight: 900;
+            background: #FFF7E0;
+            padding: 8px 16px;
+            border-radius: 30px;
+            transition: transform 0.25s ease;
+            white-space: nowrap;
+        }
+
+        .stars-badge.pulse-stars {
+            transform: scale(1.15);
+        }
+
+        @media (max-width: 768px) {
+            .mission-bar { margin: 0 20px 10px 20px; padding: 10px 14px; }
+            .mission-title { font-size: 0.8rem; }
+            .mission-item { font-size: 0.75rem; padding: 5px 10px; }
+        }
+
         .btn-parents {
             background: #EEE;
             color: #999;
@@ -304,6 +367,16 @@
         <button onclick="toggleFullscreen()" class="btn-parents">📺 Pantalla Completa</button>
     </header>
 
+    <div class="mission-bar">
+        <div class="mission-title">🎯 Misión de hoy</div>
+        <div class="mission-items">
+            <span class="mission-item" id="mission-jugar">⬜ Jugar</span>
+            <span class="mission-item" id="mission-hablar">⬜ Hablar</span>
+            <span class="mission-item" id="mission-descansar">⬜ Descansar</span>
+        </div>
+        <div class="stars-badge" id="starsBadge">⭐ 0</div>
+    </div>
+
     <main>
         <button class="card card-jugar" onclick="navigate('juegos.html')">
             <span class="card-icon">🎮</span>
@@ -378,9 +451,73 @@
             oscillator.stop(context.currentTime + 0.1);
         }
 
+        // --- Gamificación (Misión del día + Estrellas) ---
+        function todayKey() {
+            const d = new Date();
+            return 'samuel_progress_' + d.toISOString().slice(0, 10);
+        }
+
+        function loadProgress() {
+            try {
+                const raw = localStorage.getItem(todayKey());
+                if (raw) return JSON.parse(raw);
+            } catch (e) {}
+            return { stars: 0, jugar: false, hablar: false, descansar: false };
+        }
+
+        function saveProgress(p) {
+            localStorage.setItem(todayKey(), JSON.stringify(p));
+        }
+
+        function addStars(n, missionKey) {
+            const p = loadProgress();
+            p.stars += n;
+            if (missionKey) p[missionKey] = true;
+            saveProgress(p);
+            updateMissionUI();
+            pulseStars();
+        }
+
+        // Detecta cambio de actividad (variedad = +2 estrellas, suma a la misión "Descansar")
+        function registerActivity(name) {
+            const last = localStorage.getItem('samuel_last_activity');
+            if (last && last !== name) {
+                addStars(2, 'descansar');
+            }
+            localStorage.setItem('samuel_last_activity', name);
+        }
+
+        function updateMissionUI() {
+            const p = loadProgress();
+            const setItem = (id, done, label) => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                el.innerText = (done ? '✅ ' : '⬜ ') + label;
+                el.classList.toggle('done', done);
+            };
+            setItem('mission-jugar', p.jugar, 'Jugar');
+            setItem('mission-hablar', p.hablar, 'Hablar');
+            setItem('mission-descansar', p.descansar, 'Descansar');
+
+            const badge = document.getElementById('starsBadge');
+            if (badge) {
+                const shown = p.stars > 0 ? '⭐'.repeat(Math.min(p.stars, 8)) + (p.stars > 8 ? ` +${p.stars - 8}` : '') : '⭐ 0';
+                badge.innerText = shown;
+            }
+        }
+
+        function pulseStars() {
+            const badge = document.getElementById('starsBadge');
+            if (!badge) return;
+            badge.classList.add('pulse-stars');
+            setTimeout(() => badge.classList.remove('pulse-stars'), 300);
+        }
+
         // --- Reproductor de Voz ---
         function say(text, emoji) {
             playTapSound();
+            registerActivity('hablar');
+            addStars(1, 'hablar');
             document.getElementById('lastText').innerText = text;
             
             const utterance = new SpeechSynthesisUtterance(text);
@@ -399,6 +536,7 @@
         // --- Audios Grabados (Parentales) ---
         function playParentalAudio(type) {
             playTapSound();
+            if (type === 'ayuda') registerActivity('ayuda');
             const audioPath = parentalAudios[type];
             const audio = new Audio(audioPath);
             
@@ -416,6 +554,10 @@
         // --- Navegación y Timer ---
         function navigate(url) {
             playTapSound();
+            if (url === 'juegos.html') {
+                registerActivity('jugar');
+                addStars(1, 'jugar');
+            }
             setTimeout(() => {
                 window.location.href = url;
             }, 200);
@@ -424,6 +566,7 @@
         function startVideoTimer() {
             // Guardamos en localStorage el inicio de la sesión de video
             localStorage.setItem('video_start_time', Date.now());
+            registerActivity('videos');
             navigate('youtube.html');
         }
 
@@ -503,6 +646,7 @@
 
         // --- Inicialización ---
         window.onload = () => {
+            updateMissionUI();
             checkVideoLimit();
             // Audio de bienvenida después de una pequeña interacción o carga
             setTimeout(() => {
