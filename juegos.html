@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#2563eb" />
   <link rel="manifest" href="./manifest.webmanifest" />
-  <title>Zona de juegos - Samuel</title>
+  <title>Centro de Juegos - Samuel</title>
   <style>
     :root{
       --bg:#f2f5f8;
@@ -60,6 +60,21 @@
     }
     .gtitle{font-size:24px;font-weight:950;letter-spacing:-.02em;}
     .gdesc{color:var(--muted);font-weight:800;line-height:1.3;font-size:16px;}
+
+    /* Centro de Juegos: tarjetas de categoría (Fase 14) */
+    .hub-card{ border-bottom: 10px solid var(--hub-color, #2563eb); }
+    .hub-card .gtitle{ display:flex; align-items:center; gap:10px; }
+    .hub-card .gicon{ font-size:40px; line-height:1; }
+    .hub-simples{ --hub-color:#2563eb; }
+    .hub-didacticos{ --hub-color:#7c3aed; }
+    .hub-fichas{ --hub-color:#f59e0b; }
+    .hub-comunicacion{ --hub-color:#0ea5a4; }
+    .hub-historias{ --hub-color:#ec4899; }
+
+    .soon-card{ margin-top:18px; border:2px solid rgba(15,23,42,.14); border-radius:18px; background:var(--card); box-shadow:var(--shadow); padding:30px 22px; text-align:center; }
+    .soon-emoji{ font-size:64px; margin-bottom:8px; }
+    .soon-title{ font-size:22px; font-weight:950; margin-bottom:6px; }
+    .soon-text{ color:var(--muted); font-weight:800; }
 
     /* Memotest */
     .bar{margin-top:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
@@ -184,8 +199,8 @@
       <div class="brand">
         <div class="avatar"><img src="./samuel-avatar.png" alt="Samuel"></div>
         <div>
-          <h1>Zona de juegos</h1>
-          <div class="hint">Juegos simples, sin internet (offline). Tocá para jugar.</div>
+          <h1>Centro de Juegos</h1>
+          <div class="hint">Elegí una categoría para jugar y aprender.</div>
         </div>
       </div>
       <div class="top-actions">
@@ -193,14 +208,42 @@
       </div>
     </header>
 
-    <!-- HOME -->
-    <section id="viewHome" class="view active" aria-label="Inicio">
+    <!-- HOME: Centro de Juegos y Aprendizaje -->
+    <section id="viewHome" class="view active" aria-label="Centro de juegos">
       <div class="grid">
-        <button class="game" id="goMemo">
-          <div class="gtitle">🧠 Memotest</div>
-          <div class="gdesc">Encontrá las parejas. Atención y memoria.</div>
+        <button class="game hub-card hub-simples" id="goSimples">
+          <div class="gtitle"><span class="gicon">🎮</span>Juegos simples</div>
+          <div class="gdesc">Tocar, sonidos y diversión sin reglas complicadas.</div>
         </button>
 
+        <button class="game hub-card hub-didacticos" id="goDidacticos">
+          <div class="gtitle"><span class="gicon">🧠</span>Juegos didácticos</div>
+          <div class="gdesc">Memoria, atención y aprendizaje jugando.</div>
+        </button>
+
+        <button class="game hub-card hub-fichas" id="goFichas">
+          <div class="gtitle"><span class="gicon">📚</span>Fichas de aprendizaje</div>
+          <div class="gdesc">Animales, vehículos, emociones y más.</div>
+        </button>
+
+        <button class="game hub-card hub-comunicacion" id="goComunicacion">
+          <div class="gtitle"><span class="gicon">🗣️</span>Comunicación</div>
+          <div class="gdesc">Frases para decir lo que necesito.</div>
+        </button>
+
+        <button class="game hub-card hub-historias" id="goHistorias">
+          <div class="gtitle"><span class="gicon">📖</span>Historias sociales</div>
+          <div class="gdesc">Para entender los momentos del día.</div>
+        </button>
+      </div>
+    </section>
+
+    <!-- JUEGOS SIMPLES -->
+    <section id="viewSimples" class="view" aria-label="Juegos simples">
+      <div class="top-actions" style="margin-bottom:6px;">
+        <button class="btn ghost" id="simplesHome">⬅️ Centro de juegos</button>
+      </div>
+      <div class="grid">
         <button class="game" id="goSound">
           <div class="gtitle">🐶 Tocar y escuchar</div>
           <div class="gdesc">Tocás un animal y suena. Muy motivante.</div>
@@ -220,11 +263,60 @@
           <div class="gtitle">🛣️ Esquivar en la calle</div>
           <div class="gdesc">Esquivá objetos por 30 segundos. Atención y seguridad vial.</div>
         </button>
+      </div>
+    </section>
 
-        <button class="game" id="goBack" onclick="location.href='./child.html'">
-          <div class="gtitle">🏠 Volver a la app</div>
-          <div class="gdesc">Regresar a los botones de comunicación.</div>
+    <!-- JUEGOS DIDÁCTICOS -->
+    <section id="viewDidacticos" class="view" aria-label="Juegos didácticos">
+      <div class="top-actions" style="margin-bottom:6px;">
+        <button class="btn ghost" id="didacticosHome">⬅️ Centro de juegos</button>
+      </div>
+      <div class="grid">
+        <button class="game" id="goMemo">
+          <div class="gtitle">🧠 Memotest</div>
+          <div class="gdesc">Encontrá las parejas. Atención y memoria.</div>
         </button>
+      </div>
+      <div class="soon-card">
+        <div class="soon-emoji">💡</div>
+        <div class="soon-title">Pronto vamos a sumar más juegos para pensar</div>
+        <div class="soon-text">Asociación, rompecabezas y más actividades llegarán pronto.</div>
+      </div>
+    </section>
+
+    <!-- FICHAS DE APRENDIZAJE (contenido completo en una fase futura) -->
+    <section id="viewFichas" class="view" aria-label="Fichas de aprendizaje">
+      <div class="top-actions" style="margin-bottom:6px;">
+        <button class="btn ghost" id="fichasHome">⬅️ Centro de juegos</button>
+      </div>
+      <div class="soon-card">
+        <div class="soon-emoji">📚</div>
+        <div class="soon-title">Fichas de aprendizaje</div>
+        <div class="soon-text">Muy pronto vamos a tener nuevas fichas para aprender 💛</div>
+      </div>
+    </section>
+
+    <!-- COMUNICACIÓN (contenido completo en una fase futura) -->
+    <section id="viewComunicacion" class="view" aria-label="Comunicación">
+      <div class="top-actions" style="margin-bottom:6px;">
+        <button class="btn ghost" id="comunicacionHome">⬅️ Centro de juegos</button>
+      </div>
+      <div class="soon-card">
+        <div class="soon-emoji">🗣️</div>
+        <div class="soon-title">Comunicación</div>
+        <div class="soon-text">Muy pronto vamos a tener nuevas frases acá 💛</div>
+      </div>
+    </section>
+
+    <!-- HISTORIAS SOCIALES (contenido completo en una fase futura) -->
+    <section id="viewHistorias" class="view" aria-label="Historias sociales">
+      <div class="top-actions" style="margin-bottom:6px;">
+        <button class="btn ghost" id="historiasHome">⬅️ Centro de juegos</button>
+      </div>
+      <div class="soon-card">
+        <div class="soon-emoji">📖</div>
+        <div class="soon-title">Historias sociales</div>
+        <div class="soon-text">Muy pronto vamos a tener nuevas historias acá 💛</div>
       </div>
     </section>
 
@@ -409,6 +501,11 @@
     // --- Views ---
     const views = {
       home: document.getElementById('viewHome'),
+      simples: document.getElementById('viewSimples'),
+      didacticos: document.getElementById('viewDidacticos'),
+      fichas: document.getElementById('viewFichas'),
+      comunicacion: document.getElementById('viewComunicacion'),
+      historias: document.getElementById('viewHistorias'),
       memo: document.getElementById('viewMemo'),
       sound: document.getElementById('viewSound'),
       cars: document.getElementById('viewCars'),
@@ -424,17 +521,29 @@
       window.scrollTo({ top: 0, behavior: 'instant' });
     }
 
+    document.getElementById('goSimples').addEventListener('click', () => { showView('simples'); speak('Juegos simples.'); });
+    document.getElementById('goDidacticos').addEventListener('click', () => { showView('didacticos'); speak('Juegos didácticos.'); });
+    document.getElementById('goFichas').addEventListener('click', () => { showView('fichas'); speak('Fichas de aprendizaje. Muy pronto.'); });
+    document.getElementById('goComunicacion').addEventListener('click', () => { showView('comunicacion'); speak('Comunicación. Muy pronto.'); });
+    document.getElementById('goHistorias').addEventListener('click', () => { showView('historias'); speak('Historias sociales. Muy pronto.'); });
+
+    document.getElementById('simplesHome').addEventListener('click', () => showView('home'));
+    document.getElementById('didacticosHome').addEventListener('click', () => showView('home'));
+    document.getElementById('fichasHome').addEventListener('click', () => showView('home'));
+    document.getElementById('comunicacionHome').addEventListener('click', () => showView('home'));
+    document.getElementById('historiasHome').addEventListener('click', () => showView('home'));
+
     document.getElementById('goMemo').addEventListener('click', () => { showView('memo'); startMemo(currentPairs); });
     document.getElementById('goSound').addEventListener('click', () => { showView('sound'); renderAnimals(); });
     document.getElementById('goCars').addEventListener('click', () => { showView('cars'); renderCars(); });
     document.getElementById('goRace').addEventListener('click', () => { showView('race'); resetRace(); speak('Semáforo. Verde: avanzar. Amarillo: cuidado. Rojo: parar.'); startSemaforo(); });
     document.getElementById('goDrive').addEventListener('click', () => { showView('drive'); driveReset(); speak('Esquivar en la calle. Mové el auto para esquivar objetos.'); });
 
-    document.getElementById('memoHome').addEventListener('click', () => showView('home'));
-    document.getElementById('soundHome').addEventListener('click', () => showView('home'));
-    document.getElementById('carHome').addEventListener('click', () => showView('home'));
-    document.getElementById('raceHome').addEventListener('click', () => showView('home'));
-    document.getElementById('driveHome').addEventListener('click', () => showView('home'));
+    document.getElementById('memoHome').addEventListener('click', () => showView('didacticos'));
+    document.getElementById('soundHome').addEventListener('click', () => showView('simples'));
+    document.getElementById('carHome').addEventListener('click', () => showView('simples'));
+    document.getElementById('raceHome').addEventListener('click', () => showView('simples'));
+    document.getElementById('driveHome').addEventListener('click', () => showView('simples'));
 
     // --- Shared speech helpers ---
     function speak(text){
