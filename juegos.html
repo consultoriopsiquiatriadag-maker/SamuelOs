@@ -1,0 +1,1571 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#2563eb" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <title>Zona de juegos - Samuel</title>
+  <style>
+    :root{
+      --bg:#f2f5f8;
+      --card:#ffffff;
+      --stroke:#e5e7eb;
+      --shadow: 0 16px 34px rgba(2,6,23,.14);
+      --blue:#2563eb;
+      --text:#0f172a;
+      --muted:#475569;
+      --ok:#16a34a;
+      --warn:#f59e0b;
+    }
+    *{box-sizing:border-box;}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial; background:var(--bg); color:var(--text);}
+    .shell{max-width:1120px;margin:0 auto;padding:18px 18px 26px;}
+
+    header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+    .brand{display:flex;align-items:center;gap:14px;}
+    .avatar{width:64px;height:64px;border-radius:999px;background:#fff;border:2px solid var(--stroke);box-shadow:0 10px 20px rgba(2,6,23,.08);overflow:hidden;display:flex;align-items:center;justify-content:center;flex:0 0 auto;}
+    .avatar img{width:100%;height:100%;object-fit:cover;}
+    h1{margin:0;font-size:28px;letter-spacing:-.02em;}
+    .hint{margin-top:6px;color:var(--muted);font-weight:750;}
+
+    .top-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+    .btn{border:2px solid rgba(15,23,42,.12); background:#fff; padding:12px 16px; border-radius:16px; font-weight:900; cursor:pointer; text-decoration:none; color:var(--text); display:inline-flex; align-items:center; gap:10px; box-shadow:0 14px 28px rgba(2,6,23,.10);}
+    .btn.primary{background:var(--blue); color:#fff; border-color:transparent;}
+    .btn.ghost{background:transparent; box-shadow:none;}
+    .btn.small{padding:10px 12px;border-radius:14px;font-weight:900;}
+    .pill{display:inline-flex;align-items:center;gap:8px;border:2px solid rgba(15,23,42,.12);background:#fff;padding:10px 12px;border-radius:999px;font-weight:900;}
+
+    .view{display:none;}
+    .view.active{display:block;}
+
+    /* Home cards */
+    .grid{margin-top:18px;display:grid;gap:18px;grid-template-columns:repeat(3,1fr);}
+    @media (max-width: 920px){ .grid{grid-template-columns:repeat(2,1fr);} }
+    @media (max-width: 600px){ .grid{grid-template-columns:1fr;} }
+
+    .game{
+      border:2px solid rgba(15,23,42,.14);
+      border-radius:18px;
+      background:var(--card);
+      box-shadow:var(--shadow);
+      padding:18px;
+      min-height:140px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      gap:10px;
+      cursor:pointer;
+      text-align:left;
+    }
+    .gtitle{font-size:24px;font-weight:950;letter-spacing:-.02em;}
+    .gdesc{color:var(--muted);font-weight:800;line-height:1.3;font-size:16px;}
+
+    /* Memotest */
+    .bar{margin-top:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+    .stats{display:flex;gap:10px;flex-wrap:wrap;}
+    .stat{background:#fff;border:2px solid rgba(15,23,42,.12);border-radius:16px;padding:10px 12px;font-weight:950;box-shadow:0 10px 18px rgba(2,6,23,.06);}
+    .stat small{display:block;color:var(--muted);font-weight:800;margin-top:2px;}
+
+    .board{margin-top:16px;display:grid;gap:14px;grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));}
+    @media (max-width: 600px){ .board{gap:12px;} }
+
+    .card{
+      border:2px solid rgba(15,23,42,.16);
+      border-radius:18px;
+      background:#fff;
+      min-height:132px;
+      box-shadow:0 18px 30px rgba(2,6,23,.10);
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      position:relative;
+      overflow:hidden;
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .card:active{transform:scale(.99);}
+    .card.back{background:linear-gradient(135deg, rgba(37,99,235,.12), rgba(14,34,57,.06));}
+    .card.revealed{border-color:rgba(37,99,235,.55)}
+    .card.matched{border-color:rgba(22,163,74,.75); box-shadow:0 18px 30px rgba(22,163,74,.12)}
+
+    .face{display:flex;flex-direction:column;align-items:center;gap:10px;padding:14px;text-align:center;}
+    .emoji{font-size:56px;line-height:1;}
+    .label{font-size:20px;font-weight:950;letter-spacing:-.01em;}
+    .qmark{font-size:56px;font-weight:950;color:rgba(15,23,42,.50);}
+
+    .win{margin-top:16px;border:2px solid rgba(22,163,74,.40);background:rgba(22,163,74,.10);border-radius:18px;padding:14px;font-weight:950;display:none;}
+    .win.show{display:block;}
+
+    /* Sonidos */
+    .sound-grid{margin-top:16px;display:grid;gap:14px;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));}
+    .sound{
+      border:2px solid rgba(15,23,42,.16);
+      border-radius:18px;
+      background:#fff;
+      min-height:150px;
+      box-shadow:0 18px 30px rgba(2,6,23,.10);
+      cursor:pointer;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      padding:16px;
+      text-align:center;
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .sound:active{transform:scale(.99);}
+    .sound .emoji{font-size:64px;}
+    .sound .label{font-size:22px;}
+
+    .now{margin-top:14px;background:#fff;border:2px solid rgba(15,23,42,.12);border-radius:18px;padding:14px;box-shadow:0 12px 22px rgba(2,6,23,.08);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+    .now strong{font-size:20px;}
+    .now small{display:block;color:var(--muted);font-weight:800;margin-top:4px;}
+
+    /* Carrera de toques */
+    .race-shell{margin-top:16px;display:grid;gap:14px;}
+    .race-card{background:#fff;border:2px solid rgba(15,23,42,.12);border-radius:18px;padding:14px;box-shadow:0 12px 22px rgba(2,6,23,.08);}
+    .race-title{font-size:22px;font-weight:950;}
+    .race-sub{color:var(--muted);font-weight:850;margin-top:6px;}
+    .sema-wrap{margin-top:12px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+    .sema-box{display:flex;align-items:center;gap:12px;}
+    .sema{width:76px;height:34px;border-radius:999px;background:rgba(15,23,42,.06);border:2px solid rgba(15,23,42,.12);display:flex;align-items:center;justify-content:space-evenly;padding:0 10px;}
+    .light{width:18px;height:18px;border-radius:999px;opacity:.22;box-shadow:inset 0 0 0 2px rgba(0,0,0,.12);}
+    .light.red{background:#ef4444;}
+    .light.yellow{background:#f59e0b;}
+    .light.green{background:#22c55e;}
+    .light.on{opacity:1;box-shadow:0 0 0 4px rgba(0,0,0,.06), 0 0 18px rgba(0,0,0,.12);}
+    .sema-text{font-weight:950;}
+    .sema-text small{display:block;font-weight:850;color:var(--muted);margin-top:2px;}
+    .tap-btn.disabled{opacity:.55;filter:grayscale(.15);cursor:not-allowed;}
+
+    .race-vehicles{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;}
+    .race-veh{border:2px solid rgba(15,23,42,.14);background:rgba(15,23,42,.03);border-radius:14px;padding:10px 12px;min-width:92px;display:flex;align-items:center;justify-content:center;gap:10px;font-weight:950;cursor:pointer;user-select:none;}
+    .race-veh .ico{font-size:28px;}
+    .race-veh.active{border-color:rgba(37,99,235,.55);box-shadow:0 10px 18px rgba(37,99,235,.15);background:rgba(37,99,235,.08);}
+    .track{margin-top:12px;position:relative;height:92px;border-radius:18px;background:linear-gradient(180deg, rgba(15,23,42,.06), rgba(15,23,42,.02));border:2px solid rgba(15,23,42,.10);overflow:hidden;}
+    .finish{position:absolute;right:14px;top:10px;bottom:10px;width:10px;background:repeating-linear-gradient(90deg,#111 0 6px,#fff 6px 12px);border-radius:10px;opacity:.75;}
+    .car{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:64px;transition:left .07s ease-out;filter:drop-shadow(0 12px 16px rgba(2,6,23,.15));}
+    .race-progress{margin-top:10px;display:flex;align-items:center;gap:10px;}
+    .race-bar{flex:1;height:14px;border-radius:999px;background:rgba(15,23,42,.08);overflow:hidden;border:2px solid rgba(15,23,42,.10);}
+    .race-bar > div{height:100%;width:0%;background:linear-gradient(90deg, rgba(37,99,235,.85), rgba(16,185,129,.85));transition:width .12s ease-out;}
+    .race-pct{min-width:64px;text-align:right;font-weight:950;}
+    .tap-btn{width:100%;min-height:150px;border-radius:16px;border:2px solid rgba(15,23,42,.16);background:linear-gradient(135deg, rgba(37,99,235,.16), rgba(245,158,11,.12));box-shadow:0 18px 30px rgba(2,6,23,.10);font-size:34px;font-weight:950;cursor:pointer;}
+    .tap-btn:active{transform:scale(.99);}
+
+    .confetti{pointer-events:none;position:fixed;inset:0;overflow:hidden;display:none;}
+    .confetti.show{display:block;}
+    .confetti i{position:absolute;top:-10px;width:10px;height:16px;border-radius:4px;opacity:.9;transform:translateY(0) rotate(0deg);animation:fall 1.8s linear forwards;}
+    @keyframes fall{to{transform:translateY(110vh) rotate(360deg);opacity:0.9;}}
+
+
+    /* Esquivar en la calle (canvas) */
+    .drive-wrap{position:relative;border-radius:18px;overflow:hidden;border:2px solid rgba(15,23,42,.10);background:linear-gradient(180deg, rgba(15,23,42,.03), rgba(15,23,42,.01));box-shadow:0 16px 26px rgba(2,6,23,.10);}
+    .drive-canvas{display:block;width:100%;height:auto;touch-action:none;background:linear-gradient(180deg, #dbeafe 0%, #f8fafc 38%, #eef2f7 100%);}
+    .drive-hud{position:absolute;left:12px;right:12px;top:12px;display:flex;align-items:center;justify-content:space-between;gap:10px;pointer-events:none;}
+    .drive-pill{pointer-events:none;background:rgba(255,255,255,.92);border:2px solid rgba(15,23,42,.12);border-radius:999px;padding:10px 14px;font-weight:950;box-shadow:0 10px 18px rgba(2,6,23,.10);}
+    #driveRepeat{pointer-events:auto;}
+    .drive-touch{position:absolute;inset:0;display:grid;grid-template-columns:1fr 1fr;opacity:0;}
+    .drive-touch-left,.drive-touch-right{cursor:pointer;}
+    @media (hover:none){
+      .drive-touch{opacity:0;} /* mantenemos invisible */
+    }
+
+    /* Accessibility */
+    :focus-visible{outline:4px solid rgba(37,99,235,.35); outline-offset:3px;}
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <div class="brand">
+        <div class="avatar"><img src="./samuel-avatar.png" alt="Samuel"></div>
+        <div>
+          <h1>Zona de juegos</h1>
+          <div class="hint">Juegos simples, sin internet (offline). Tocá para jugar.</div>
+        </div>
+      </div>
+      <div class="top-actions">
+        <a class="btn primary" href="./child.html">⬅️ Volver</a>
+      </div>
+    </header>
+
+    <!-- HOME -->
+    <section id="viewHome" class="view active" aria-label="Inicio">
+      <div class="grid">
+        <button class="game" id="goMemo">
+          <div class="gtitle">🧠 Memotest</div>
+          <div class="gdesc">Encontrá las parejas. Atención y memoria.</div>
+        </button>
+
+        <button class="game" id="goSound">
+          <div class="gtitle">🐶 Tocar y escuchar</div>
+          <div class="gdesc">Tocás un animal y suena. Muy motivante.</div>
+        </button>
+
+        <button class="game" id="goCars">
+          <div class="gtitle">🚗 Autos y sirenas</div>
+          <div class="gdesc">Vehículos: motor, bocina, sirenas. Tocá y escuchá.</div>
+        </button>
+
+        <button class="game" id="goRace">
+          <div class="gtitle">🏁 Carrera de toques</div>
+          <div class="gdesc">Tocá muchas veces para que el auto llegue a la meta.</div>
+        </button>
+
+        <button class="game" id="goDrive">
+          <div class="gtitle">🛣️ Esquivar en la calle</div>
+          <div class="gdesc">Esquivá objetos por 30 segundos. Atención y seguridad vial.</div>
+        </button>
+
+        <button class="game" id="goBack" onclick="location.href='./child.html'">
+          <div class="gtitle">🏠 Volver a la app</div>
+          <div class="gdesc">Regresar a los botones de comunicación.</div>
+        </button>
+      </div>
+    </section>
+
+    <!-- MEMOTEST -->
+    <section id="viewMemo" class="view" aria-label="Memotest">
+      <div class="bar">
+        <div class="stats">
+          <div class="stat"><span id="memoPairs">6</span><small>Pares</small></div>
+          <div class="stat"><span id="memoMoves">0</span><small>Intentos</small></div>
+          <div class="stat"><span id="memoHits">0</span><small>Aciertos</small></div>
+        </div>
+
+        <div class="top-actions">
+          <span class="pill">Nivel:
+            <button class="btn small" id="lvl6">6</button>
+            <button class="btn small" id="lvl8">8</button>
+            <button class="btn small" id="lvl10">10</button>
+          </span>
+          <button class="btn" id="memoReset">🔄 Reiniciar</button>
+          <button class="btn ghost" id="memoHome">⬅️ Juegos</button>
+        </div>
+      </div>
+
+      <div id="memoWin" class="win" role="status" aria-live="polite">🎉 ¡Excelente, Samuel! Encontraste todas las parejas.</div>
+      <div id="memoBoard" class="board" aria-label="Tablero memotest"></div>
+    </section>
+
+    <!-- SONIDOS ANIMALES -->
+    <section id="viewSound" class="view" aria-label="Tocar y escuchar">
+      <div class="bar">
+        <div class="stats">
+          <div class="stat"><span>🎧</span><small>Sonidos</small></div>
+          <div class="stat"><span>👆</span><small>Tocá un animal</small></div>
+        </div>
+        <div class="top-actions">
+          <button class="btn" id="soundStop">⏹️ Detener</button>
+          <button class="btn ghost" id="soundHome">⬅️ Juegos</button>
+        </div>
+      </div>
+
+      <div class="now" aria-live="polite">
+        <div>
+          <strong id="nowTitle">Listo</strong>
+          <small id="nowDesc">Tocá un animal para escuchar.</small>
+        </div>
+        <button class="btn primary" id="soundSpeak">🔊 Repetir</button>
+      </div>
+
+      <div id="soundGrid" class="sound-grid" aria-label="Animales"></div>
+    </section>
+
+    <!-- AUTOS -->
+    <section id="viewCars" class="view" aria-label="Autos y sirenas">
+      <div class="bar">
+        <div class="stats">
+          <div class="stat"><span>🚗</span><small>Vehículos</small></div>
+          <div class="stat"><span>👆</span><small>Tocá y escuchá</small></div>
+        </div>
+        <div class="top-actions">
+          <button class="btn" id="carStop">⏹️ Detener</button>
+          <button class="btn ghost" id="carHome">⬅️ Juegos</button>
+        </div>
+      </div>
+
+      <div class="now" aria-live="polite">
+        <div>
+          <strong id="carNowTitle">Listo</strong>
+          <small id="carNowDesc">Tocá un vehículo para escuchar.</small>
+        </div>
+        <button class="btn primary" id="carSpeak">🔊 Repetir</button>
+      </div>
+
+      <div id="carGrid" class="sound-grid" aria-label="Vehículos"></div>
+    </section>
+
+    <!-- CARRERA DE TOQUES -->
+    <section id="viewRace" class="view" aria-label="Carrera de toques">
+      <div class="bar">
+        <div class="stats">
+          <div class="stat"><span id="raceTaps">0</span><small>Toques</small></div>
+          <div class="stat"><span id="raceGoal">25</span><small>Meta</small></div>
+        </div>
+        <div class="top-actions">
+          <span class="pill">Dificultad:
+            <button class="btn small" id="raceEasy">15</button>
+            <button class="btn small" id="raceMed">25</button>
+            <button class="btn small" id="raceHard">40</button>
+          </span>
+          <button class="btn" id="raceReset">🔄 Reiniciar</button>
+          <button class="btn ghost" id="raceHome">⬅️ Juegos</button>
+        </div>
+      </div>
+
+      <div class="race-shell">
+        <div class="race-card">
+          <div class="race-title">🏁 Carrera de toques</div>
+          <div class="race-sub" id="raceHint">Tocá solo cuando el semáforo está en VERDE para que el vehículo avance.</div>
+          <div class="sema-wrap" aria-label="Semáforo">
+            <div class="sema-box">
+              <div class="sema" role="img" aria-label="Semáforo">
+                <div class="light red" id="lightRed"></div>
+                <div class="light yellow" id="lightYellow"></div>
+                <div class="light green on" id="lightGreen"></div>
+              </div>
+              <div class="sema-text" id="semaText">Verde: avanzar
+                <small id="semaSub">Solo tocá para avanzar cuando está verde.</small>
+              </div>
+            </div>
+          </div>
+          <div class="race-vehicles" aria-label="Elegir vehículo">
+            <button class="race-veh active" id="rvAuto" type="button"><span class="ico">🚗</span>Auto</button>
+            <button class="race-veh" id="rvCarrera" type="button"><span class="ico">🏎️</span>Carrera</button>
+            <button class="race-veh" id="rvColectivo" type="button"><span class="ico">🚌</span>Colectivo</button>
+            <button class="race-veh" id="rvCamion" type="button"><span class="ico">🚚</span>Camión</button>
+            <button class="race-veh" id="rvMoto" type="button"><span class="ico">🏍️</span>Moto</button>
+          </div>
+          <div class="track" aria-label="Pista">
+            <div class="finish" aria-hidden="true"></div>
+            <div class="car" id="raceCar" aria-hidden="true">🚗</div>
+          </div>
+          <div class="race-progress" aria-label="Progreso">
+            <div class="race-bar" aria-hidden="true"><div id="raceBar"></div></div>
+            <div class="race-pct" id="racePct">0%</div>
+          </div>
+        </div>
+
+        <button class="tap-btn" id="raceTapBtn" aria-label="Tocar para avanzar">👆 TOCAR</button>
+        <div id="raceWin" class="win" role="status" aria-live="polite">🎉 ¡Ganaste, Samuel! ¡Excelente!</div>
+      </div>
+    </section>
+
+    <!-- ESQUIVAR EN LA CALLE (30s) -->
+    <section id="viewDrive" class="view" aria-label="Esquivar en la calle">
+      <div class="bar">
+        <div class="stats">
+          <div class="stat"><span id="driveTime">30</span><small>Segundos</small></div>
+          <div class="stat"><span id="driveScore">0</span><small>Esquivados</small></div>
+          <div class="stat"><span id="driveHits">0</span><small>Golpes</small></div>
+        </div>
+
+        <div class="top-actions">
+          <button class="btn primary" id="driveStart">▶️ Empezar</button>
+          <button class="btn" id="driveReset">🔄 Reiniciar</button>
+          <button class="btn ghost" id="driveHome">⬅️ Juegos</button>
+        </div>
+      </div>
+
+      <div class="race-card" style="margin-top:14px;">
+        <div class="race-title">🛣️ Esquivar en la calle</div>
+        <div class="race-sub">Mové el auto a izquierda/derecha para esquivar objetos durante 30 segundos.</div>
+
+        <div class="drive-wrap" style="margin-top:12px;">
+          <canvas id="driveCanvas" class="drive-canvas" width="900" height="520" aria-label="Juego de esquivar"></canvas>
+          <div class="drive-hud">
+            <div class="drive-pill" id="driveCue">Listo</div>
+            <button class="btn small" id="driveRepeat">🔊 Repetir</button>
+          </div>
+
+          <!-- Zonas grandes para tocar (tablet) -->
+          <div class="drive-touch" aria-hidden="true">
+            <div class="drive-touch-left" title="Izquierda"></div>
+            <div class="drive-touch-right" title="Derecha"></div>
+          </div>
+        </div>
+
+        <div id="driveEnd" class="win" role="status" aria-live="polite" style="margin-top:14px;">
+          ⏱️ Terminó el tiempo. ¡Muy bien!
+        </div>
+      </div>
+    </section>
+
+
+    <div class="confetti" id="confetti" aria-hidden="true"></div>
+  </div>
+
+  <script>
+    // --- SW ---
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw-aac.js');
+    }
+
+    // --- Views ---
+    const views = {
+      home: document.getElementById('viewHome'),
+      memo: document.getElementById('viewMemo'),
+      sound: document.getElementById('viewSound'),
+      cars: document.getElementById('viewCars'),
+      race: document.getElementById('viewRace'),
+      drive: document.getElementById('viewDrive')
+    };
+    function showView(key){
+      // detener juegos con loops/timers
+      try{ if (window.__driveStop) window.__driveStop(); }catch(e){}
+      try{ if (window.__raceStop) window.__raceStop(); }catch(e){} 
+      Object.values(views).forEach(v => v.classList.remove('active'));
+      views[key].classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }
+
+    document.getElementById('goMemo').addEventListener('click', () => { showView('memo'); startMemo(currentPairs); });
+    document.getElementById('goSound').addEventListener('click', () => { showView('sound'); renderAnimals(); });
+    document.getElementById('goCars').addEventListener('click', () => { showView('cars'); renderCars(); });
+    document.getElementById('goRace').addEventListener('click', () => { showView('race'); resetRace(); speak('Semáforo. Verde: avanzar. Amarillo: cuidado. Rojo: parar.'); startSemaforo(); });
+    document.getElementById('goDrive').addEventListener('click', () => { showView('drive'); driveReset(); speak('Esquivar en la calle. Mové el auto para esquivar objetos.'); });
+
+    document.getElementById('memoHome').addEventListener('click', () => showView('home'));
+    document.getElementById('soundHome').addEventListener('click', () => showView('home'));
+    document.getElementById('carHome').addEventListener('click', () => showView('home'));
+    document.getElementById('raceHome').addEventListener('click', () => showView('home'));
+    document.getElementById('driveHome').addEventListener('click', () => showView('home'));
+
+    // --- Shared speech helpers ---
+    function speak(text){
+      try{
+        window.speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(text);
+        const voices = window.speechSynthesis.getVoices?.() || [];
+        const es = voices.find(v => /es/i.test(v.lang)) || voices.find(v => /spanish/i.test(v.name)) || voices[0];
+        if (es) u.voice = es;
+        u.rate = 0.95;
+        u.pitch = 1.05;
+        u.volume = 1;
+        window.speechSynthesis.speak(u);
+      }catch(e){/* ignore */}
+    }
+
+    // --- Audio engine ---
+    let audioCtx = null;
+    let currentNodes = [];
+    const bufferCache = new Map(); // url -> AudioBuffer
+
+    const CLIP_SECONDS = 4.0;      // duración fija
+    const FADE_IN = 0.18;          // segundos
+    const FADE_OUT = 0.35;         // segundos
+
+    function decodeAudio(ctx, arrayBuffer){
+      return new Promise((resolve, reject) => {
+        try{
+          ctx.decodeAudioData(arrayBuffer, resolve, reject);
+        }catch(e){ reject(e); }
+      });
+    }
+
+    async function getBuffer(url){
+      if (bufferCache.has(url)) return bufferCache.get(url);
+      const res = await fetch(url, { cache: 'no-cache' });
+      if (!res.ok) throw new Error('Audio not found: ' + url);
+      const arr = await res.arrayBuffer();
+      const buf = await decodeAudio(audioCtx, arr);
+      bufferCache.set(url, buf);
+      return buf;
+    }
+
+    // Reproduce un mp3 por 4s con fade in/out. Devuelve true si pudo.
+    async function playMp3Clip(url){
+      if (!audioCtx) return false;
+      const t0 = audioCtx.currentTime + 0.02;
+
+      const out = audioCtx.createGain();
+      out.gain.setValueAtTime(0.0001, t0);
+      out.gain.linearRampToValueAtTime(1.0, t0 + FADE_IN);
+      out.gain.setValueAtTime(1.0, t0 + Math.max(FADE_IN, CLIP_SECONDS - FADE_OUT));
+      out.gain.linearRampToValueAtTime(0.0001, t0 + CLIP_SECONDS);
+      out.connect(audioCtx.destination);
+
+      try{
+        const buf = await getBuffer(url);
+        const src = audioCtx.createBufferSource();
+        src.buffer = buf;
+        src.connect(out);
+        src.start(t0);
+        src.stop(t0 + CLIP_SECONDS);
+        currentNodes.push(src, out);
+        return true;
+      }catch(e){
+        try{ out.disconnect(); }catch(_){}
+        return false;
+      }
+    }
+
+    function ensureAudio(){
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return null;
+      if (!audioCtx) audioCtx = new AC();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      return audioCtx;
+    }
+
+    function stopAll(){
+      try{ window.speechSynthesis.cancel(); }catch(e){}
+      currentNodes.forEach(n => { try{ n.stop?.(); }catch(e){} try{ n.disconnect?.(); }catch(e){} });
+      currentNodes = [];
+    }
+
+    function mkNoise(dur){
+      const bufferSize = Math.floor(audioCtx.sampleRate * dur);
+      const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i=0;i<bufferSize;i++) data[i] = (Math.random()*2-1);
+      const src = audioCtx.createBufferSource();
+      src.buffer = buffer;
+      return src;
+    }
+
+    function env(gainNode, start, dur){
+      gainNode.gain.setValueAtTime(0.0001, start);
+      gainNode.gain.exponentialRampToValueAtTime(1.0, start + 0.02);
+      gainNode.gain.exponentialRampToValueAtTime(0.0001, start + dur);
+    }
+
+    function playTone({type='sine', f0=440, f1=null, dur=0.3, gain=0.85}){
+      if (!audioCtx) return;
+      const t0 = audioCtx.currentTime + 0.02;
+      const out = audioCtx.createGain();
+      out.gain.value = gain;
+      out.connect(audioCtx.destination);
+      currentNodes.push(out);
+
+      const o = audioCtx.createOscillator();
+      o.type = type;
+      o.frequency.setValueAtTime(f0, t0);
+      if (f1) o.frequency.exponentialRampToValueAtTime(f1, t0 + dur);
+
+      const g = audioCtx.createGain();
+      env(g, t0, dur);
+      o.connect(g); g.connect(out);
+      o.start(t0); o.stop(t0 + dur);
+      currentNodes.push(o,g);
+    }
+
+    // --- MEMOTEST ---
+    const memoBoard = document.getElementById('memoBoard');
+    const memoPairsEl = document.getElementById('memoPairs');
+    const memoMovesEl = document.getElementById('memoMoves');
+    const memoHitsEl  = document.getElementById('memoHits');
+    const memoWinEl   = document.getElementById('memoWin');
+
+    const icons = [
+      { id:'dog',   emoji:'🐶', label:'Perro' },
+      { id:'cat',   emoji:'🐱', label:'Gato' },
+      { id:'cow',   emoji:'🐮', label:'Vaca' },
+      { id:'bird',  emoji:'🐦', label:'Pájaro' },
+      { id:'car',   emoji:'🚗', label:'Auto' },
+      { id:'bus',   emoji:'🚌', label:'Colectivo' },
+      { id:'truck', emoji:'🚚', label:'Camión' },
+      { id:'moto',  emoji:'🏍️', label:'Moto' },
+      { id:'star',  emoji:'⭐', label:'Estrella' },
+      { id:'train', emoji:'🚂', label:'Tren' },
+      { id:'fish',  emoji:'🐟', label:'Pez' },
+      { id:'plane', emoji:'✈️', label:'Avión' }
+    ];
+
+    function shuffle(arr){
+      const a = arr.slice();
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    let currentPairs = 6;
+    let deck = [];
+    let revealed = [];
+    let lock = false;
+    let moves = 0;
+    let hits = 0;
+
+    function setLevel(n){ currentPairs = n; startMemo(n); }
+    document.getElementById('lvl6').addEventListener('click', () => setLevel(6));
+    document.getElementById('lvl8').addEventListener('click', () => setLevel(8));
+    document.getElementById('lvl10').addEventListener('click', () => setLevel(10));
+    document.getElementById('memoReset').addEventListener('click', () => startMemo(currentPairs));
+
+    function startMemo(pairs){
+      memoWinEl.classList.remove('show');
+      memoPairsEl.textContent = String(pairs);
+      moves = 0; hits = 0;
+      memoMovesEl.textContent = '0';
+      memoHitsEl.textContent = '0';
+      revealed = [];
+      lock = false;
+
+      const pick = shuffle(icons).slice(0, pairs);
+      const doubled = shuffle([...pick, ...pick].map((x, idx) => ({
+        key: x.id + '-' + idx,
+        id: x.id,
+        emoji: x.emoji,
+        label: x.label,
+        matched: false,
+        open: false
+      })));
+      deck = doubled;
+
+      renderMemo();
+      speak('Memotest. Encontrá las parejas.');
+    }
+
+    function renderMemo(){
+      memoBoard.innerHTML = '';
+      deck.forEach((c, idx) => {
+        const b = document.createElement('button');
+        b.className = 'card ' + (c.open || c.matched ? 'revealed' : 'back') + (c.matched ? ' matched' : '');
+        b.setAttribute('aria-label', c.open || c.matched ? c.label : 'Carta');
+        b.addEventListener('click', () => onFlip(idx));
+
+        const face = document.createElement('div');
+        face.className = 'face';
+
+        if (c.open || c.matched){
+          const e = document.createElement('div'); e.className='emoji'; e.textContent = c.emoji;
+          const l = document.createElement('div'); l.className='label'; l.textContent = c.label;
+          face.appendChild(e); face.appendChild(l);
+        } else {
+          const q = document.createElement('div'); q.className='qmark'; q.textContent = '❓';
+          face.appendChild(q);
+        }
+        b.appendChild(face);
+        memoBoard.appendChild(b);
+      });
+    }
+
+    function onFlip(index){
+      if (lock) return;
+      const c = deck[index];
+      if (c.matched || c.open) return;
+
+      c.open = true;
+      revealed.push(index);
+      renderMemo();
+
+      if (revealed.length === 2){
+        moves += 1;
+        memoMovesEl.textContent = String(moves);
+        const [aIdx, bIdx] = revealed;
+        const a = deck[aIdx];
+        const b = deck[bIdx];
+        lock = true;
+
+        const isMatch = a.id === b.id;
+        window.setTimeout(() => {
+          if (isMatch){
+            a.matched = true; b.matched = true;
+            hits += 1;
+            memoHitsEl.textContent = String(hits);
+            speak('¡Bien!');
+          } else {
+            a.open = false; b.open = false;
+          }
+          revealed = [];
+          lock = false;
+          renderMemo();
+
+          if (deck.every(x => x.matched)){
+            memoWinEl.classList.add('show');
+            speak('¡Excelente, Samuel!');
+          }
+        }, isMatch ? 450 : 700);
+      }
+    }
+
+    // --- ANIMALES ---
+    const soundGrid = document.getElementById('soundGrid');
+    const nowTitle = document.getElementById('nowTitle');
+    const nowDesc = document.getElementById('nowDesc');
+    const soundSpeakBtn = document.getElementById('soundSpeak');
+    let lastAnimalText = 'Listo';
+
+    document.getElementById('soundStop').addEventListener('click', () => {
+      stopAll();
+      nowTitle.textContent = 'Detenido';
+      nowDesc.textContent = 'Elegí otro animal.';
+    });
+    soundSpeakBtn.addEventListener('click', () => { if (lastAnimalText) speak(lastAnimalText); });
+
+    const animals = [
+      { id:'perro',     emoji:'🐶', name:'Perro',      phrase:'Perro',      audioUrl:'./audio/animales/perro.mp3',      sound:'dog'  },
+      { id:'gato',      emoji:'🐱', name:'Gato',       phrase:'Gato',       audioUrl:'./audio/animales/gato.mp3',       sound:'cat'  },
+      { id:'vaca',      emoji:'🐮', name:'Vaca',       phrase:'Vaca',       audioUrl:'./audio/animales/vaca.mp3',       sound:'cow'  },
+      { id:'pajaro',    emoji:'🐦', name:'Pájaro',     phrase:'Pájaro',     audioUrl:'./audio/animales/pajaro.mp3',     sound:'bird' },
+      { id:'caballo',   emoji:'🐴', name:'Caballo',    phrase:'Caballo',    audioUrl:'./audio/animales/caballo.mp3',    sound:'horse'},
+      { id:'leon',      emoji:'🦁', name:'León',       phrase:'León',       audioUrl:'./audio/animales/leon.mp3',       sound:'lion' },
+      { id:'rana',      emoji:'🐸', name:'Rana',       phrase:'Rana',       audioUrl:'./audio/animales/rana.mp3',       sound:'frog' },
+      { id:'pato',      emoji:'🦆', name:'Pato',       phrase:'Pato',       audioUrl:'./audio/animales/pato.mp3',       sound:'duck' },
+      { id:'oveja',     emoji:'🐑', name:'Oveja',      phrase:'Oveja',      audioUrl:'./audio/animales/oveja.mp3'                 },
+      { id:'cerdo',     emoji:'🐷', name:'Cerdo',      phrase:'Cerdo',      audioUrl:'./audio/animales/cerdo.mp3'                 },
+
+      { id:'gallo',     emoji:'🐓', name:'Gallo',      phrase:'Gallo',      audioUrl:'./audio/animales/gallo.mp3'                 },
+      { id:'gallina',   emoji:'🐔', name:'Gallina',    phrase:'Gallina',    audioUrl:'./audio/animales/gallina.mp3'               },
+      { id:'cabra',     emoji:'🐐', name:'Cabra',      phrase:'Cabra',      audioUrl:'./audio/animales/cabra.mp3'                 },
+      { id:'burro',     emoji:'🫏', name:'Burro',      phrase:'Burro',      audioUrl:'./audio/animales/burro.mp3'                 },
+      { id:'lobo',      emoji:'🐺', name:'Lobo',       phrase:'Lobo',       audioUrl:'./audio/animales/lobo.mp3'                  },
+      { id:'tigre',     emoji:'🐯', name:'Tigre',      phrase:'Tigre',      audioUrl:'./audio/animales/tigre.mp3'                 },
+      { id:'mono',      emoji:'🐵', name:'Mono',       phrase:'Mono',       audioUrl:'./audio/animales/mono.mp3'                  },
+      { id:'elefante',  emoji:'🐘', name:'Elefante',   phrase:'Elefante',   audioUrl:'./audio/animales/elefante.mp3'              },
+      { id:'serpiente', emoji:'🐍', name:'Serpiente',  phrase:'Serpiente',  audioUrl:'./audio/animales/serpiente.mp3'             },
+      { id:'grillo',    emoji:'🦗', name:'Grillo',     phrase:'Grillo',     audioUrl:'./audio/animales/grillo.mp3'                }
+    ];
+
+    function renderAnimals(){
+      stopAll();
+      ensureAudio();
+      soundGrid.innerHTML = '';
+      nowTitle.textContent = 'Listo';
+      nowDesc.textContent = 'Tocá un animal para escuchar.';
+      lastAnimalText = 'Tocá un animal para escuchar.';
+
+      animals.forEach(a => {
+        const b = document.createElement('button');
+        b.className = 'sound';
+        b.setAttribute('aria-label', a.name);
+        b.innerHTML = `<div class="emoji">${a.emoji}</div><div class="label">${a.name}</div>`;
+        b.addEventListener('click', () => playAnimal(a));
+        soundGrid.appendChild(b);
+      });
+      speak('Tocar y escuchar. Elegí un animal.');
+    }
+
+    async function playAnimal(a){
+      stopAll();
+      ensureAudio();
+      nowTitle.textContent = a.name;
+      nowDesc.textContent = a.phrase;
+      lastAnimalText = a.phrase;
+      speak(a.phrase);
+      // MP3 (offline): 4s con fade in/out
+      if (a.audioUrl){
+        const ok = await playMp3Clip(a.audioUrl);
+        if (ok) return;
+      }
+
+      if (!audioCtx) return;
+
+      const t0 = audioCtx.currentTime + 0.02;
+      const out = audioCtx.createGain();
+      out.gain.value = 0.85;
+      out.connect(audioCtx.destination);
+      currentNodes.push(out);
+
+      function dog(){
+        [0, 0.22].forEach((off) => {
+          const n = mkNoise(0.16);
+          const bp = audioCtx.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=520; bp.Q.value=2.5;
+          const g = audioCtx.createGain();
+          env(g, t0+off, 0.16);
+          n.connect(bp); bp.connect(g); g.connect(out);
+          n.start(t0+off); n.stop(t0+off+0.16);
+          currentNodes.push(n,bp,g);
+        });
+      }
+      function cat(){
+        const o = audioCtx.createOscillator(); o.type='sine';
+        const g = audioCtx.createGain();
+        env(g, t0, 0.55);
+        o.frequency.setValueAtTime(700, t0);
+        o.frequency.exponentialRampToValueAtTime(260, t0+0.55);
+        const lfo = audioCtx.createOscillator(); lfo.type='sine'; lfo.frequency.value = 6;
+        const lfoG = audioCtx.createGain(); lfoG.gain.value = 18;
+        lfo.connect(lfoG); lfoG.connect(o.frequency);
+        o.connect(g); g.connect(out);
+        o.start(t0); o.stop(t0+0.55);
+        lfo.start(t0); lfo.stop(t0+0.55);
+        currentNodes.push(o,g,lfo,lfoG);
+      }
+      function cow(){
+        const o = audioCtx.createOscillator(); o.type='sawtooth';
+        const g = audioCtx.createGain();
+        env(g, t0, 0.75);
+        o.frequency.setValueAtTime(115, t0);
+        const lfo = audioCtx.createOscillator(); lfo.type='sine'; lfo.frequency.value = 4;
+        const lfoG = audioCtx.createGain(); lfoG.gain.value = 10;
+        lfo.connect(lfoG); lfoG.connect(o.frequency);
+        const lp = audioCtx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value = 600;
+        o.connect(lp); lp.connect(g); g.connect(out);
+        o.start(t0); o.stop(t0+0.75);
+        lfo.start(t0); lfo.stop(t0+0.75);
+        currentNodes.push(o,g,lfo,lfoG,lp);
+      }
+      function bird(){
+        const o = audioCtx.createOscillator(); o.type='sine';
+        const g = audioCtx.createGain();
+        env(g, t0, 0.35);
+        o.frequency.setValueAtTime(2200, t0);
+        o.frequency.exponentialRampToValueAtTime(4200, t0+0.08);
+        o.frequency.exponentialRampToValueAtTime(1800, t0+0.18);
+        o.frequency.exponentialRampToValueAtTime(3500, t0+0.30);
+        o.connect(g); g.connect(out);
+        o.start(t0); o.stop(t0+0.35);
+        currentNodes.push(o,g);
+      }
+      function horse(){
+        const o = audioCtx.createOscillator(); o.type='square';
+        const g = audioCtx.createGain();
+        env(g, t0, 0.55);
+        o.frequency.setValueAtTime(220, t0);
+        o.frequency.exponentialRampToValueAtTime(480, t0+0.3);
+        o.frequency.exponentialRampToValueAtTime(260, t0+0.55);
+        const lp = audioCtx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=900;
+        o.connect(lp); lp.connect(g); g.connect(out);
+        o.start(t0); o.stop(t0+0.55);
+        currentNodes.push(o,g,lp);
+      }
+      function lion(){
+        const n = mkNoise(0.65);
+        const bp = audioCtx.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=180; bp.Q.value=1.2;
+        const g = audioCtx.createGain();
+        env(g, t0, 0.65);
+        n.connect(bp); bp.connect(g); g.connect(out);
+        n.start(t0); n.stop(t0+0.65);
+        currentNodes.push(n,bp,g);
+      }
+      function frog(){
+        const o = audioCtx.createOscillator(); o.type='triangle';
+        const g = audioCtx.createGain();
+        env(g, t0, 0.35);
+        o.frequency.setValueAtTime(300, t0);
+        o.frequency.exponentialRampToValueAtTime(120, t0+0.35);
+        o.connect(g); g.connect(out);
+        o.start(t0); o.stop(t0+0.35);
+        currentNodes.push(o,g);
+      }
+      function duck(){
+        [0, 0.18].forEach((off) => {
+          const o = audioCtx.createOscillator(); o.type='square';
+          const g = audioCtx.createGain();
+          env(g, t0+off, 0.14);
+          o.frequency.setValueAtTime(520, t0+off);
+          o.frequency.exponentialRampToValueAtTime(320, t0+off+0.14);
+          o.connect(g); g.connect(out);
+          o.start(t0+off); o.stop(t0+off+0.14);
+          currentNodes.push(o,g);
+        });
+      }
+
+      const map = { dog, cat, cow, bird, horse, lion, frog, duck };
+      const fn = map[a.sound];
+      if (fn) fn();
+    }
+
+    // --- AUTOS Y SIRENAS ---
+    const carGrid = document.getElementById('carGrid');
+    const carNowTitle = document.getElementById('carNowTitle');
+    const carNowDesc  = document.getElementById('carNowDesc');
+    const carSpeakBtn = document.getElementById('carSpeak');
+    let lastCarText = 'Listo';
+
+    document.getElementById('carStop').addEventListener('click', () => {
+      stopAll();
+      carNowTitle.textContent = 'Detenido';
+      carNowDesc.textContent = 'Elegí otro vehículo.';
+    });
+    carSpeakBtn.addEventListener('click', () => { if (lastCarText) speak(lastCarText); });
+
+    const cars = [
+      { id:'car',    emoji:'🚗',  name:'Auto',            phrase:'Auto',            audioUrl:'./audio/vehiculos/auto.mp3',       sound:'engine' },
+      { id:'race',   emoji:'🏎️',  name:'Auto de carrera', phrase:'Auto de carrera', audioUrl:'./audio/vehiculos/carrera.mp3',    sound:'race'   },
+      { id:'bus',    emoji:'🚌',  name:'Colectivo',       phrase:'Colectivo',       audioUrl:'./audio/vehiculos/colectivo.mp3',  sound:'horn'   },
+      { id:'truck',  emoji:'🚚',  name:'Camión',          phrase:'Camión',          audioUrl:'./audio/vehiculos/camion.mp3',     sound:'truck'  },
+      { id:'moto',   emoji:'🏍️',  name:'Moto',            phrase:'Moto',            audioUrl:'./audio/vehiculos/moto.mp3',       sound:'moto'   },
+      { id:'police', emoji:'🚓',  name:'Policía',         phrase:'Policía',         audioUrl:'./audio/vehiculos/policia.mp3',    sound:'siren1' },
+      { id:'ambul',  emoji:'🚑',  name:'Ambulancia',      phrase:'Ambulancia',      audioUrl:'./audio/vehiculos/ambulancia.mp3', sound:'siren2' },
+      { id:'fire',   emoji:'🚒',  name:'Bomberos',        phrase:'Bomberos',        audioUrl:'./audio/vehiculos/bomberos.mp3',   sound:'siren3' }
+    ];
+
+    function renderCars(){
+      stopAll();
+      ensureAudio();
+      carGrid.innerHTML = '';
+      carNowTitle.textContent = 'Listo';
+      carNowDesc.textContent = 'Tocá un vehículo para escuchar.';
+      lastCarText = 'Tocá un vehículo para escuchar.';
+
+      cars.forEach(v => {
+        const b = document.createElement('button');
+        b.className = 'sound';
+        b.setAttribute('aria-label', v.name);
+        b.innerHTML = `<div class="emoji">${v.emoji}</div><div class="label">${v.name}</div>`;
+        b.addEventListener('click', () => playCar(v));
+        carGrid.appendChild(b);
+      });
+      speak('Autos y sirenas. Elegí un vehículo.');
+    }
+
+    async function playCar(v){
+      stopAll();
+      ensureAudio();
+      carNowTitle.textContent = v.name;
+      carNowDesc.textContent = 'Tocá para escuchar.';
+      lastCarText = v.phrase;
+      speak(v.phrase);
+      // MP3 (offline): 4s con fade in/out
+      if (v.audioUrl){
+        const ok = await playMp3Clip(v.audioUrl);
+        if (ok) return;
+      }
+
+      if (!audioCtx) return;
+
+      const t0 = audioCtx.currentTime + 0.02;
+      const out = audioCtx.createGain();
+      out.gain.value = 0.85;
+      out.connect(audioCtx.destination);
+      currentNodes.push(out);
+
+      function engine(){
+        // Low rumble + little rev
+        const o = audioCtx.createOscillator(); o.type = 'sawtooth';
+        const g = audioCtx.createGain();
+        env(g, t0, 0.7);
+        o.frequency.setValueAtTime(90, t0);
+        o.frequency.exponentialRampToValueAtTime(140, t0+0.25);
+        o.frequency.exponentialRampToValueAtTime(110, t0+0.7);
+        const lp = audioCtx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value = 380;
+        o.connect(lp); lp.connect(g); g.connect(out);
+        o.start(t0); o.stop(t0+0.7);
+        currentNodes.push(o,g,lp);
+      }
+
+      function race(){
+        // Quick rev with higher pitch
+        const o = audioCtx.createOscillator(); o.type = 'square';
+        const g = audioCtx.createGain();
+        env(g, t0, 0.6);
+        o.frequency.setValueAtTime(180, t0);
+        o.frequency.exponentialRampToValueAtTime(520, t0+0.2);
+        o.frequency.exponentialRampToValueAtTime(260, t0+0.6);
+        const bp = audioCtx.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=550; bp.Q.value=1.1;
+        o.connect(bp); bp.connect(g); g.connect(out);
+        o.start(t0); o.stop(t0+0.6);
+        currentNodes.push(o,g,bp);
+      }
+
+      function horn(){
+        // Short horn (two tones)
+        const g = audioCtx.createGain();
+        g.connect(out);
+        env(g, t0, 0.28);
+        const o1 = audioCtx.createOscillator(); o1.type='sine'; o1.frequency.setValueAtTime(440, t0);
+        const o2 = audioCtx.createOscillator(); o2.type='sine'; o2.frequency.setValueAtTime(554, t0);
+        o1.connect(g); o2.connect(g);
+        o1.start(t0); o2.start(t0);
+        o1.stop(t0+0.28); o2.stop(t0+0.28);
+        currentNodes.push(g,o1,o2);
+      }
+
+      function truck(){
+        // Deeper horn
+        playTone({type:'sawtooth', f0:180, f1:160, dur:0.42, gain:0.85});
+      }
+
+      function moto(){
+        const o = audioCtx.createOscillator(); o.type='triangle';
+        const g = audioCtx.createGain();
+        env(g, t0, 0.55);
+        o.frequency.setValueAtTime(220, t0);
+        o.frequency.exponentialRampToValueAtTime(620, t0+0.22);
+        o.frequency.exponentialRampToValueAtTime(260, t0+0.55);
+        o.connect(g); g.connect(out);
+        o.start(t0); o.stop(t0+0.55);
+        currentNodes.push(o,g);
+      }
+
+      function sirenSweep(freqA, freqB, dur){
+        const o = audioCtx.createOscillator(); o.type='sine';
+        const g = audioCtx.createGain();
+        env(g, t0, dur);
+        o.frequency.setValueAtTime(freqA, t0);
+        o.frequency.linearRampToValueAtTime(freqB, t0 + dur/2);
+        o.frequency.linearRampToValueAtTime(freqA, t0 + dur);
+        o.connect(g); g.connect(out);
+        o.start(t0); o.stop(t0 + dur);
+        currentNodes.push(o,g);
+      }
+
+      function siren1(){ sirenSweep(520, 880, 1.1); }
+      function siren2(){ sirenSweep(440, 740, 1.2); }
+      function siren3(){ sirenSweep(360, 660, 1.3); }
+
+      const map = { engine, race, horn, truck, moto, siren1, siren2, siren3 };
+      const fn = map[v.sound];
+      if (fn) fn();
+    }
+
+    // --- CARRERA DE TOQUES ---
+    const raceTapsEl = document.getElementById('raceTaps');
+    const raceGoalEl = document.getElementById('raceGoal');
+    const raceCarEl  = document.getElementById('raceCar');
+    const raceTapBtn = document.getElementById('raceTapBtn');
+    const raceWinEl  = document.getElementById('raceWin');
+    const raceBarEl  = document.getElementById('raceBar');
+    const racePctEl  = document.getElementById('racePct');
+    const raceTrackEl = document.querySelector('#viewRace .track');
+    const confettiEl = document.getElementById('confetti');
+
+    const RACE_VEHICLES = {
+      auto:      { emoji: '🚗', audio: './audio/vehiculos/auto.mp3' },
+      carrera:   { emoji: '🏎️', audio: './audio/vehiculos/carrera.mp3' },
+      colectivo: { emoji: '🚌', audio: './audio/vehiculos/colectivo.mp3' },
+      camion:    { emoji: '🚚', audio: './audio/vehiculos/camion.mp3' },
+      moto:      { emoji: '🏍️', audio: './audio/vehiculos/moto.mp3' },
+    };
+    let raceVehKey = 'auto';
+
+    let raceTaps = 0;
+    let raceGoal = 25;
+
+    // --- Semáforo (solo avanzar en verde) ---
+    const lightRed = document.getElementById('lightRed');
+    const lightYellow = document.getElementById('lightYellow');
+    const lightGreen = document.getElementById('lightGreen');
+    const semaTextEl = document.getElementById('semaText');
+    const semaSubEl = document.getElementById('semaSub');
+
+    let semaState = 'green';
+    let semaTimer = null;
+    let lastNoGoSpeak = 0;
+    let lastStateSpeak = 0;
+
+    function setSemaforo(state, announce=true){
+      semaState = state;
+      if (lightRed) lightRed.classList.toggle('on', state==='red');
+      if (lightYellow) lightYellow.classList.toggle('on', state==='yellow');
+      if (lightGreen) lightGreen.classList.toggle('on', state==='green');
+
+      if (state==='green'){
+        if (semaTextEl && semaTextEl.childNodes[0]) semaTextEl.childNodes[0].textContent = 'Verde: avanzar';
+        if (semaSubEl) semaSubEl.textContent = 'Podés tocar para avanzar.';
+        raceTapBtn.classList.remove('disabled');
+        raceTapBtn.setAttribute('aria-disabled', 'false');
+      } else if (state==='yellow'){
+        if (semaTextEl && semaTextEl.childNodes[0]) semaTextEl.childNodes[0].textContent = 'Amarillo: esperar';
+        if (semaSubEl) semaSubEl.textContent = 'Cuidado. Esperá un momento.';
+        raceTapBtn.classList.add('disabled');
+        raceTapBtn.setAttribute('aria-disabled', 'true');
+      } else {
+        if (semaTextEl && semaTextEl.childNodes[0]) semaTextEl.childNodes[0].textContent = 'Rojo: parar';
+        if (semaSubEl) semaSubEl.textContent = 'Pará. Esperá al verde.';
+        raceTapBtn.classList.add('disabled');
+        raceTapBtn.setAttribute('aria-disabled', 'true');
+      }
+
+      const now = Date.now();
+      if (announce && now - lastStateSpeak > 2500){
+        lastStateSpeak = now;
+        if (state==='green') speak('Verde. Podés avanzar.');
+        if (state==='yellow') speak('Amarillo. Esperá.');
+        if (state==='red') speak('Rojo. Parar.');
+      }
+    }
+
+    function stopSemaforo(){
+      if (semaTimer){ clearTimeout(semaTimer); semaTimer=null; }
+      setSemaforo('green', false);
+    }
+
+    function semaLoop(){
+      const durations = { green: 3200, yellow: 1200, red: 2600 };
+      const next = (semaState==='green') ? 'yellow' : (semaState==='yellow' ? 'red' : 'green');
+      setSemaforo(next, true);
+      semaTimer = setTimeout(semaLoop, durations[next]);
+    }
+
+    function startSemaforo(){
+      stopSemaforo();
+      setSemaforo('green', true);
+      semaTimer = setTimeout(semaLoop, 3200);
+      window.__raceStop = stopSemaforo;
+    }
+
+
+    function setRaceVehicle(key){
+      if (!RACE_VEHICLES[key]) return;
+      raceVehKey = key;
+      raceCarEl.textContent = RACE_VEHICLES[key].emoji;
+      // marcar activo
+      const ids = {
+        auto: 'rvAuto',
+        carrera: 'rvCarrera',
+        colectivo: 'rvColectivo',
+        camion: 'rvCamion',
+        moto: 'rvMoto'
+      };
+      Object.values(ids).forEach(id => document.getElementById(id).classList.remove('active'));
+      document.getElementById(ids[key]).classList.add('active');
+    }
+
+    document.getElementById('rvAuto').addEventListener('click', () => setRaceVehicle('auto'));
+    document.getElementById('rvCarrera').addEventListener('click', () => setRaceVehicle('carrera'));
+    document.getElementById('rvColectivo').addEventListener('click', () => setRaceVehicle('colectivo'));
+    document.getElementById('rvCamion').addEventListener('click', () => setRaceVehicle('camion'));
+    document.getElementById('rvMoto').addEventListener('click', () => setRaceVehicle('moto'));
+
+    function setRaceGoal(n){
+      raceGoal = n;
+      raceGoalEl.textContent = String(raceGoal);
+      resetRace();
+    }
+
+    document.getElementById('raceEasy').addEventListener('click', () => setRaceGoal(15));
+    document.getElementById('raceMed').addEventListener('click', () => setRaceGoal(25));
+    document.getElementById('raceHard').addEventListener('click', () => setRaceGoal(40));
+    document.getElementById('raceReset').addEventListener('click', () => resetRace());
+
+    function resetRace(){
+      stopAll();
+      ensureAudio();
+      raceTaps = 0;
+      raceTapsEl.textContent = '0';
+      raceWinEl.classList.remove('show');
+      confettiEl.classList.remove('show');
+      moveCar();
+      startSemaforo();
+    }
+
+    function moveCar(){
+      const track = raceCarEl.parentElement;
+      const left = 14;
+      const rightPadding = 34; // keep away from finish
+      const maxX = track.clientWidth - rightPadding;
+      const progress = Math.min(1, raceTaps / raceGoal);
+      const x = left + (maxX - left) * progress;
+      raceCarEl.style.left = `${x}px`;
+
+      const pct = Math.round(progress * 100);
+      raceBarEl.style.width = `${pct}%`;
+      racePctEl.textContent = `${pct}%`;
+    }
+
+    function showConfetti(){
+      // confetti simple sin librerías
+      confettiEl.innerHTML = '';
+      const n = 28;
+      for (let i = 0; i < n; i++){
+        const p = document.createElement('i');
+        const x = Math.random() * 100;
+        const d = 0.8 + Math.random() * 1.0;
+        const rot = Math.floor(Math.random() * 360);
+        const hue = Math.floor(Math.random() * 360);
+        p.style.left = `${x}vw`;
+        p.style.animationDuration = `${d}s`;
+        p.style.transform = `rotate(${rot}deg)`;
+        p.style.background = `hsl(${hue} 85% 55%)`;
+        confettiEl.appendChild(p);
+      }
+      confettiEl.classList.add('show');
+      setTimeout(() => confettiEl.classList.remove('show'), 2000);
+    }
+
+    function tinyBeep(){
+      if (!audioCtx) return;
+      const t = audioCtx.currentTime + 0.01;
+      const o = audioCtx.createOscillator(); o.type='sine';
+      const g = audioCtx.createGain();
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(0.4, t+0.01);
+      g.gain.exponentialRampToValueAtTime(0.0001, t+0.08);
+      o.frequency.setValueAtTime(660, t);
+      o.connect(g); g.connect(audioCtx.destination);
+      o.start(t); o.stop(t+0.09);
+      currentNodes.push(o,g);
+    }
+
+    async function handleRaceTap(){
+      if (raceWinEl.classList.contains('show')) return;
+      ensureAudio();
+      if (semaState !== 'green'){
+        const now = Date.now();
+        if (now - lastNoGoSpeak > 1800){
+          lastNoGoSpeak = now;
+          if (semaState === 'red') speak('Rojo. Esperá.');
+          else speak('Amarillo. Esperá.');
+        }
+        return;
+      }
+      raceTaps += 1;
+      raceTapsEl.textContent = String(raceTaps);
+      moveCar();
+      tinyBeep();
+
+      if (raceTaps >= raceGoal){
+        raceWinEl.classList.add('show');
+        stopSemaforo();
+        showConfetti();
+        speak('¡Ganaste, Samuel!');
+
+        // reproducir el vehículo elegido (4s con fade)
+        try{
+          stopAll();
+          ensureAudio();
+          const url = RACE_VEHICLES[raceVehKey]?.audio;
+          if (url) await playMp3Clip(url);
+        }catch(e){
+          // fallback: beep
+          playTone({type:'sine', f0:660, f1:990, dur:0.35, gain:0.7});
+        }
+      }
+    }
+
+    // botón grande
+    raceTapBtn.addEventListener('click', handleRaceTap);
+    // también tocar la pista (más fácil para Samuel)
+    raceTrackEl.addEventListener('pointerdown', (ev) => {
+      // evitar doble click si toca el auto
+      ev.preventDefault();
+      handleRaceTap();
+    });
+
+    
+    // ==============================
+    // 🛣️ Esquivar en la calle (30s)
+    // ==============================
+    const driveCanvas = document.getElementById('driveCanvas');
+    const dctx = driveCanvas.getContext('2d');
+
+    const driveTimeEl = document.getElementById('driveTime');
+    const driveScoreEl = document.getElementById('driveScore');
+    const driveHitsEl  = document.getElementById('driveHits');
+    const driveCueEl   = document.getElementById('driveCue');
+    const driveEndEl   = document.getElementById('driveEnd');
+
+    const driveStartBtn = document.getElementById('driveStart');
+    const driveResetBtn = document.getElementById('driveReset');
+    const driveRepeatBtn= document.getElementById('driveRepeat');
+
+    // Objetos de la calle (nominar)
+    const STREET_OBJECTS = [
+      { key:'moto',     label:'moto',     emoji:'🏍️' },
+      { key:'cono',     label:'cono',     emoji:'🚧' },
+      { key:'charco',   label:'charco',   emoji:'💧' },
+      { key:'popo',     label:'popó de perrito', emoji:'💩' },
+      { key:'pelota',   label:'pelota',   emoji:'⚽' },
+      { key:'bicicleta',label:'bicicleta',emoji:'🚲' },
+      { key:'auto',     label:'auto',     emoji:'🚗' },
+    ];
+
+    const SAFETY_TIPS = [
+      'En la calle, miramos a ambos lados antes de cruzar de una vereda a la otra.',
+      'Cuando cruzamos, prestamos mucha atención a las motos.',
+      'En la calle puede haber popó de perritos. Miramos el piso y evitamos pisarla.',
+      'Cruzamos solo con un adulto y despacio, mirando autos y motos.',
+      'Si hay un charco, lo esquivamos para no resbalar.'
+    ];
+
+    let driveRunning = false;
+    let driveRaf = 0;
+    let driveStartTs = 0;
+    let driveLastTs = 0;
+    let driveTimeLeft = 30;
+    let driveScore = 0;
+    let driveHits = 0;
+
+    // Jugador
+    let playerX = 0; // -1 .. 1 (centro)
+    let targetX = 0;
+
+    // Obstáculos con "profundidad" (pseudo 3D)
+    let obstacles = [];
+    let spawnAcc = 0;
+    let speed = 0.65; // base
+    let lastSpoken = 0;
+
+    function clamp(v, a, b){ return Math.max(a, Math.min(b, v)); }
+
+    function sayCue(text){
+      driveCueEl.textContent = text;
+    }
+
+    function pickTip(){
+      return SAFETY_TIPS[Math.floor(Math.random()*SAFETY_TIPS.length)];
+    }
+
+    function driveStop(){
+      if (!driveRunning) return;
+      driveRunning = false;
+      cancelAnimationFrame(driveRaf);
+      driveRaf = 0;
+    }
+    window.__driveStop = driveStop;
+
+    function driveReset(){
+      driveStop();
+      obstacles = [];
+      spawnAcc = 0;
+      speed = 0.65;
+      playerX = 0;
+      targetX = 0;
+      driveTimeLeft = 30;
+      driveScore = 0;
+      driveHits = 0;
+
+      driveTimeEl.textContent = String(driveTimeLeft);
+      driveScoreEl.textContent = String(driveScore);
+      driveHitsEl.textContent  = String(driveHits);
+
+      driveEndEl.classList.remove('show');
+      sayCue('Listo');
+      renderDrive(0); // frame inicial
+    }
+
+    function spawnObstacle(){
+      const obj = STREET_OBJECTS[Math.floor(Math.random()*STREET_OBJECTS.length)];
+      // lane x in [-0.9..0.9], snap to 5 lanes for consistencia
+      const lanes = [-0.8,-0.4,0,0.4,0.8];
+      const x = lanes[Math.floor(Math.random()*lanes.length)];
+      const o = { obj, x, z: 1.25, hit:false, passed:false };
+      obstacles.push(o);
+
+      // Nominar (limitado)
+      const now = performance.now();
+      if (now - lastSpoken > 1500){
+        lastSpoken = now;
+        speak(obj.label);
+        sayCue(obj.label.toUpperCase());
+      }
+    }
+
+    function endDrive(){
+      driveStop();
+      driveEndEl.classList.add('show');
+      const tip = pickTip();
+      speak('Terminó. ' + tip);
+      sayCue('TERMINÓ ✅');
+    }
+
+    function setPlayerFromPointer(clientX){
+      const rect = driveCanvas.getBoundingClientRect();
+      const t = (clientX - rect.left) / rect.width; // 0..1
+      // map to -1..1 with slight margins
+      targetX = clamp((t*2-1) * 1.05, -1, 1);
+    }
+
+    // Controles: tocar izquierda/derecha (zonas invisibles)
+    const touchLeft = document.querySelector('.drive-touch-left');
+    const touchRight= document.querySelector('.drive-touch-right');
+    touchLeft.addEventListener('pointerdown', (e)=>{ e.preventDefault(); targetX = clamp(targetX - 0.35, -1, 1); });
+    touchRight.addEventListener('pointerdown',(e)=>{ e.preventDefault(); targetX = clamp(targetX + 0.35, -1, 1); });
+
+    // Drag sobre canvas
+    driveCanvas.addEventListener('pointerdown', (e)=>{ e.preventDefault(); driveCanvas.setPointerCapture(e.pointerId); setPlayerFromPointer(e.clientX); });
+    driveCanvas.addEventListener('pointermove', (e)=>{ if(!driveRunning) return; if(e.pressure===0) return; setPlayerFromPointer(e.clientX); });
+
+    driveStartBtn.addEventListener('click', ()=>{
+      if (driveRunning) return;
+      ensureAudio(); // habilita audio/tts
+      driveEndEl.classList.remove('show');
+      driveRunning = true;
+      driveStartTs = performance.now();
+      driveLastTs = driveStartTs;
+      sayCue('¡VAMOS! 🚗');
+      driveRaf = requestAnimationFrame(loopDrive);
+    });
+
+    driveResetBtn.addEventListener('click', driveReset);
+
+    driveRepeatBtn.addEventListener('click', ()=>{
+      const tip = pickTip();
+      speak(tip);
+    });
+
+    function loopDrive(ts){
+      if (!driveRunning) return;
+      const dt = Math.min(0.05, (ts - driveLastTs) / 1000);
+      driveLastTs = ts;
+
+      // Tiempo
+      const elapsed = (ts - driveStartTs) / 1000;
+      driveTimeLeft = Math.max(0, 30 - Math.floor(elapsed));
+      driveTimeEl.textContent = String(driveTimeLeft);
+
+      // Spawn
+      spawnAcc += dt;
+      const spawnEvery = 0.85 - Math.min(0.35, elapsed/60); // se acelera levemente
+      while (spawnAcc > spawnEvery){
+        spawnAcc -= spawnEvery;
+        spawnObstacle();
+      }
+
+      // Aumenta velocidad suavemente
+      speed = 0.65 + Math.min(0.8, elapsed * 0.02);
+
+      // Interpolar movimiento (suave)
+      playerX += (targetX - playerX) * Math.min(1, dt*10);
+
+      // Update obstacles
+      for (const o of obstacles){
+        o.z -= dt * speed;
+      }
+
+      // Collisions / passed
+      for (const o of obstacles){
+        if (o.hit) continue;
+
+        // cuando está "cerca" (z ~ 0.10), chequear colisión
+        if (o.z < 0.12 && o.z > 0.02){
+          const dx = Math.abs(o.x - playerX);
+          if (dx < 0.28){
+            o.hit = true;
+            driveHits += 1;
+            driveHitsEl.textContent = String(driveHits);
+            // feedback breve
+            sayCue('¡UPS! ' + o.obj.label.toUpperCase());
+            // sonido corto
+            playTone({type:'square', f0:180, f1:120, dur:0.12, gain:0.5});
+          }
+        }
+
+        // si pasó sin choque
+        if (!o.passed && o.z < 0.00){
+          o.passed = true;
+          if (!o.hit){
+            driveScore += 1;
+            driveScoreEl.textContent = String(driveScore);
+          }
+        }
+      }
+
+      // limpiar obstacles ya lejos
+      obstacles = obstacles.filter(o => o.z > -0.25);
+
+      // Render
+      renderDrive(elapsed);
+
+      // Fin
+      if (elapsed >= 30){
+        endDrive();
+        return;
+      }
+
+      driveRaf = requestAnimationFrame(loopDrive);
+    }
+
+    function renderDrive(elapsed){
+      // Ajustar canvas a device pixel ratio para nitidez
+      const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+      const cssW = driveCanvas.clientWidth || driveCanvas.width;
+      const cssH = (cssW * 520/900);
+      const w = Math.floor(cssW * dpr);
+      const h = Math.floor(cssH * dpr);
+      if (driveCanvas.width !== w || driveCanvas.height !== h){
+        driveCanvas.width = w;
+        driveCanvas.height = h;
+      }
+
+      const W = driveCanvas.width, H = driveCanvas.height;
+      dctx.clearRect(0,0,W,H);
+
+      // cielo
+      const sky = dctx.createLinearGradient(0,0,0,H*0.55);
+      sky.addColorStop(0,'#c7e7ff');
+      sky.addColorStop(1,'#f8fafc');
+      dctx.fillStyle = sky;
+      dctx.fillRect(0,0,W,H);
+
+      // perspectiva carretera
+      const horizonY = H*0.30;
+      const roadBottomW = W*0.92;
+      const roadTopW = W*0.18;
+      const roadX = W/2;
+
+      // fondo (vereda)
+      dctx.fillStyle = '#e8edf3';
+      dctx.fillRect(0,horizonY,W,H-horizonY);
+
+      // carretera trapezoide
+      dctx.beginPath();
+      dctx.moveTo(roadX-roadTopW/2, horizonY);
+      dctx.lineTo(roadX+roadTopW/2, horizonY);
+      dctx.lineTo(roadX+roadBottomW/2, H);
+      dctx.lineTo(roadX-roadBottomW/2, H);
+      dctx.closePath();
+      dctx.fillStyle = '#5b6470';
+      dctx.fill();
+
+      // bordes
+      dctx.strokeStyle = 'rgba(255,255,255,.55)';
+      dctx.lineWidth = Math.max(2, W*0.004);
+      dctx.stroke();
+
+      // líneas centrales (discontinuas)
+      dctx.save();
+      dctx.setLineDash([Math.max(10, W*0.018), Math.max(10, W*0.018)]);
+      dctx.lineDashOffset = -elapsed*200;
+      dctx.beginPath();
+      dctx.moveTo(roadX, horizonY+6);
+      dctx.lineTo(roadX, H);
+      dctx.strokeStyle='rgba(255,255,255,.6)';
+      dctx.lineWidth = Math.max(2, W*0.005);
+      dctx.stroke();
+      dctx.restore();
+
+      // Función de proyección: (x,z) -> screen
+      function project(x, z){
+        // z: 0 cerca, 1 lejos
+        const zz = clamp(z, 0.02, 1.25);
+        const t = 1 - zz; // 0 lejos, 1 cerca
+        const rw = roadTopW + (roadBottomW-roadTopW)*t;
+        const y = horizonY + (H-horizonY)*t;
+        const sx = roadX + x * (rw/2) * 0.9;
+        const scale = 0.25 + 0.95*t; // tamaño
+        return {sx, y, scale};
+      }
+
+      // Dibujar obstáculos del fondo al frente (z mayor primero)
+      const obsSorted = [...obstacles].sort((a,b)=>b.z-a.z);
+      for (const o of obsSorted){
+        const p = project(o.x, o.z);
+        const size = Math.max(18, W*0.07*p.scale);
+        dctx.font = `${size}px system-ui, Apple Color Emoji, Segoe UI Emoji`;
+        dctx.textAlign='center';
+        dctx.textBaseline='middle';
+        dctx.globalAlpha = o.hit ? 0.35 : 0.95;
+        dctx.fillText(o.obj.emoji, p.sx, p.y - size*0.2);
+        // rótulo mini (opcional) - solo si no está muy lejos
+        if (o.z < 0.6){
+          dctx.globalAlpha = 0.88;
+          dctx.font = `${Math.max(14, W*0.018)}px system-ui`;
+          dctx.fillStyle='rgba(15,23,42,.9)';
+          dctx.fillText('', p.sx, p.y + size*0.55);
+        }
+        dctx.globalAlpha = 1;
+      }
+
+      // Jugador (auto) cerca
+      const pcar = project(playerX, 0.06);
+      const carSize = Math.max(40, W*0.11);
+      dctx.font = `${carSize}px system-ui, Apple Color Emoji, Segoe UI Emoji`;
+      dctx.textAlign='center';
+      dctx.textBaseline='middle';
+      dctx.fillText('🚗', pcar.sx, pcar.y);
+
+      // efecto de "flash" si choque reciente (simple)
+      // (opcional: no guardamos timestamp, mantenemos simple)
+    }
+
+    // inicial
+    driveReset();
+
+
+    window.addEventListener('resize', () => {
+      if (views.race.classList.contains('active')) moveCar();
+    });
+  </script>
+</body>
+</html>

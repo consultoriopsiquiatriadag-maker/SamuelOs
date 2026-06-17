@@ -1,0 +1,796 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#dc2626" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <title>Videos de Samuel</title>
+  <style>
+    /* ====== Reset & Variables ====== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --text: #1e1b4b;
+      --muted: #6b7280;
+      --stroke: #e5e7eb;
+      --bg: #f8f4ff;
+    }
+
+    html { min-height: 100%; }
+
+    body {
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Inter, Arial, sans-serif;
+      background: linear-gradient(160deg, #fdf4ff 0%, #eff6ff 45%, #f0fdf4 100%);
+      min-height: 100vh;
+      color: var(--text);
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(circle at 20% 25%, rgba(167,139,250,.10) 0%, transparent 40%),
+        radial-gradient(circle at 80% 75%, rgba(96,165,250,.09) 0%, transparent 40%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ====== Shell ====== */
+    .shell {
+      position: relative;
+      z-index: 1;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 16px 16px 32px;
+    }
+
+    /* ====== Header ====== */
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .avatar {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: #fff;
+      border: 3px solid #c4b5fd;
+      box-shadow: 0 6px 20px rgba(124,58,237,.20);
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+    .header-title h1 {
+      font-size: 24px;
+      font-weight: 950;
+      letter-spacing: -.03em;
+      color: var(--text);
+    }
+    .header-title p {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .btn-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 18px;
+      border-radius: 99px;
+      border: 2px solid rgba(15,23,42,.10);
+      background: rgba(255,255,255,.90);
+      font-weight: 900;
+      font-size: 15px;
+      cursor: pointer;
+      text-decoration: none;
+      color: var(--text);
+      box-shadow: 0 4px 14px rgba(0,0,0,.07);
+      transition: transform .10s ease;
+    }
+    .btn-back:active { transform: scale(.96) translateY(1px); }
+
+    /* ====== Banner offline ====== */
+    .offline-banner {
+      display: none;
+      margin-top: 14px;
+      padding: 14px 18px;
+      background: linear-gradient(135deg, #fef3c7, #fde68a);
+      border: 2px solid #f59e0b;
+      border-radius: 18px;
+      font-weight: 800;
+      font-size: 16px;
+      color: #92400e;
+    }
+    .offline-banner.show { display: flex; align-items: center; gap: 12px; }
+
+    /* ====== Banner padres (colapsable) ====== */
+    .parents-note {
+      margin-top: 12px;
+      background: rgba(255,255,255,.80);
+      border: 2px solid #e0e7ff;
+      border-radius: 16px;
+      padding: 12px 16px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #4338ca;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .parents-note button {
+      margin-left: auto;
+      border: none;
+      background: none;
+      font-size: 18px;
+      cursor: pointer;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+
+    /* ====== Views (pantallas) ====== */
+    .view { display: none; }
+    .view.active { display: block; }
+
+    @keyframes fadeSlideIn {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .view.active { animation: fadeSlideIn .22s ease; }
+
+    /* ====== VIEW: HOME — categorías ====== */
+    .view-title {
+      margin-top: 20px;
+      font-size: 22px;
+      font-weight: 950;
+      letter-spacing: -.02em;
+      color: var(--text);
+    }
+    .view-sub {
+      margin-top: 4px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    .cat-grid {
+      margin-top: 16px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    @media (max-width: 480px) { .cat-grid { grid-template-columns: 1fr 1fr; gap: 10px; } }
+
+    .cat-card {
+      border: none;
+      border-radius: 26px;
+      min-height: 200px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      cursor: pointer;
+      color: #fff;
+      font-weight: 950;
+      box-shadow: 0 20px 44px rgba(0,0,0,.15), inset 0 1px 0 rgba(255,255,255,.22);
+      transition: transform .10s ease, box-shadow .10s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Gloss en cat-card */
+    .cat-card::before {
+      content: '';
+      position: absolute;
+      inset: -80px -80px auto -80px;
+      height: 140px;
+      background: rgba(255,255,255,.16);
+      transform: rotate(-14deg);
+      pointer-events: none;
+    }
+
+    .cat-card:active {
+      transform: scale(.93) translateY(4px);
+      box-shadow: 0 6px 14px rgba(0,0,0,.12);
+    }
+
+    @keyframes catPop {
+      0%   { transform: scale(1); }
+      35%  { transform: scale(.92) translateY(4px); }
+      70%  { transform: scale(1.04); }
+      100% { transform: scale(1); }
+    }
+    .cat-card.pop { animation: catPop .28s ease; }
+
+    .cat-emoji { font-size: 78px; line-height: 1; position: relative; z-index: 1; }
+    .cat-name  { font-size: 22px; letter-spacing: -.02em; position: relative; z-index: 1; text-align: center; padding: 0 10px; }
+    .cat-desc  { font-size: 13px; font-weight: 700; opacity: .85; position: relative; z-index: 1; text-align: center; padding: 0 12px; }
+
+    /* Gradientes por categoría */
+    .cat-canciones { background: linear-gradient(145deg, #be185d, #ec4899); }
+    .cat-dibujos   { background: linear-gradient(145deg, #c2410c, #f97316); }
+    .cat-autos     { background: linear-gradient(145deg, #1d4ed8, #3b82f6); }
+    .cat-lavado    { background: linear-gradient(145deg, #0e7490, #06b6d4); }
+
+    /* ====== VIEW: CATEGORY — grilla de videos ====== */
+    .cat-header {
+      margin-top: 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .cat-header-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: 99px;
+      color: #fff;
+      font-weight: 900;
+      font-size: 18px;
+      box-shadow: 0 6px 16px rgba(0,0,0,.18);
+    }
+
+    .cat-header-title {
+      font-size: 20px;
+      font-weight: 950;
+      letter-spacing: -.02em;
+    }
+
+    .cat-header-sub {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .video-grid {
+      margin-top: 16px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+    @media (min-width: 700px) { .video-grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 420px) { .video-grid { gap: 10px; } }
+
+    .video-card {
+      border: 2.5px solid rgba(15,23,42,.09);
+      border-radius: 20px;
+      overflow: hidden;
+      cursor: pointer;
+      background: #fff;
+      box-shadow: 0 14px 30px rgba(0,0,0,.10);
+      transition: transform .10s ease, box-shadow .10s ease;
+      display: flex;
+      flex-direction: column;
+    }
+    .video-card:active {
+      transform: scale(.94) translateY(3px);
+      box-shadow: 0 4px 10px rgba(0,0,0,.08);
+    }
+
+    .video-thumb-wrap {
+      position: relative;
+      width: 100%;
+      padding-top: 56.25%; /* 16:9 */
+      background: #e2e8f0;
+      overflow: hidden;
+    }
+    .video-thumb-wrap img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .video-thumb-fallback {
+      position: absolute;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 52px;
+      background: linear-gradient(135deg, rgba(15,23,42,.06), rgba(15,23,42,.02));
+    }
+    /* Overlay play */
+    .video-thumb-wrap::after {
+      content: '▶';
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      color: rgba(255,255,255,.92);
+      text-shadow: 0 2px 12px rgba(0,0,0,.40);
+      opacity: 0;
+      transition: opacity .15s;
+    }
+    .video-card:hover .video-thumb-wrap::after { opacity: 1; }
+
+    .video-info {
+      padding: 10px 12px 12px;
+      flex: 1;
+    }
+    .video-info .vtitle {
+      font-size: 14px;
+      font-weight: 900;
+      letter-spacing: -.01em;
+      line-height: 1.3;
+      color: var(--text);
+    }
+    .video-info .vchannel {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+
+    /* ====== VIEW: PLAYER — reproductor ====== */
+    .player-bar {
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .player-title-text {
+      font-size: 20px;
+      font-weight: 950;
+      letter-spacing: -.02em;
+    }
+
+    .player-wrap {
+      margin-top: 14px;
+      border-radius: 22px;
+      overflow: hidden;
+      box-shadow: 0 24px 50px rgba(0,0,0,.18);
+      position: relative;
+      background: #000;
+    }
+    .player-wrap iframe {
+      display: block;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border: none;
+    }
+
+    .player-note {
+      margin-top: 14px;
+      background: rgba(255,255,255,.80);
+      border: 2px solid var(--stroke);
+      border-radius: 16px;
+      padding: 12px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    /* Iframe error message */
+    .iframe-error {
+      display: none;
+      padding: 40px 20px;
+      text-align: center;
+      font-size: 20px;
+      font-weight: 900;
+      color: var(--muted);
+    }
+    .iframe-error.show { display: block; }
+
+    /* ====== Botón primario ====== */
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 22px;
+      border-radius: 99px;
+      border: none;
+      background: linear-gradient(135deg, #dc2626, #ef4444);
+      color: #fff;
+      font-weight: 900;
+      font-size: 16px;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(220,38,38,.30);
+      transition: transform .10s ease;
+      text-decoration: none;
+    }
+    .btn-primary:active { transform: scale(.96) translateY(1px); }
+
+  </style>
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- ====== Header (siempre visible) ====== -->
+  <header class="page-header">
+    <div class="header-brand">
+      <div class="avatar">
+        <img src="./samuel-avatar.png" alt="Samuel" />
+      </div>
+      <div class="header-title">
+        <h1>📺 Videos de Samuel</h1>
+        <p>Videos seguros y divertidos para vos</p>
+      </div>
+    </div>
+    <button class="btn-back" onclick="goHome()" id="btnBack" aria-label="Volver a la app">
+      ⬅️ Volver a la app
+    </button>
+  </header>
+
+  <!-- Banner sin internet -->
+  <div class="offline-banner" id="offlineBanner">
+    📡 <span>Sin internet. Los videos necesitan conexión a internet para verse.</span>
+  </div>
+
+  <!-- Nota para padres (colapsable) -->
+  <div class="parents-note" id="parentsNote">
+    <span>👨‍👩‍👧 <b>Papás:</b> los videos fueron seleccionados especialmente para Samuel. Para agregar o cambiar videos, editá el archivo <code>youtube.html</code> (sección <code>VIDEOS_CURADOS</code> al inicio del script).</span>
+    <button onclick="document.getElementById('parentsNote').remove()" aria-label="Cerrar nota">✕</button>
+  </div>
+
+  <!-- ========================================
+       VIEW 1: HOME — selector de categorías
+       ======================================== -->
+  <div id="viewHome" class="view active">
+    <div class="view-title">¿Qué querés ver hoy?</div>
+    <div class="view-sub">Tocá una categoría para elegir un video</div>
+
+    <div class="cat-grid">
+
+      <button class="cat-card cat-canciones" onclick="openCategory('canciones')" aria-label="Canciones infantiles">
+        <div class="cat-emoji">🎵</div>
+        <div class="cat-name">Canciones</div>
+        <div class="cat-desc">Canciones y música para chicos</div>
+      </button>
+
+      <button class="cat-card cat-dibujos" onclick="openCategory('dibujos')" aria-label="Dibujos animados">
+        <div class="cat-emoji">🎨</div>
+        <div class="cat-name">Dibujos</div>
+        <div class="cat-desc">Dibujos animados para chicos</div>
+      </button>
+
+      <button class="cat-card cat-autos" onclick="openCategory('autos')" aria-label="Autos y motos">
+        <div class="cat-emoji">🚗</div>
+        <div class="cat-name">Autos y motos</div>
+        <div class="cat-desc">Vehículos y manejo para chicos</div>
+      </button>
+
+      <button class="cat-card cat-lavado" onclick="openCategory('lavado')" aria-label="Lavado de autos">
+        <div class="cat-emoji">🫧</div>
+        <div class="cat-name">Lavado de autos</div>
+        <div class="cat-desc">Lavar y limpiar autos, muy divertido</div>
+      </button>
+
+    </div>
+  </div>
+
+  <!-- ========================================
+       VIEW 2: CATEGORY — grilla de videos
+       ======================================== -->
+  <div id="viewCategory" class="view">
+    <div class="cat-header">
+      <button class="btn-back" onclick="backToHome()" aria-label="Volver a categorías">⬅️ Categorías</button>
+      <span class="cat-header-badge" id="catBadge"></span>
+      <div>
+        <div class="cat-header-title" id="catTitle"></div>
+        <div class="cat-header-sub">Tocá un video para verlo</div>
+      </div>
+    </div>
+    <div class="video-grid" id="videoGrid"></div>
+  </div>
+
+  <!-- ========================================
+       VIEW 3: PLAYER — reproductor
+       ======================================== -->
+  <div id="viewPlayer" class="view">
+    <div class="player-bar">
+      <button class="btn-back" onclick="backToCategory()" aria-label="Volver a la lista de videos">⬅️ Volver</button>
+      <span class="player-title-text" id="playerTitle"></span>
+    </div>
+
+    <div class="player-wrap">
+      <iframe
+        id="playerIframe"
+        src=""
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen
+        title="Video para Samuel"
+      ></iframe>
+    </div>
+
+    <div class="iframe-error" id="iframeError">
+      😕 Este video no está disponible. Probá otro.
+    </div>
+
+    <div class="player-note">
+      🔒 Solo videos seleccionados para Samuel — sin búsqueda libre
+    </div>
+  </div>
+
+</div><!-- /shell -->
+
+<script>
+  // ============================================================
+  // VIDEOS_CURADOS — Papás: actualizá los IDs de YouTube aquí.
+  //
+  // Para encontrar el ID de un video de YouTube, abrí el video
+  // en el navegador y fijate en la URL:
+  //   youtube.com/watch?v=ESTE_ES_EL_ID
+  //
+  // ✅ = ID muy confiable (canales oficiales conocidos)
+  // ⚠️ = ID aproximado, verificar antes de usar
+  // ============================================================
+  const CATEGORIAS = [
+    {
+      id: 'canciones',
+      nombre: 'Canciones',
+      emoji: '🎵',
+      claseColor: 'cat-canciones',
+      badgeStyle: 'background:linear-gradient(135deg,#be185d,#ec4899)',
+      videos: [
+        // ✅ Pinkfong — canal oficial verificado
+        { id: 'XqZsoesa55w', titulo: 'Baby Shark 🦈',       canal: 'Pinkfong' },
+        { id: 'E7wJTI-1dvQ', titulo: 'La Rueda del Bus 🚌',  canal: 'Pinkfong' },
+        { id: 'DfbGFyDFAms', titulo: 'Johny Johny 👶',       canal: 'Pinkfong' },
+        { id: '6T_-wPBZYA0', titulo: 'El Granjero 🐄',       canal: 'Pinkfong' },
+        // ✅ Super Simple Songs — canal oficial
+        { id: '0TgLtF3PMOc', titulo: 'Cinco Patitos 🐥',     canal: 'Super Simple Songs' },
+        { id: 'ffwAEm_2Y6s', titulo: 'El Abecedario 🔤',     canal: 'Super Simple Songs' },
+        // ⚠️ Cocomelon en Español — verificar disponibilidad
+        { id: 'yCjJyiqpAuU', titulo: 'Bingo el Perrito 🐶',  canal: 'Cocomelon' },
+        { id: 'IFo3t4I26q4', titulo: 'Hora del Baño 🛁',     canal: 'Cocomelon' },
+      ]
+    },
+    {
+      id: 'dibujos',
+      nombre: 'Dibujos',
+      emoji: '🎨',
+      claseColor: 'cat-dibujos',
+      badgeStyle: 'background:linear-gradient(135deg,#c2410c,#f97316)',
+      videos: [
+        // ⚠️ Verificar IDs — son episodios/compilaciones de canales oficiales
+        { id: 'gUmSEuoMHa8', titulo: 'Peppa Pig 🐷',             canal: 'Peppa Pig en Español' },
+        { id: 'mBhLc2gKFBE', titulo: 'Peppa Pig - Aventuras 🐷',  canal: 'Peppa Pig en Español' },
+        { id: 'cEJHMn68oBE', titulo: 'Pocoyo 🎪',                 canal: 'Pocoyo en Español' },
+        { id: 'VgOTNVdOxzQ', titulo: 'Pocoyo y Amigos 🎪',        canal: 'Pocoyo en Español' },
+        { id: 'T9l1gSoQ0YY', titulo: 'PAW Patrol 🐾',             canal: 'PAW Patrol en Español' },
+        { id: 'b7A9GzZOaxo', titulo: 'Bluey 🐕',                  canal: 'Bluey' },
+      ]
+    },
+    {
+      id: 'autos',
+      nombre: 'Autos y motos',
+      emoji: '🚗',
+      claseColor: 'cat-autos',
+      badgeStyle: 'background:linear-gradient(135deg,#1d4ed8,#3b82f6)',
+      videos: [
+        // ⚠️ Verificar IDs — contenido infantil de vehículos
+        { id: 'vDIjFTSX5_4', titulo: 'Blippi - Vehículos 🚛',     canal: 'Blippi en Español' },
+        { id: 'IYVE1cT6rPs', titulo: 'Autos para Chicos 🚗',       canal: 'Kids' },
+        { id: 'rWrg6JMmNt4', titulo: 'Monster Trucks 🚚',          canal: 'Kids' },
+        { id: 'ZBVQQkrJzOM', titulo: 'Motos para Chicos 🏍️',       canal: 'Kids' },
+        { id: '8Y5JVkjBHoc', titulo: 'Autos de Colores 🎨',        canal: 'Kids' },
+        { id: 'pNfHoPIxhcM', titulo: 'Camiones Gigantes 🚜',       canal: 'Kids' },
+      ]
+    },
+    {
+      id: 'lavado',
+      nombre: 'Lavado de autos',
+      emoji: '🫧',
+      claseColor: 'cat-lavado',
+      badgeStyle: 'background:linear-gradient(135deg,#0e7490,#06b6d4)',
+      videos: [
+        // ⚠️ Verificar IDs — lavado de autos para chicos
+        { id: 'g5w_dlMVhRU', titulo: 'Blippi - Car Wash 🚗',       canal: 'Blippi en Español' },
+        { id: 'vDcDfMbTVr4', titulo: 'Lavado de Autos 🚿',         canal: 'Kids' },
+        { id: 'TkZMKLt4D2E', titulo: 'Car Wash para Chicos 🫧',    canal: 'Kids' },
+        { id: 'YaWT4sAshR8', titulo: 'Limpiar el Auto ✨',          canal: 'Kids' },
+      ]
+    }
+  ];
+
+  // ============================================================
+  // Estado de navegación
+  // ============================================================
+  let catActual = null;  // objeto de categoría actual
+  let videoActual = null; // objeto de video actual
+
+  // ============================================================
+  // Navegación
+  // ============================================================
+  function showView(id) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function goHome() {
+    // Detener video si hay uno activo
+    stopPlayer();
+    location.href = './child.html';
+  }
+
+  function backToHome() {
+    stopPlayer();
+    catActual = null;
+    updateBackBtn('home');
+    showView('viewHome');
+  }
+
+  function backToCategory() {
+    stopPlayer();
+    openCategory(catActual.id, false); // sin animación
+  }
+
+  function updateBackBtn(ctx) {
+    const btn = document.getElementById('btnBack');
+    if (ctx === 'home') {
+      btn.textContent = '⬅️ Volver a la app';
+      btn.onclick = goHome;
+    }
+  }
+
+  // ============================================================
+  // Abrir categoría
+  // ============================================================
+  function openCategory(catId, animate = true) {
+    catActual = CATEGORIAS.find(c => c.id === catId);
+    if (!catActual) return;
+
+    // Animación en el card (solo desde home)
+    if (animate) {
+      const cards = document.querySelectorAll('.cat-card');
+      cards.forEach(c => {
+        if (c.classList.contains('cat-' + catId)) {
+          c.classList.add('pop');
+          c.addEventListener('animationend', () => c.classList.remove('pop'), { once: true });
+        }
+      });
+    }
+
+    // Badge de categoría
+    const badge = document.getElementById('catBadge');
+    badge.textContent = catActual.emoji + ' ' + catActual.nombre;
+    badge.setAttribute('style', catActual.badgeStyle + ';padding:8px 16px;border-radius:99px;color:#fff;font-weight:900;font-size:16px;');
+
+    document.getElementById('catTitle').textContent = catActual.nombre;
+
+    // Renderizar grilla de videos
+    const grid = document.getElementById('videoGrid');
+    grid.innerHTML = '';
+
+    catActual.videos.forEach(v => {
+      const card = document.createElement('button');
+      card.className = 'video-card';
+      card.setAttribute('aria-label', 'Ver ' + v.titulo);
+      card.onclick = () => openPlayer(v);
+
+      const thumbUrl = `https://img.youtube.com/vi/${v.id}/mqdefault.jpg`;
+      card.innerHTML = `
+        <div class="video-thumb-wrap">
+          <img
+            src="${thumbUrl}"
+            alt="${v.titulo}"
+            loading="lazy"
+            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+          />
+          <div class="video-thumb-fallback" style="font-size:48px;">
+            ${catActual.emoji}
+          </div>
+        </div>
+        <div class="video-info">
+          <div class="vtitle">${v.titulo}</div>
+          <div class="vchannel">${v.canal}</div>
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+
+    showView('viewCategory');
+  }
+
+  // ============================================================
+  // Abrir reproductor
+  // ============================================================
+  function openPlayer(video) {
+    if (!navigator.onLine) {
+      document.getElementById('offlineBanner').classList.add('show');
+      return;
+    }
+
+    videoActual = video;
+    document.getElementById('playerTitle').textContent = video.titulo;
+
+    // Embed con parámetros seguros:
+    // rel=0     → solo relacionados del mismo canal
+    // modestbranding=1 → mínimo branding YouTube
+    // playsinline=1    → en línea en iOS
+    // autoplay=1       → reproduce automáticamente
+    const embedUrl =
+      `https://www.youtube.com/embed/${video.id}` +
+      `?rel=0&modestbranding=1&playsinline=1&autoplay=1`;
+
+    const iframe = document.getElementById('playerIframe');
+    iframe.src = embedUrl;
+
+    // Ocultar error previo
+    document.getElementById('iframeError').classList.remove('show');
+
+    // Timeout simple: si no carga en 8s, mostrar error (solo como guía visual)
+    const errTimer = setTimeout(() => {
+      // No mostramos error agresivo porque YouTube en iframe puede tardar
+    }, 8000);
+
+    iframe.onload = () => clearTimeout(errTimer);
+
+    showView('viewPlayer');
+  }
+
+  function stopPlayer() {
+    const iframe = document.getElementById('playerIframe');
+    // Vaciar src para detener el video
+    iframe.src = '';
+  }
+
+  // ============================================================
+  // Detección offline
+  // ============================================================
+  function checkOnline() {
+    const banner = document.getElementById('offlineBanner');
+    if (!navigator.onLine) {
+      banner.classList.add('show');
+    } else {
+      banner.classList.remove('show');
+    }
+  }
+
+  window.addEventListener('online',  checkOnline);
+  window.addEventListener('offline', checkOnline);
+
+  // ============================================================
+  // Animación press en cat-cards (pointerdown)
+  // ============================================================
+  document.querySelectorAll('.cat-card').forEach(card => {
+    card.addEventListener('pointerdown', () => {
+      card.style.transform = 'scale(.93) translateY(4px)';
+    });
+    card.addEventListener('pointerup', () => {
+      card.style.transform = '';
+    });
+    card.addEventListener('pointercancel', () => {
+      card.style.transform = '';
+    });
+  });
+
+  // ============================================================
+  // Inicialización
+  // ============================================================
+  (function init() {
+    checkOnline();
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw-aac.js');
+    }
+  })();
+</script>
+</body>
+</html>

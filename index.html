@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#2563eb" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <title>Aplicación de Samuel</title>
+  <meta http-equiv="refresh" content="0; url=child.html" />
+  <script>
+    // Redirección robusta (por si el meta refresh falla)
+    if (!location.pathname.endsWith('child.html')) {
+      location.replace('child.html');
+    }
+  </script>
+</head>
+<body></body>
+</html>
