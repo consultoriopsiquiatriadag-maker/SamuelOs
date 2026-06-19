@@ -595,7 +595,7 @@ function openVoiceSettings() {
   modal.showModal();
 
   const cancel = document.getElementById('settingsCancel');
-  const test = document.getElementById('settingsTest');
+  const test = document.getElementById('testVoice');
   const ok = document.getElementById('settingsOk');
 
   if (cancel) cancel.onclick = () => modal.close();
