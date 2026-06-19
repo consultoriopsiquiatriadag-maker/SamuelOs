@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#2563eb" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <title>Progreso de Samuel</title>
+  <style>
+    :root{
+      --bg:#f2f5f8;
+      --card:#ffffff;
+      --stroke:#e5e7eb;
+      --shadow: 0 12px 30px rgba(2,6,23,.08);
+      --navy:#0e2239;
+      --blue:#2563eb;
+      --text:#0f172a;
+      --muted:#475569;
+      --radius:16px;
+    }
+    *{box-sizing:border-box;}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial; background:var(--bg); color:var(--text);}
+    .shell{max-width:920px;margin:0 auto;padding:18px 18px 32px;}
+    header{display:flex;align-items:center;gap:14px;justify-content:space-between;flex-wrap:wrap;}
+    h1{font-size:24px;margin:0;letter-spacing:-.02em;}
+    .btn{border:1px solid var(--stroke); background:#fff; padding:10px 14px; border-radius:999px; font-weight:700; cursor:pointer; text-decoration:none; color:var(--text); display:inline-flex; align-items:center; gap:8px;}
+    .btn:active{transform:translateY(1px);}
+
+    .card{background:var(--card); border:1px solid var(--stroke); border-radius:var(--radius); box-shadow:var(--shadow); padding:20px; margin-top:18px;}
+    .cardTitle{font-size:14px; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:.04em; margin:0 0 12px;}
+
+    .levelRow{display:flex; align-items:center; gap:18px; flex-wrap:wrap;}
+    .levelEmoji{font-size:54px; line-height:1;}
+    .levelName{font-size:26px; font-weight:900; letter-spacing:-.02em;}
+    .levelSub{color:var(--muted); font-weight:700; margin-top:4px;}
+
+    .progressTrack{margin-top:14px; background:#eef2f7; border-radius:999px; height:18px; overflow:hidden; border:1px solid var(--stroke);}
+    .progressFill{height:100%; background:linear-gradient(90deg, #60a5fa, var(--blue)); border-radius:999px; transition:width .4s ease;}
+
+    .badgeGrid{display:grid; grid-template-columns:repeat(5,1fr); gap:14px;}
+    @media (max-width: 700px){ .badgeGrid{grid-template-columns:repeat(3,1fr);} }
+    @media (max-width: 420px){ .badgeGrid{grid-template-columns:repeat(2,1fr);} }
+    .badge{border:2px solid var(--stroke); border-radius:16px; padding:14px 8px; text-align:center; background:#f8fafc;}
+    .badge.unlocked{border-color:#bfe0ff; background:#eef6ff;}
+    .badge .em{font-size:32px; line-height:1; filter:grayscale(1); opacity:.45;}
+    .badge.unlocked .em{filter:none; opacity:1;}
+    .badge .nm{font-size:12px; font-weight:800; margin-top:6px; color:var(--muted);}
+    .badge.unlocked .nm{color:var(--text);}
+
+    .weekRow{display:flex; gap:10px; justify-content:space-between; flex-wrap:wrap;}
+    .dayCol{flex:1; min-width:64px; text-align:center;}
+    .dayBar{height:90px; display:flex; align-items:flex-end; justify-content:center;}
+    .dayBarFill{width:28px; background:linear-gradient(180deg, #fbbf24, #f59e0b); border-radius:8px 8px 4px 4px; min-height:4px;}
+    .dayLabel{font-size:12px; font-weight:800; color:var(--muted); margin-top:6px; text-transform:capitalize;}
+    .dayStars{font-size:13px; font-weight:900; margin-top:2px;}
+
+    .totalLine{font-size:15px; color:var(--muted); margin-top:6px;}
+    .totalLine b{color:var(--text);}
+
+    footer{text-align:center; padding:14px 8px 6px; font-size:12px; color:var(--muted);}
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <h1>📈 Progreso de Samuel</h1>
+      <a class="btn" href="./adult.html">⬅ Volver</a>
+    </header>
+
+    <section class="card">
+      <p class="cardTitle">Nivel actual</p>
+      <div class="levelRow">
+        <div class="levelEmoji" id="levelEmoji">🌱</div>
+        <div>
+          <div class="levelName" id="levelName">Explorador</div>
+          <div class="levelSub" id="levelSub">0 estrellas en total</div>
+        </div>
+      </div>
+      <div class="progressTrack"><div class="progressFill" id="levelProgressFill" style="width:0%;"></div></div>
+      <div class="totalLine" id="levelNextText"></div>
+    </section>
+
+    <section class="card">
+      <p class="cardTitle">Insignias</p>
+      <div class="badgeGrid" id="badgeGrid"></div>
+    </section>
+
+    <section class="card">
+      <p class="cardTitle">Últimos 7 días</p>
+      <div class="weekRow" id="weekRow"></div>
+      <div class="totalLine" id="weekTotalText"></div>
+    </section>
+
+    <footer>
+      Creado por PETER-SOFT Co. para <a href="https://juegosconsultoriodagnino.netlify.app/" target="_blank" rel="noopener" style="color:var(--muted);">juegosconsultoriodagnino.netlify.app</a> (SITIO WEB OFICIAL)
+    </footer>
+  </div>
+
+  <script>
+    // Mismas constantes/claves que child.html y juegos.html (Fase 22).
+    const LEVELS = [
+      { name: 'Explorador', emoji: '🌱', min: 0 },
+      { name: 'Ayudante', emoji: '🤝', min: 15 },
+      { name: 'Capitán', emoji: '🚀', min: 40 },
+      { name: 'Piloto', emoji: '✈️', min: 80 },
+      { name: 'Comandante Samuel', emoji: '🏆', min: 150 }
+    ];
+    const BADGES = [
+      { stars: 10, name: '10 estrellas', emoji: '🥉' },
+      { stars: 25, name: '25 estrellas', emoji: '🥈' },
+      { stars: 50, name: '50 estrellas', emoji: '🥇' },
+      { stars: 100, name: '100 estrellas', emoji: '💎' },
+      { stars: 200, name: '200 estrellas', emoji: '👑' }
+    ];
+
+    function getTotalStars() {
+      return parseInt(localStorage.getItem('samuel_total_stars') || '0', 10) || 0;
+    }
+
+    function getLevel(total) {
+      let idx = 0;
+      for (let i = 0; i < LEVELS.length; i++) { if (total >= LEVELS[i].min) idx = i; }
+      const current = LEVELS[idx];
+      const next = LEVELS[idx + 1] || null;
+      return { current, next };
+    }
+
+    function renderLevel() {
+      const total = getTotalStars();
+      const { current, next } = getLevel(total);
+      document.getElementById('levelEmoji').textContent = current.emoji;
+      document.getElementById('levelName').textContent = current.name;
+      document.getElementById('levelSub').textContent = total + (total === 1 ? ' estrella en total' : ' estrellas en total');
+
+      const fill = document.getElementById('levelProgressFill');
+      const nextText = document.getElementById('levelNextText');
+      if (next) {
+        const span = next.min - current.min;
+        const into = total - current.min;
+        const pct = Math.max(4, Math.min(100, Math.round((into / span) * 100)));
+        fill.style.width = pct + '%';
+        nextText.innerHTML = `Faltan <b>${next.min - total}</b> estrellas para llegar a ${next.emoji} <b>${next.name}</b>`;
+      } else {
+        fill.style.width = '100%';
+        nextText.innerHTML = `¡Samuel alcanzó el nivel máximo! ${current.emoji} <b>${current.name}</b>`;
+      }
+    }
+
+    function renderBadges() {
+      const total = getTotalStars();
+      const grid = document.getElementById('badgeGrid');
+      grid.innerHTML = '';
+      BADGES.forEach(b => {
+        const unlocked = total >= b.stars;
+        const div = document.createElement('div');
+        div.className = 'badge' + (unlocked ? ' unlocked' : '');
+        div.innerHTML = `<div class="em">${b.emoji}</div><div class="nm">${b.name}</div>`;
+        grid.appendChild(div);
+      });
+    }
+
+    function dayKey(d) {
+      return 'samuel_progress_' + d.toISOString().slice(0, 10);
+    }
+
+    function renderWeek() {
+      const row = document.getElementById('weekRow');
+      row.innerHTML = '';
+      const days = [];
+      let weekTotal = 0;
+      const dayNames = ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'];
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        let stars = 0;
+        try {
+          const raw = localStorage.getItem(dayKey(d));
+          if (raw) stars = JSON.parse(raw).stars || 0;
+        } catch (e) {}
+        weekTotal += stars;
+        days.push({ label: dayNames[d.getDay()], stars });
+      }
+      const maxStars = Math.max(1, ...days.map(d => d.stars));
+      days.forEach(d => {
+        const col = document.createElement('div');
+        col.className = 'dayCol';
+        const heightPx = Math.round((d.stars / maxStars) * 80) + (d.stars > 0 ? 10 : 4);
+        col.innerHTML = `
+          <div class="dayBar"><div class="dayBarFill" style="height:${heightPx}px;"></div></div>
+          <div class="dayLabel">${d.label}</div>
+          <div class="dayStars">⭐ ${d.stars}</div>
+        `;
+        row.appendChild(col);
+      });
+      document.getElementById('weekTotalText').innerHTML = `Total de la semana: <b>${weekTotal} ⭐</b>`;
+    }
+
+    renderLevel();
+    renderBadges();
+    renderWeek();
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw-aac.js');
+    }
+  </script>
+</body>
+</html>

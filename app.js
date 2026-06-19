@@ -292,6 +292,12 @@ function renderTabs() {
     videosBtn.textContent = '▶️ Videos';
     videosBtn.onclick = () => { location.href = './youtube.html'; };
     tabsEl.appendChild(videosBtn);
+
+    const progresoBtn = document.createElement('button');
+    progresoBtn.className = 'tab';
+    progresoBtn.textContent = '📈 Progreso';
+    progresoBtn.onclick = () => { location.href = './progreso.html'; };
+    tabsEl.appendChild(progresoBtn);
   }
 
   if (pageKind() === 'adult' && !locked && editMode) {

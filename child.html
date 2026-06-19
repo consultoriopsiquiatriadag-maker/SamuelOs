@@ -184,18 +184,21 @@
         }
 
         .mission-item {
-            font-size: 0.85rem;
-            font-weight: 700;
+            font-size: 1rem;
+            font-weight: 800;
             color: #999;
             background: #F2F3F8;
-            padding: 6px 14px;
-            border-radius: 30px;
+            padding: 10px 20px;
+            border-radius: 20px;
             transition: var(--transition);
+            border: 2px solid #E5E7EB;
         }
 
         .mission-item.done {
             color: white;
             background: var(--color-ayuda);
+            border-color: transparent;
+            transform: scale(1.04);
         }
 
         .stars-badge {
@@ -212,10 +215,25 @@
             transform: scale(1.15);
         }
 
+        .level-badge {
+            font-size: 0.85rem;
+            font-weight: 800;
+            background: #EAF6FF;
+            color: #0b4aa7;
+            padding: 6px 14px;
+            border-radius: 30px;
+            transition: transform 0.25s ease;
+            white-space: nowrap;
+        }
+
+        .level-badge.pulse-stars {
+            transform: scale(1.15);
+        }
+
         @media (max-width: 768px) {
             .mission-bar { margin: 0 20px 10px 20px; padding: 10px 14px; }
             .mission-title { font-size: 0.8rem; }
-            .mission-item { font-size: 0.75rem; padding: 5px 10px; }
+            .mission-item { font-size: 0.85rem; padding: 8px 14px; }
         }
 
         .btn-parents {
@@ -495,12 +513,13 @@
     </header>
 
     <div class="mission-bar">
-        <div class="mission-title">🎯 Misión de hoy</div>
+        <div class="mission-title">🎯 Misiones de hoy</div>
         <div class="mission-items">
             <span class="mission-item" id="mission-jugar">⬜ Jugar</span>
             <span class="mission-item" id="mission-hablar">⬜ Hablar</span>
-            <span class="mission-item" id="mission-descansar">⬜ Descansar</span>
+            <span class="mission-item" id="mission-aprender">⬜ Aprender</span>
         </div>
+        <div class="level-badge" id="levelBadge">🌱 Explorador</div>
         <div class="stars-badge" id="starsBadge">⭐ 0</div>
     </div>
 
@@ -624,13 +643,54 @@
         function loadProgress() {
             try {
                 const raw = localStorage.getItem(todayKey());
-                if (raw) return JSON.parse(raw);
+                if (raw) {
+                    const p = JSON.parse(raw);
+                    // Migración Fase 23: la misión "Descansar" pasó a llamarse "Aprender".
+                    if (p.aprender === undefined) p.aprender = !!p.descansar;
+                    return p;
+                }
             } catch (e) {}
-            return { stars: 0, jugar: false, hablar: false, descansar: false };
+            return { stars: 0, jugar: false, hablar: false, aprender: false };
         }
 
         function saveProgress(p) {
             localStorage.setItem(todayKey(), JSON.stringify(p));
+        }
+
+        // --- Nivel de Samuel e insignias (Fase 22) ---
+        // "samuel_total_stars" es un contador de por vida (nunca baja, no hay castigos).
+        const LEVELS = [
+            { name: 'Explorador', emoji: '🌱', min: 0 },
+            { name: 'Ayudante', emoji: '🤝', min: 15 },
+            { name: 'Capitán', emoji: '🚀', min: 40 },
+            { name: 'Piloto', emoji: '✈️', min: 80 },
+            { name: 'Comandante Samuel', emoji: '🏆', min: 150 }
+        ];
+        const BADGES = [
+            { stars: 10, name: '10 estrellas', emoji: '🥉' },
+            { stars: 25, name: '25 estrellas', emoji: '🥈' },
+            { stars: 50, name: '50 estrellas', emoji: '🥇' },
+            { stars: 100, name: '100 estrellas', emoji: '💎' },
+            { stars: 200, name: '200 estrellas', emoji: '👑' }
+        ];
+        function getTotalStars() {
+            return parseInt(localStorage.getItem('samuel_total_stars') || '0', 10) || 0;
+        }
+        function addTotalStars(n) {
+            const total = getTotalStars() + (n || 0);
+            try { localStorage.setItem('samuel_total_stars', String(total)); } catch (e) {}
+            return total;
+        }
+        function getLevel(total) {
+            let current = LEVELS[0];
+            for (const lvl of LEVELS) { if (total >= lvl.min) current = lvl; }
+            return current;
+        }
+        function updateLevelUI() {
+            const el = document.getElementById('levelBadge');
+            if (!el) return;
+            const lvl = getLevel(getTotalStars());
+            el.innerText = lvl.emoji + ' ' + lvl.name;
         }
 
         function addStars(n, missionKey) {
@@ -638,7 +698,9 @@
             p.stars += n;
             if (missionKey) p[missionKey] = true;
             saveProgress(p);
+            addTotalStars(n);
             updateMissionUI();
+            updateLevelUI();
             pulseStars();
             spawnFloatingStar(n);
             playStarSound();
@@ -679,12 +741,12 @@
             setTimeout(() => star.remove(), 1150);
         }
 
-        // Detecta cambio de actividad (variedad = +2 estrellas, suma a la misión "Descansar")
+        // Detecta cambio de actividad (variedad = +2 estrellas, suma a la misión "Aprender")
         // notify=false evita superponer el audio "cambiar de actividad" con otro audio que ya se va a reproducir
         function registerActivity(name, notify = true) {
             const last = localStorage.getItem('samuel_last_activity');
             if (last && last !== name) {
-                addStars(2, 'descansar');
+                addStars(2, 'aprender');
                 if (notify) playParentAudio('cambiarActividad');
             }
             localStorage.setItem('samuel_last_activity', name);
@@ -700,7 +762,7 @@
             };
             setItem('mission-jugar', p.jugar, 'Jugar');
             setItem('mission-hablar', p.hablar, 'Hablar');
-            setItem('mission-descansar', p.descansar, 'Descansar');
+            setItem('mission-aprender', p.aprender, 'Aprender');
 
             const badge = document.getElementById('starsBadge');
             if (badge) {
@@ -879,6 +941,7 @@
         // --- Inicialización ---
         window.onload = () => {
             updateMissionUI();
+            updateLevelUI();
             checkVideoLimit();
             try {
                 const lastPhrase = localStorage.getItem('samuel_last_phrase');

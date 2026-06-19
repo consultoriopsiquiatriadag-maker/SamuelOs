@@ -922,9 +922,13 @@
     function loadProgressJ(){
       try{
         const raw = localStorage.getItem(todayKeyJ());
-        return raw ? JSON.parse(raw) : { stars:0, jugar:false, hablar:false, descansar:false };
+        if (!raw) return { stars:0, jugar:false, hablar:false, aprender:false };
+        const p = JSON.parse(raw);
+        // Migración Fase 23: la misión "Descansar" pasó a llamarse "Aprender".
+        if (p.aprender === undefined) p.aprender = !!p.descansar;
+        return p;
       }catch(e){
-        return { stars:0, jugar:false, hablar:false, descansar:false };
+        return { stars:0, jugar:false, hablar:false, aprender:false };
       }
     }
     function saveProgressJ(p){
@@ -935,21 +939,30 @@
       if (!el) return;
       el.textContent = '⭐ ' + (loadProgressJ().stars || 0);
     }
+    // Contador de por vida (Fase 22), compartido con child.html. Nunca baja, no hay castigos.
+    function addTotalStarsJ(n){
+      try{
+        const total = (parseInt(localStorage.getItem('samuel_total_stars') || '0', 10) || 0) + (n || 0);
+        localStorage.setItem('samuel_total_stars', String(total));
+      }catch(e){/* ignore */}
+    }
     function addStarJ(missionKey){
       const p = loadProgressJ();
       p.stars = (p.stars || 0) + 1;
       p[missionKey || 'jugar'] = true;
       saveProgressJ(p);
+      addTotalStarsJ(1);
       updateStarsBadgeJ();
       const el = document.getElementById('starsBadge');
       if (el){ el.classList.remove('pulse-stars'); void el.offsetWidth; el.classList.add('pulse-stars'); }
     }
     // Cada `threshold` aciertos suma 1 estrella real. Sin castigos: nunca resta ni penaliza.
-    function makeStarTicker(threshold = 5){
+    // missionKey opcional: a qué misión de hoy suma (por defecto "jugar").
+    function makeStarTicker(threshold = 5, missionKey){
       let n = 0;
       return function(){
         n++;
-        if (n >= threshold){ n = 0; addStarJ(); return true; }
+        if (n >= threshold){ n = 0; addStarJ(missionKey); return true; }
         return false;
       };
     }
@@ -2910,7 +2923,7 @@
         formas:  document.getElementById('fichaFormas'),
         rutina:  document.getElementById('fichaRutina')
       };
-      const tick = makeStarTicker(6);
+      const tick = makeStarTicker(6, 'aprender');
 
       let currentCat = 'colores';
       let currentIdx = 0;
@@ -3090,7 +3103,7 @@
       let currentHistoria = null;
       let stepIdx = 0;
       let finished = false;
-      const tick = makeStarTicker(1);
+      const tick = makeStarTicker(1, 'aprender');
 
       function renderStep(){
         const h = HISTORIAS[currentHistoria];
