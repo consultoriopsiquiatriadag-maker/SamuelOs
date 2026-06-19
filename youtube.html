@@ -537,8 +537,10 @@
   // en el navegador y fijate en la URL:
   //   youtube.com/watch?v=ESTE_ES_EL_ID
   //
-  // ✅ = ID muy confiable (canales oficiales conocidos)
-  // ⚠️ = ID aproximado, verificar antes de usar
+  // ✅ = ID verificado en Fase 26 vía YouTube oEmbed API
+  //     (https://www.youtube.com/oembed?url=...&format=json), confirmando
+  //     que el video existe, es público y permite ser embebido, y que el
+  //     título/canal devuelto coincide con lo que se muestra acá.
   // ============================================================
   const CATEGORIAS = [
     {
@@ -548,17 +550,17 @@
       claseColor: 'cat-canciones',
       badgeStyle: 'background:linear-gradient(135deg,#be185d,#ec4899)',
       videos: [
-        // ✅ Pinkfong — canal oficial verificado
-        { id: 'XqZsoesa55w', titulo: 'Baby Shark 🦈',       canal: 'Pinkfong' },
-        { id: 'E7wJTI-1dvQ', titulo: 'La Rueda del Bus 🚌',  canal: 'Pinkfong' },
-        { id: 'DfbGFyDFAms', titulo: 'Johny Johny 👶',       canal: 'Pinkfong' },
-        { id: '6T_-wPBZYA0', titulo: 'El Granjero 🐄',       canal: 'Pinkfong' },
-        // ✅ Super Simple Songs — canal oficial
-        { id: '0TgLtF3PMOc', titulo: 'Cinco Patitos 🐥',     canal: 'Super Simple Songs' },
-        { id: 'ffwAEm_2Y6s', titulo: 'El Abecedario 🔤',     canal: 'Super Simple Songs' },
-        // ⚠️ Cocomelon en Español — verificar disponibilidad
-        { id: 'yCjJyiqpAuU', titulo: 'Bingo el Perrito 🐶',  canal: 'Cocomelon' },
-        { id: 'IFo3t4I26q4', titulo: 'Hora del Baño 🛁',     canal: 'Cocomelon' },
+        // ✅ Pinkfong en español — canal oficial, verificado
+        { id: 'XqZsoesa55w', titulo: 'Baby Shark 🦈',          canal: 'Pinkfong' },
+        { id: 'EwMlYMqWEiU', titulo: 'Las Ruedas del Bus 🚌',  canal: 'Pinkfong en español' },
+        { id: 'iV-8FpGrEuI', titulo: 'La Granja de Pinkfong 🐄', canal: 'Pinkfong en español' },
+        { id: 'wszs5nDay6I', titulo: 'Todos los Patitos 🐥',   canal: 'Pinkfong en español' },
+        { id: 'po5tCXKmvoo', titulo: 'El Abecedario 🔤',       canal: 'Pinkfong en español' },
+        // ✅ ChuChu TV Español — canal oficial, verificado
+        { id: 'bvupIA1qc7w', titulo: 'Johny Johny 👶',         canal: 'ChuChu TV Español' },
+        // ✅ CoComelon en Español (Moonbug Kids) — canal oficial, verificado
+        { id: 'ZbfRCL-7Oqs', titulo: 'Bingo el Perrito 🐶',    canal: 'CoComelon en Español' },
+        { id: 'EySV6I-3U1c', titulo: 'Hora del Baño 🛁',       canal: 'CoComelon en Español' },
       ]
     },
     {
@@ -568,13 +570,13 @@
       claseColor: 'cat-dibujos',
       badgeStyle: 'background:linear-gradient(135deg,#c2410c,#f97316)',
       videos: [
-        // ⚠️ Verificar IDs — son episodios/compilaciones de canales oficiales
-        { id: 'gUmSEuoMHa8', titulo: 'Peppa Pig 🐷',             canal: 'Peppa Pig en Español' },
-        { id: 'mBhLc2gKFBE', titulo: 'Peppa Pig - Aventuras 🐷',  canal: 'Peppa Pig en Español' },
-        { id: 'cEJHMn68oBE', titulo: 'Pocoyo 🎪',                 canal: 'Pocoyo en Español' },
-        { id: 'VgOTNVdOxzQ', titulo: 'Pocoyo y Amigos 🎪',        canal: 'Pocoyo en Español' },
-        { id: 'T9l1gSoQ0YY', titulo: 'PAW Patrol 🐾',             canal: 'PAW Patrol en Español' },
-        { id: 'b7A9GzZOaxo', titulo: 'Bluey 🐕',                  canal: 'Bluey' },
+        // ✅ Canales oficiales, verificados
+        { id: 'Eog6R528OMo', titulo: 'Peppa Pig 🐷',             canal: 'Peppa Pig Español Latino' },
+        { id: 'YDNkZ2tO_kk', titulo: 'Peppa - Muchas Burbujas 🫧', canal: 'Peppa Pig Español Latino' },
+        { id: '6vHCB5PK31Y', titulo: 'Pocoyo 🎪',                 canal: 'Pocoyó Español' },
+        { id: 'hpVPNzhnH78', titulo: 'PAW Patrol - Rubble 🐾',    canal: 'PAW Patrol en Español' },
+        { id: 'AG5HnHE__5Y', titulo: 'Bluey 🐕',                  canal: 'Bluey Español' },
+        { id: 'CBxXOW81Rjs', titulo: 'Bluey - Faceytalk 📱',      canal: 'Bluey Español' },
       ]
     },
     {
@@ -584,13 +586,12 @@
       claseColor: 'cat-autos',
       badgeStyle: 'background:linear-gradient(135deg,#1d4ed8,#3b82f6)',
       videos: [
-        // ⚠️ Verificar IDs — contenido infantil de vehículos
-        { id: 'vDIjFTSX5_4', titulo: 'Blippi - Vehículos 🚛',     canal: 'Blippi en Español' },
-        { id: 'IYVE1cT6rPs', titulo: 'Autos para Chicos 🚗',       canal: 'Kids' },
-        { id: 'rWrg6JMmNt4', titulo: 'Monster Trucks 🚚',          canal: 'Kids' },
-        { id: 'ZBVQQkrJzOM', titulo: 'Motos para Chicos 🏍️',       canal: 'Kids' },
-        { id: '8Y5JVkjBHoc', titulo: 'Autos de Colores 🎨',        canal: 'Kids' },
-        { id: 'pNfHoPIxhcM', titulo: 'Camiones Gigantes 🚜',       canal: 'Kids' },
+        // ✅ Canales oficiales, verificados
+        { id: 'rbZ3T99VEKI', titulo: 'Blippi - Camión de Basura 🚛', canal: 'Blippi en Español' },
+        { id: '1IJ3U8fGYhQ', titulo: 'Blippi - Camión Monstruo 🚜', canal: 'Blippi en Español' },
+        { id: 'dcJjhdDqJxk', titulo: 'Leo el Camión y los Autos 🚗', canal: 'TV para niños' },
+        { id: '3xKffSjFTTM', titulo: 'Camiones de Colores 🎨',       canal: 'Vehículos de Servicio' },
+        { id: '2GNyXeJiaC4', titulo: 'Coches y Colores 🌈',          canal: 'TV para niños' },
       ]
     },
     {
@@ -600,11 +601,11 @@
       claseColor: 'cat-lavado',
       badgeStyle: 'background:linear-gradient(135deg,#0e7490,#06b6d4)',
       videos: [
-        // ⚠️ Verificar IDs — lavado de autos para chicos
-        { id: 'g5w_dlMVhRU', titulo: 'Blippi - Car Wash 🚗',       canal: 'Blippi en Español' },
-        { id: 'vDcDfMbTVr4', titulo: 'Lavado de Autos 🚿',         canal: 'Kids' },
-        { id: 'TkZMKLt4D2E', titulo: 'Car Wash para Chicos 🫧',    canal: 'Kids' },
-        { id: 'YaWT4sAshR8', titulo: 'Limpiar el Auto ✨',          canal: 'Kids' },
+        // ✅ Canales oficiales, verificados
+        { id: 'sP8hEsTGp1Q', titulo: 'Blippi - Auto Lavado 🚗',     canal: 'Blippi en Español' },
+        { id: '1y0GLO0OrPM', titulo: 'Auto Lavado de Blippi 🫧',    canal: 'Blippi en Español' },
+        { id: 'FCvIwuYyPQU', titulo: 'Auto Lavado de Blippi 🚿',    canal: 'Moonbug Kids en Español' },
+        { id: 'Y1vP1gBNiik', titulo: 'El Autolavado de Jorge ✨',    canal: 'Jorge el Curioso en Español' },
       ]
     }
   ];
@@ -750,9 +751,10 @@
     // Ocultar error previo
     document.getElementById('iframeError').classList.remove('show');
 
-    // Timeout simple: si no carga en 8s, mostrar error (solo como guía visual)
+    // Si el video no carga en 8s (borrado, privado o sin permiso de embed),
+    // mostramos el aviso amable en vez de dejar la pantalla en blanco.
     const errTimer = setTimeout(() => {
-      // No mostramos error agresivo porque YouTube en iframe puede tardar
+      document.getElementById('iframeError').classList.add('show');
     }, 8000);
 
     iframe.onload = () => clearTimeout(errTimer);
