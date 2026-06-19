@@ -73,6 +73,10 @@
     .hub-fichas{ --hub-color:#f59e0b; }
     .hub-comunicacion{ --hub-color:#0ea5a4; }
     .hub-historias{ --hub-color:#ec4899; }
+    .hub-aprender{ --hub-color:#f59e0b; }
+    .hub-sonidos{ --hub-color:#2563eb; }
+    .hub-explotar{ --hub-color:#22c55e; }
+    .hub-movimiento{ --hub-color:#f97316; }
 
     .soon-card{ margin-top:18px; border:2px solid rgba(15,23,42,.14); border-radius:18px; background:var(--card); box-shadow:var(--shadow); padding:30px 22px; text-align:center; }
     .soon-emoji{ font-size:64px; margin-bottom:8px; }
@@ -324,14 +328,27 @@
           <div class="gdesc">Memoria, atención y aprendizaje jugando.</div>
         </button>
 
-        <button class="game hub-card hub-fichas" id="goFichas">
-          <div class="gtitle"><span class="gicon">📚</span>Fichas de aprendizaje</div>
-          <div class="gdesc">Animales, vehículos, emociones y más.</div>
+        <button class="game hub-card hub-aprender" id="goAprender">
+          <div class="gtitle"><span class="gicon">📚</span>Aprender</div>
+          <div class="gdesc">Fichas e historias para aprender jugando.</div>
         </button>
 
         <button class="game hub-card hub-comunicacion" id="goComunicacion">
           <div class="gtitle"><span class="gicon">🗣️</span>Comunicación</div>
           <div class="gdesc">Frases para decir lo que necesito.</div>
+        </button>
+      </div>
+    </section>
+
+    <!-- APRENDER: sub-hub de Fichas + Historias (Fase 24) -->
+    <section id="viewAprender" class="view" aria-label="Aprender">
+      <div class="top-actions" style="margin-bottom:6px;">
+        <button class="btn ghost" id="aprenderHome">⬅️ Centro de juegos</button>
+      </div>
+      <div class="grid">
+        <button class="game hub-card hub-fichas" id="goFichas">
+          <div class="gtitle"><span class="gicon">📚</span>Fichas de aprendizaje</div>
+          <div class="gdesc">Animales, vehículos, emociones y más.</div>
         </button>
 
         <button class="game hub-card hub-historias" id="goHistorias">
@@ -341,10 +358,33 @@
       </div>
     </section>
 
-    <!-- JUEGOS SIMPLES -->
+    <!-- JUEGOS SIMPLES: mini-hub de 3 subcategorías (Fase 24) -->
     <section id="viewSimples" class="view" aria-label="Juegos simples">
       <div class="top-actions" style="margin-bottom:6px;">
         <button class="btn ghost" id="simplesHome">⬅️ Centro de juegos</button>
+      </div>
+      <div class="grid">
+        <button class="game hub-card hub-sonidos" id="goSonidos">
+          <div class="gtitle"><span class="gicon">🔊</span>Sonidos</div>
+          <div class="gdesc">Animales, vehículos y piano de sonidos.</div>
+        </button>
+
+        <button class="game hub-card hub-explotar" id="goExplotar">
+          <div class="gtitle"><span class="gicon">🎈</span>Para tocar</div>
+          <div class="gdesc">Burbujas, globos y estrellas mágicas.</div>
+        </button>
+
+        <button class="game hub-card hub-movimiento" id="goMovimiento">
+          <div class="gtitle"><span class="gicon">🚗</span>Movimiento</div>
+          <div class="gdesc">Carrera, esquivar y luces de colores.</div>
+        </button>
+      </div>
+    </section>
+
+    <!-- SONIDOS (sub-hub de Juegos simples, Fase 24) -->
+    <section id="viewSonidos" class="view" aria-label="Sonidos">
+      <div class="top-actions" style="margin-bottom:6px;">
+        <button class="btn ghost" id="sonidosHome">⬅️ Juegos simples</button>
       </div>
       <div class="grid">
         <button class="game" id="goSound">
@@ -357,16 +397,24 @@
           <div class="gdesc">Vehículos: motor, bocina, sirenas. Tocá y escuchá.</div>
         </button>
 
-        <button class="game" id="goRace">
-          <div class="gtitle">🏁 Carrera de toques</div>
-          <div class="gdesc">Tocá muchas veces para que el auto llegue a la meta.</div>
+        <button class="game" id="goPianoAnimales">
+          <div class="gtitle">🐾 Piano de animales</div>
+          <div class="gdesc">Tocá rápido y escuchá a cada animal.</div>
         </button>
 
-        <button class="game" id="goDrive">
-          <div class="gtitle">🛣️ Esquivar en la calle</div>
-          <div class="gdesc">Esquivá objetos por 30 segundos. Atención y seguridad vial.</div>
+        <button class="game" id="goPianoVehiculos">
+          <div class="gtitle">🚓 Sonidos de vehículos</div>
+          <div class="gdesc">Tocá rápido y escuchá cada vehículo.</div>
         </button>
+      </div>
+    </section>
 
+    <!-- PARA TOCAR (sub-hub de Juegos simples, Fase 24) -->
+    <section id="viewExplotar" class="view" aria-label="Para tocar">
+      <div class="top-actions" style="margin-bottom:6px;">
+        <button class="btn ghost" id="explotarHome">⬅️ Juegos simples</button>
+      </div>
+      <div class="grid">
         <button class="game" id="goBurbujas">
           <div class="gtitle">🫧 Tocar burbujas</div>
           <div class="gdesc">Tocá las burbujas para hacerlas explotar.</div>
@@ -381,20 +429,28 @@
           <div class="gtitle">⭐ Estrellas mágicas</div>
           <div class="gdesc">Tocá la pantalla y aparecen estrellas.</div>
         </button>
+      </div>
+    </section>
+
+    <!-- MOVIMIENTO (sub-hub de Juegos simples, Fase 24) -->
+    <section id="viewMovimiento" class="view" aria-label="Movimiento">
+      <div class="top-actions" style="margin-bottom:6px;">
+        <button class="btn ghost" id="movimientoHome">⬅️ Juegos simples</button>
+      </div>
+      <div class="grid">
+        <button class="game" id="goRace">
+          <div class="gtitle">🏁 Carrera de toques</div>
+          <div class="gdesc">Tocá muchas veces para que el auto llegue a la meta.</div>
+        </button>
+
+        <button class="game" id="goDrive">
+          <div class="gtitle">🛣️ Esquivar en la calle</div>
+          <div class="gdesc">Esquivá objetos por 30 segundos. Atención y seguridad vial.</div>
+        </button>
 
         <button class="game" id="goLuces">
           <div class="gtitle">🌈 Luces y colores</div>
           <div class="gdesc">Tocá un color, mirá y escuchá.</div>
-        </button>
-
-        <button class="game" id="goPianoAnimales">
-          <div class="gtitle">🐾 Piano de animales</div>
-          <div class="gdesc">Tocá rápido y escuchá a cada animal.</div>
-        </button>
-
-        <button class="game" id="goPianoVehiculos">
-          <div class="gtitle">🚓 Sonidos de vehículos</div>
-          <div class="gdesc">Tocá rápido y escuchá cada vehículo.</div>
         </button>
       </div>
     </section>
@@ -520,7 +576,7 @@
     <!-- BURBUJAS (Fase 15) -->
     <section id="viewBurbujas" class="view" aria-label="Tocar burbujas">
       <div class="top-actions" style="margin-bottom:6px;">
-        <button class="btn ghost" id="burbujasHome">⬅️ Juegos simples</button>
+        <button class="btn ghost" id="burbujasHome">⬅️ Para tocar</button>
       </div>
       <div class="bubble-stage" id="bubbleStage" aria-label="Área de burbujas"></div>
     </section>
@@ -528,7 +584,7 @@
     <!-- GLOBOS (Fase 15) -->
     <section id="viewGlobos" class="view" aria-label="Explotar globos">
       <div class="top-actions" style="margin-bottom:6px;">
-        <button class="btn ghost" id="globosHome">⬅️ Juegos simples</button>
+        <button class="btn ghost" id="globosHome">⬅️ Para tocar</button>
       </div>
       <div class="balloon-stage" id="balloonStage" aria-label="Área de globos"></div>
     </section>
@@ -536,7 +592,7 @@
     <!-- ESTRELLAS (Fase 15) -->
     <section id="viewEstrellas" class="view" aria-label="Estrellas mágicas">
       <div class="top-actions" style="margin-bottom:6px;">
-        <button class="btn ghost" id="estrellasHome">⬅️ Juegos simples</button>
+        <button class="btn ghost" id="estrellasHome">⬅️ Para tocar</button>
       </div>
       <div class="stars-stage" id="starsStage" aria-label="Tocá para hacer aparecer estrellas"></div>
     </section>
@@ -544,7 +600,7 @@
     <!-- LUCES Y COLORES (Fase 15) -->
     <section id="viewLuces" class="view" aria-label="Luces y colores">
       <div class="top-actions" style="margin-bottom:6px;">
-        <button class="btn ghost" id="lucesHome">⬅️ Juegos simples</button>
+        <button class="btn ghost" id="lucesHome">⬅️ Movimiento</button>
       </div>
       <div class="luces-stage" id="lucesStage">
         <div class="luces-grid" id="lucesGrid"></div>
@@ -554,7 +610,7 @@
     <!-- PIANO DE ANIMALES (Fase 15) -->
     <section id="viewPianoAnimales" class="view" aria-label="Piano de animales">
       <div class="top-actions" style="margin-bottom:6px;">
-        <button class="btn ghost" id="pianoAnimalesHome">⬅️ Juegos simples</button>
+        <button class="btn ghost" id="pianoAnimalesHome">⬅️ Sonidos</button>
       </div>
       <div id="pianoAnimalesGrid" class="sound-grid" aria-label="Piano de animales"></div>
     </section>
@@ -562,7 +618,7 @@
     <!-- PIANO DE VEHÍCULOS (Fase 15) -->
     <section id="viewPianoVehiculos" class="view" aria-label="Sonidos de vehículos">
       <div class="top-actions" style="margin-bottom:6px;">
-        <button class="btn ghost" id="pianoVehiculosHome">⬅️ Juegos simples</button>
+        <button class="btn ghost" id="pianoVehiculosHome">⬅️ Sonidos</button>
       </div>
       <div id="pianoVehiculosGrid" class="sound-grid" aria-label="Sonidos de vehículos"></div>
     </section>
@@ -671,7 +727,7 @@
         </div>
         <div class="top-actions">
           <button class="btn" id="soundStop">⏹️ Detener</button>
-          <button class="btn ghost" id="soundHome">⬅️ Juegos</button>
+          <button class="btn ghost" id="soundHome">⬅️ Sonidos</button>
         </div>
       </div>
 
@@ -695,7 +751,7 @@
         </div>
         <div class="top-actions">
           <button class="btn" id="carStop">⏹️ Detener</button>
-          <button class="btn ghost" id="carHome">⬅️ Juegos</button>
+          <button class="btn ghost" id="carHome">⬅️ Sonidos</button>
         </div>
       </div>
 
@@ -724,7 +780,7 @@
             <button class="btn small" id="raceHard">40</button>
           </span>
           <button class="btn" id="raceReset">🔄 Reiniciar</button>
-          <button class="btn ghost" id="raceHome">⬅️ Juegos</button>
+          <button class="btn ghost" id="raceHome">⬅️ Movimiento</button>
         </div>
       </div>
 
@@ -778,7 +834,7 @@
         <div class="top-actions">
           <button class="btn primary" id="driveStart">▶️ Empezar</button>
           <button class="btn" id="driveReset">🔄 Reiniciar</button>
-          <button class="btn ghost" id="driveHome">⬅️ Juegos</button>
+          <button class="btn ghost" id="driveHome">⬅️ Movimiento</button>
         </div>
       </div>
 
@@ -819,7 +875,11 @@
     // --- Views ---
     const views = {
       home: document.getElementById('viewHome'),
+      aprender: document.getElementById('viewAprender'),
       simples: document.getElementById('viewSimples'),
+      sonidos: document.getElementById('viewSonidos'),
+      explotar: document.getElementById('viewExplotar'),
+      movimiento: document.getElementById('viewMovimiento'),
       didacticos: document.getElementById('viewDidacticos'),
       fichas: document.getElementById('viewFichas'),
       comunicacion: document.getElementById('viewComunicacion'),
@@ -854,9 +914,19 @@
 
     document.getElementById('goSimples').addEventListener('click', () => { showView('simples'); speak('Juegos simples.'); });
     document.getElementById('goDidacticos').addEventListener('click', () => { showView('didacticos'); speak('Juegos didácticos.'); });
-    document.getElementById('goFichas').addEventListener('click', () => { showView('fichas'); window.__fichasStart && window.__fichasStart(); });
+    document.getElementById('goAprender').addEventListener('click', () => { showView('aprender'); speak('Aprender.'); });
     document.getElementById('goComunicacion').addEventListener('click', () => { showView('comunicacion'); window.__comunicacionStart && window.__comunicacionStart(); });
+    document.getElementById('aprenderHome').addEventListener('click', () => showView('home'));
+
+    document.getElementById('goFichas').addEventListener('click', () => { showView('fichas'); window.__fichasStart && window.__fichasStart(); });
     document.getElementById('goHistorias').addEventListener('click', () => { showView('historias'); window.__historiasStart && window.__historiasStart(); });
+
+    document.getElementById('goSonidos').addEventListener('click', () => { showView('sonidos'); speak('Sonidos.'); });
+    document.getElementById('goExplotar').addEventListener('click', () => { showView('explotar'); speak('Para tocar.'); });
+    document.getElementById('goMovimiento').addEventListener('click', () => { showView('movimiento'); speak('Movimiento.'); });
+    document.getElementById('sonidosHome').addEventListener('click', () => showView('simples'));
+    document.getElementById('explotarHome').addEventListener('click', () => showView('simples'));
+    document.getElementById('movimientoHome').addEventListener('click', () => showView('simples'));
 
     document.getElementById('goBurbujas').addEventListener('click', () => { showView('burbujas'); window.__burbujasStart && window.__burbujasStart(); });
     document.getElementById('goGlobos').addEventListener('click', () => { showView('globos'); window.__globosStart && window.__globosStart(); });
@@ -865,18 +935,18 @@
     document.getElementById('goPianoAnimales').addEventListener('click', () => { showView('pianoAnimales'); renderPianoAnimales(); });
     document.getElementById('goPianoVehiculos').addEventListener('click', () => { showView('pianoVehiculos'); renderPianoVehiculos(); });
 
-    document.getElementById('burbujasHome').addEventListener('click', () => { window.__burbujasStop && window.__burbujasStop(); showView('simples'); });
-    document.getElementById('globosHome').addEventListener('click', () => { window.__globosStop && window.__globosStop(); showView('simples'); });
-    document.getElementById('estrellasHome').addEventListener('click', () => showView('simples'));
-    document.getElementById('lucesHome').addEventListener('click', () => showView('simples'));
-    document.getElementById('pianoAnimalesHome').addEventListener('click', () => showView('simples'));
-    document.getElementById('pianoVehiculosHome').addEventListener('click', () => showView('simples'));
+    document.getElementById('burbujasHome').addEventListener('click', () => { window.__burbujasStop && window.__burbujasStop(); showView('explotar'); });
+    document.getElementById('globosHome').addEventListener('click', () => { window.__globosStop && window.__globosStop(); showView('explotar'); });
+    document.getElementById('estrellasHome').addEventListener('click', () => showView('explotar'));
+    document.getElementById('lucesHome').addEventListener('click', () => showView('movimiento'));
+    document.getElementById('pianoAnimalesHome').addEventListener('click', () => showView('sonidos'));
+    document.getElementById('pianoVehiculosHome').addEventListener('click', () => showView('sonidos'));
 
     document.getElementById('simplesHome').addEventListener('click', () => showView('home'));
     document.getElementById('didacticosHome').addEventListener('click', () => showView('home'));
-    document.getElementById('fichasHome').addEventListener('click', () => showView('home'));
+    document.getElementById('fichasHome').addEventListener('click', () => showView('aprender'));
     document.getElementById('comunicacionHome').addEventListener('click', () => showView('home'));
-    document.getElementById('historiasHome').addEventListener('click', () => showView('home'));
+    document.getElementById('historiasHome').addEventListener('click', () => showView('aprender'));
 
     document.getElementById('goMemo').addEventListener('click', () => { showView('memo'); startMemo(currentPairs); });
     document.getElementById('goClasificar').addEventListener('click', () => { showView('clasificar'); window.__clasificarStart && window.__clasificarStart(); });
@@ -893,10 +963,10 @@
     document.getElementById('goDrive').addEventListener('click', () => { showView('drive'); driveReset(); speak('Esquivar en la calle. Mové el auto para esquivar objetos.'); });
 
     document.getElementById('memoHome').addEventListener('click', () => showView('didacticos'));
-    document.getElementById('soundHome').addEventListener('click', () => showView('simples'));
-    document.getElementById('carHome').addEventListener('click', () => showView('simples'));
-    document.getElementById('raceHome').addEventListener('click', () => showView('simples'));
-    document.getElementById('driveHome').addEventListener('click', () => showView('simples'));
+    document.getElementById('soundHome').addEventListener('click', () => showView('sonidos'));
+    document.getElementById('carHome').addEventListener('click', () => showView('sonidos'));
+    document.getElementById('raceHome').addEventListener('click', () => showView('movimiento'));
+    document.getElementById('driveHome').addEventListener('click', () => showView('movimiento'));
 
     // --- Shared speech helpers ---
     function speak(text){
