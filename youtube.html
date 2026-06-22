@@ -226,6 +226,31 @@
     .cat-autos     { background: linear-gradient(145deg, #1d4ed8, #3b82f6); }
     .cat-lavado    { background: linear-gradient(145deg, #0e7490, #06b6d4); }
 
+    /* ====== Banner "Videos Argentina" (Fase 28) ======
+       Banner destacado y separado de la grilla de 4 categorías,
+       para no sumar una 5ta opción a la grilla principal. */
+    .arg-banner {
+      margin-top: 16px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      border: none;
+      border-radius: 24px;
+      padding: 18px 22px;
+      cursor: pointer;
+      color: #fff;
+      font-weight: 950;
+      text-align: left;
+      background: linear-gradient(135deg, #4f9fe0, #1d4ed8);
+      box-shadow: 0 16px 36px rgba(29,78,216,.28), inset 0 1px 0 rgba(255,255,255,.22);
+      transition: transform .10s ease;
+    }
+    .arg-banner:active { transform: scale(.96) translateY(3px); }
+    .arg-banner .arg-emoji { font-size: 44px; line-height: 1; flex-shrink: 0; }
+    .arg-banner .arg-title { font-size: 19px; letter-spacing: -.02em; }
+    .arg-banner .arg-desc { font-size: 13px; font-weight: 700; opacity: .9; margin-top: 2px; }
+
     /* ====== VIEW: CATEGORY — grilla de videos ====== */
     .cat-header {
       margin-top: 16px;
@@ -342,6 +367,36 @@
       margin-top: 3px;
     }
 
+    /* ====== Tag de categoría + botones de tarjeta (Fase 28) ====== */
+    .cat-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      font-weight: 800;
+      color: #1d4ed8;
+      background: rgba(29,78,216,.10);
+      border-radius: 99px;
+      padding: 3px 9px;
+      margin-bottom: 5px;
+    }
+    .video-info .vactions {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .video-info .vbtn {
+      flex: 1;
+      border: none;
+      border-radius: 12px;
+      padding: 7px 4px;
+      font-size: 11.5px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    .video-info .vbtn-ver { background: #16a34a; color: #fff; }
+    .video-info .vbtn-escuchar { background: #e5e7eb; color: var(--text); }
+
     /* ====== VIEW: PLAYER — reproductor ====== */
     .player-bar {
       margin-top: 10px;
@@ -444,7 +499,7 @@
 
   <!-- Nota para padres (colapsable) -->
   <div class="parents-note" id="parentsNote">
-    <span>👨‍👩‍👧 <b>Papás:</b> los videos fueron seleccionados especialmente para Samuel. Para agregar o cambiar videos, editá el archivo <code>youtube.html</code> (sección <code>VIDEOS_CURADOS</code> al inicio del script).</span>
+    <span>👨‍👩‍👧 <b>Papás:</b> los videos fueron seleccionados especialmente para Samuel. Para agregar o cambiar videos, editá el archivo <code>youtube.html</code> (sección <code>CATEGORIAS</code> o, para Videos Argentina, <code>videosArgentina</code>, al inicio del script).</span>
     <button onclick="document.getElementById('parentsNote').remove()" aria-label="Cerrar nota">✕</button>
   </div>
 
@@ -454,6 +509,15 @@
   <div id="viewHome" class="view active">
     <div class="view-title">¿Qué querés ver hoy?</div>
     <div class="view-sub">Tocá una categoría para elegir un video</div>
+
+    <!-- Banner "Videos Argentina" (Fase 28) -->
+    <button class="arg-banner" id="argBanner" onclick="openCategory('argentina')" aria-label="Videos Argentina">
+      <div class="arg-emoji">🇦🇷</div>
+      <div>
+        <div class="arg-title">Videos Argentina</div>
+        <div class="arg-desc">Himnos, banderas y actos escolares</div>
+      </div>
+    </button>
 
     <div class="cat-grid">
 
@@ -607,8 +671,63 @@
         { id: 'FCvIwuYyPQU', titulo: 'Auto Lavado de Blippi 🚿',    canal: 'Moonbug Kids en Español' },
         { id: 'Y1vP1gBNiik', titulo: 'El Autolavado de Jorge ✨',    canal: 'Jorge el Curioso en Español' },
       ]
+    },
+    {
+      id: 'argentina',
+      nombre: 'Videos Argentina',
+      emoji: '🇦🇷',
+      claseColor: 'cat-argentina',
+      badgeStyle: 'background:linear-gradient(135deg,#4f9fe0,#1d4ed8)',
+      // Se construye a partir de videosArgentina (ver más abajo).
+      videos: []
     }
   ];
+
+  // ============================================================
+  // videosArgentina — Fase 28: sección patriótica "🇦🇷 Videos Argentina"
+  //
+  // Para cambiar videos, editar este array.
+  //
+  // ✅ = ID verificado vía YouTube oEmbed API (Fase 28), confirmando que
+  //     el video existe, es público y permite ser embebido.
+  // ============================================================
+  const videosArgentina = [
+    // ✅ Himnos y canciones
+    { titulo: 'Himno Nacional Argentino', categoria: 'Himnos y canciones', youtubeId: '0Bjsv6Ft9nk', descripcion: 'La canción patria de Argentina', canal: 'Ejército Argentino' },
+    { titulo: 'Marcha de San Lorenzo',    categoria: 'Himnos y canciones', youtubeId: 'sm0Ew0o3Dao', descripcion: 'Una canción patria muy conocida', canal: 'Abel Pintos (oficial)' },
+    // ✅ Bandera argentina
+    { titulo: 'Aurora, canción a la Bandera', categoria: 'Bandera argentina', youtubeId: '5bhdARadb_o', descripcion: 'La canción para saludar a la bandera', canal: 'Clarín' },
+    { titulo: 'Marcha a mi Bandera',          categoria: 'Bandera argentina', youtubeId: 'tIUpQk1SQUQ', descripcion: 'Una canción para la bandera argentina', canal: 'Cancionero Patrio' },
+    // ✅ Actos escolares
+    { titulo: 'Niños cantan el Himno',       categoria: 'Actos escolares', youtubeId: 'JvDkqyrda6E', descripcion: 'Chicos cantando en un acto escolar', canal: 'Municipalidad de San Rafael' },
+    { titulo: 'San Lorenzo en la escuela',   categoria: 'Actos escolares', youtubeId: 'DEs9i6L1Oew', descripcion: 'Así se canta en los actos escolares', canal: 'Televisión Pública' },
+    // ✅ Símbolos patrios
+    { titulo: 'Los símbolos patrios',     categoria: 'Símbolos patrios', youtubeId: 'CrI5xgcy-7Q', descripcion: 'Conocé los símbolos de Argentina', canal: 'Los Mellis Kids' },
+    { titulo: 'La escarapela argentina',  categoria: 'Símbolos patrios', youtubeId: 'sZiMefuSwC8', descripcion: 'Qué es y cómo se hace una escarapela', canal: 'Mundo Zamba' },
+  ];
+
+  // Mapeo de categoría -> {id, titulo, canal, categoria} para reusar el
+  // mismo renderizado de tarjetas que el resto de las categorías.
+  CATEGORIAS.find(c => c.id === 'argentina').videos = videosArgentina.map(v => ({
+    id: v.youtubeId,
+    titulo: v.titulo,
+    canal: v.canal,
+    categoria: v.categoria
+  }));
+
+  // Emoji corto y frase de voz por categoría (Fase 28)
+  const ARG_CAT_EMOJI = {
+    'Himnos y canciones': '🎵',
+    'Bandera argentina': '🏳️',
+    'Actos escolares': '🎓',
+    'Símbolos patrios': '⭐'
+  };
+  const ARG_CAT_PHRASE = {
+    'Himnos y canciones': 'Ahora escuchamos una canción patria',
+    'Bandera argentina': 'Esta es la bandera argentina',
+    'Actos escolares': 'Así se festeja en los actos escolares',
+    'Símbolos patrios': 'Estos son los símbolos de Argentina'
+  };
 
   // ============================================================
   // Estado de navegación
@@ -698,9 +817,17 @@
       const card = document.createElement('button');
       card.className = 'video-card';
       card.setAttribute('aria-label', 'Ver ' + v.titulo);
-      card.onclick = () => openPlayer(v);
+      card.onclick = () => (v.categoria ? openArgVideo(v) : openPlayer(v));
 
       const thumbUrl = `https://img.youtube.com/vi/${v.id}/mqdefault.jpg`;
+      const catEmoji = v.categoria ? (ARG_CAT_EMOJI[v.categoria] || '🇦🇷') : '';
+      const tagHtml = v.categoria ? `<div class="cat-tag">${catEmoji} ${v.categoria}</div>` : '';
+      const actionsHtml = v.categoria ? `
+        <div class="vactions">
+          <button type="button" class="vbtn vbtn-ver">▶️ Ver</button>
+          <button type="button" class="vbtn vbtn-escuchar">🔊 Escuchar título</button>
+        </div>` : '';
+
       card.innerHTML = `
         <div class="video-thumb-wrap">
           <img
@@ -714,14 +841,43 @@
           </div>
         </div>
         <div class="video-info">
+          ${tagHtml}
           <div class="vtitle">${v.titulo}</div>
           <div class="vchannel">${v.canal}</div>
+          ${actionsHtml}
         </div>
       `;
+
+      if (v.categoria) {
+        const verBtn = card.querySelector('.vbtn-ver');
+        const escBtn = card.querySelector('.vbtn-escuchar');
+        if (verBtn) verBtn.addEventListener('click', (e) => { e.stopPropagation(); openArgVideo(v); });
+        if (escBtn) escBtn.addEventListener('click', (e) => { e.stopPropagation(); speak(v.titulo); });
+      }
+
       grid.appendChild(card);
     });
 
     showView('viewCategory');
+
+    // Fase 28: voz de bienvenida al entrar a Videos Argentina
+    if (catId === 'argentina') {
+      speak('Vamos a ver un video de Argentina');
+    }
+  }
+
+  // ============================================================
+  // Fase 28: abrir un video de "Videos Argentina"
+  // Habla una frase corta acorde a la categoría, suma una estrella,
+  // y recién después abre el reproductor (breve pausa para que la
+  // frase no se pise con el audio del video).
+  // ============================================================
+  function openArgVideo(v) {
+    if (!navigator.onLine) { openPlayer(v); return; }
+    const frase = ARG_CAT_PHRASE[v.categoria] || 'Vamos a ver un video de Argentina';
+    speak(frase);
+    addArgStar();
+    setTimeout(() => openPlayer(v), 900);
   }
 
   // ============================================================
@@ -766,6 +922,46 @@
     const iframe = document.getElementById('playerIframe');
     // Vaciar src para detener el video
     iframe.src = '';
+  }
+
+  // ============================================================
+  // Voz generada (Fase 28) — mismo patrón que juegos.html/child.html
+  // ============================================================
+  function speak(text) {
+    try {
+      if (!('speechSynthesis' in window)) return;
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'es-AR';
+      u.rate = 0.95;
+      u.pitch = 1.05;
+      u.volume = 1;
+      const voices = window.speechSynthesis.getVoices();
+      const esVoice = voices.find(vc => vc.lang && vc.lang.startsWith('es'));
+      if (esVoice) u.voice = esVoice;
+      window.speechSynthesis.speak(u);
+    } catch (e) { /* ignore */ }
+  }
+
+  // ============================================================
+  // Estrellas (Fase 28) — comparte localStorage con child.html/juegos.html
+  // Mismas claves: samuel_progress_YYYY-MM-DD y samuel_total_stars.
+  // "Videos Argentina" suma a la misión diaria "Aprender".
+  // ============================================================
+  function todayKeyArg() {
+    const d = new Date();
+    return 'samuel_progress_' + d.toISOString().slice(0, 10);
+  }
+  function addArgStar() {
+    try {
+      const raw = localStorage.getItem(todayKeyArg());
+      const p = raw ? JSON.parse(raw) : { stars: 0, jugar: false, hablar: false, aprender: false };
+      p.stars = (p.stars || 0) + 1;
+      p.aprender = true;
+      localStorage.setItem(todayKeyArg(), JSON.stringify(p));
+      const total = (parseInt(localStorage.getItem('samuel_total_stars') || '0', 10) || 0) + 1;
+      localStorage.setItem('samuel_total_stars', String(total));
+    } catch (e) { /* ignore */ }
   }
 
   // ============================================================
