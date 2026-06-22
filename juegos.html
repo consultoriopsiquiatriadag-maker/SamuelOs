@@ -134,14 +134,34 @@
     }
 
     /* Rompecabezas infantil (Fase 18) */
+    .puzzle-theme-grid{ margin-top:16px; display:grid; gap:14px; grid-template-columns:repeat(auto-fit, minmax(170px, 1fr)); }
+    .puzzle-theme-btn{ border:2px solid rgba(168,85,247,.35); border-radius:22px; background:var(--card); box-shadow:var(--shadow); padding:22px 14px; display:flex; flex-direction:column; align-items:center; gap:10px; cursor:pointer; font-weight:950; font-size:17px; color:inherit; }
+    .puzzle-theme-btn .ptemoji{ font-size:44px; line-height:1; }
     .puzzle-stage{ position:relative; margin-top:14px; min-height:480px; border-radius:22px; background:linear-gradient(180deg,#fdf4ff,#f3e8ff); border:2px solid rgba(15,23,42,.12); touch-action:none; padding:18px; }
-    .puzzle-slots{ display:grid; grid-template-columns:repeat(2,140px); grid-template-rows:repeat(2,140px); gap:14px; justify-content:center; margin:0 auto; }
-    @media (max-width:600px){ .puzzle-slots{ grid-template-columns:repeat(2,110px); grid-template-rows:repeat(2,110px); } }
+    .puzzle-stage.count-6{ min-height:520px; }
+    .puzzle-stage.count-9{ min-height:580px; }
+    .puzzle-slots{ display:grid; gap:14px; justify-content:center; margin:0 auto; }
+    .puzzle-slots.count-4{ grid-template-columns:repeat(2,140px); grid-template-rows:repeat(2,140px); }
+    .puzzle-slots.count-6{ grid-template-columns:repeat(3,112px); grid-template-rows:repeat(2,112px); }
+    .puzzle-slots.count-9{ grid-template-columns:repeat(3,92px); grid-template-rows:repeat(3,92px); }
+    @media (max-width:600px){
+      .puzzle-slots.count-4{ grid-template-columns:repeat(2,110px); grid-template-rows:repeat(2,110px); }
+      .puzzle-slots.count-6{ grid-template-columns:repeat(3,88px); grid-template-rows:repeat(2,88px); }
+      .puzzle-slots.count-9{ grid-template-columns:repeat(3,72px); grid-template-rows:repeat(3,72px); }
+    }
     .puzzle-slot{ border:3px dashed rgba(15,23,42,.28); border-radius:18px; display:flex; align-items:center; justify-content:center; font-size:64px; opacity:.32; background:rgba(255,255,255,.55); transition:opacity .2s ease, border-style .2s ease, background .2s ease; }
+    .puzzle-slots.count-6 .puzzle-slot{ font-size:46px; }
+    .puzzle-slots.count-9 .puzzle-slot{ font-size:38px; }
     .puzzle-slot.filled{ opacity:1; border-style:solid; border-color:transparent; background:#fff; box-shadow:0 14px 26px rgba(2,6,23,.18); }
     .puzzle-piece{ position:absolute; width:96px; height:96px; border-radius:50%; background:#fff; box-shadow:0 14px 26px rgba(2,6,23,.18); display:flex; align-items:center; justify-content:center; font-size:54px; cursor:grab; touch-action:none; user-select:none; border:4px solid rgba(255,255,255,.9); }
     .puzzle-piece.placed{ pointer-events:none; }
-    @media (max-width:600px){ .puzzle-piece{ width:76px; height:76px; font-size:42px; } }
+    .puzzle-stage.count-6 .puzzle-piece{ width:76px; height:76px; font-size:40px; }
+    .puzzle-stage.count-9 .puzzle-piece{ width:64px; height:64px; font-size:32px; }
+    @media (max-width:600px){
+      .puzzle-piece{ width:76px; height:76px; font-size:42px; }
+      .puzzle-stage.count-6 .puzzle-piece{ width:60px; height:60px; font-size:30px; }
+      .puzzle-stage.count-9 .puzzle-piece{ width:52px; height:52px; font-size:24px; }
+    }
 
     /* Comunicación aumentativa (Fase 20) */
     .comm-last{ margin-top:14px; border:2px solid rgba(14,165,164,.35); background:rgba(14,165,164,.10); border-radius:18px; padding:14px 18px; font-weight:950; text-align:center; }
@@ -167,6 +187,9 @@
     @media (max-width:600px){ .historia-card{ min-height:260px; padding:22px; } .historia-emoji{ font-size:76px; } .historia-text{ font-size:20px; } }
 
     /* Fichas visuales didácticas (Fase 19) */
+    .ficha-grid{ margin-top:16px; display:grid; gap:14px; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); }
+    .ficha-cat-btn{ border:2px solid rgba(245,158,11,.35); border-radius:22px; background:var(--card); box-shadow:var(--shadow); padding:20px 12px; display:flex; flex-direction:column; align-items:center; gap:10px; cursor:pointer; font-weight:950; font-size:16px; color:inherit; }
+    .ficha-cat-btn .fcemoji{ font-size:40px; line-height:1; }
     .ficha-stage{ margin-top:14px; display:flex; flex-direction:column; align-items:center; gap:22px; }
     .ficha-card{ width:100%; max-width:360px; min-height:280px; border-radius:26px; background:var(--card); border:2px solid rgba(15,23,42,.12); box-shadow:var(--shadow); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:18px; padding:26px; cursor:pointer; }
     .ficha-swatch{ width:140px; height:140px; border-radius:50%; box-shadow:0 14px 26px rgba(2,6,23,.18); border:4px solid rgba(255,255,255,.85); }
@@ -495,21 +518,30 @@
 
     <!-- FICHAS DE APRENDIZAJE (Fase 19) -->
     <section id="viewFichas" class="view" aria-label="Fichas de aprendizaje">
-      <div class="bar">
-        <div class="stats">
-          <div class="stat"><span id="fichaIndex">1</span><small>de <span id="fichaTotal">6</span></small></div>
-        </div>
-        <div class="top-actions">
-          <span class="pill">Categoría:
-            <button class="btn small" id="fichaColores">🎨</button>
-            <button class="btn small" id="fichaNumeros">🔢</button>
-            <button class="btn small" id="fichaFormas">🔺</button>
-            <button class="btn small" id="fichaRutina">🌞</button>
-          </span>
-          <button class="btn ghost" id="fichasHome">⬅️ Centro de juegos</button>
-        </div>
+      <div class="top-actions" style="margin-bottom:6px;">
+        <button class="btn ghost" id="fichasHome">⬅️ Centro de juegos</button>
       </div>
-      <div class="ficha-stage">
+
+      <div class="ficha-grid" id="fichaCategorySelector">
+        <button class="ficha-cat-btn" data-cat="colores"><span class="fcemoji">🎨</span>Colores</button>
+        <button class="ficha-cat-btn" data-cat="numeros"><span class="fcemoji">🔢</span>Números</button>
+        <button class="ficha-cat-btn" data-cat="formas"><span class="fcemoji">🔺</span>Formas</button>
+        <button class="ficha-cat-btn" data-cat="rutina"><span class="fcemoji">🌞</span>Rutinas</button>
+        <button class="ficha-cat-btn" data-cat="animales"><span class="fcemoji">🐶</span>Animales</button>
+        <button class="ficha-cat-btn" data-cat="vehiculos"><span class="fcemoji">🚗</span>Vehículos</button>
+        <button class="ficha-cat-btn" data-cat="alimentos"><span class="fcemoji">🍎</span>Alimentos</button>
+        <button class="ficha-cat-btn" data-cat="emociones"><span class="fcemoji">😊</span>Emociones</button>
+        <button class="ficha-cat-btn" data-cat="familia"><span class="fcemoji">👨‍👩‍👧</span>Familia</button>
+        <button class="ficha-cat-btn" data-cat="objetos"><span class="fcemoji">🏠</span>Objetos de casa</button>
+      </div>
+
+      <div class="ficha-stage" id="fichaStage" style="display:none;">
+        <div class="bar" style="width:100%;justify-content:center;gap:18px;">
+          <div class="stats">
+            <div class="stat"><span id="fichaIndex">1</span><small>de <span id="fichaTotal">6</span></small></div>
+          </div>
+          <button class="btn ghost" id="fichaVolver">⬅️ Categorías</button>
+        </div>
         <div class="ficha-card" id="fichaCard">
           <div class="ficha-visual" id="fichaVisual"></div>
           <div class="ficha-label" id="fichaLabel"></div>
@@ -698,23 +730,40 @@
 
     <!-- ROMPECABEZAS INFANTIL (Fase 18) -->
     <section id="viewPuzzle" class="view" aria-label="Rompecabezas">
-      <div class="bar">
-        <div class="stats">
-          <div class="stat"><span id="puzzlePlaced">0</span><small>Piezas</small></div>
-        </div>
-        <div class="top-actions">
-          <span class="pill">Tema:
-            <button class="btn small" id="puzzleGranja">🐮</button>
-            <button class="btn small" id="puzzleCielo">☀️</button>
-            <button class="btn small" id="puzzleTransporte">🚗</button>
-          </span>
-          <button class="btn" id="puzzleReset">🔄 Reiniciar</button>
-          <button class="btn ghost" id="puzzleHome">⬅️ Juegos didácticos</button>
-        </div>
+      <div class="top-actions" style="margin-bottom:6px;">
+        <button class="btn ghost" id="puzzleHome">⬅️ Juegos didácticos</button>
       </div>
-      <div id="puzzleWin" class="win" role="status" aria-live="polite">🎉 ¡Armaste el rompecabezas, Samuel!</div>
-      <div class="puzzle-stage" id="puzzleStage">
-        <div class="puzzle-slots" id="puzzleSlots"></div>
+
+      <div class="puzzle-theme-grid" id="puzzleThemeSelector">
+        <button class="puzzle-theme-btn" data-theme="granja"><span class="ptemoji">🐮</span>Granja</button>
+        <button class="puzzle-theme-btn" data-theme="cielo"><span class="ptemoji">☀️</span>Cielo</button>
+        <button class="puzzle-theme-btn" data-theme="transporte"><span class="ptemoji">🚗</span>Transporte</button>
+        <button class="puzzle-theme-btn" data-theme="animales"><span class="ptemoji">🐶</span>Animales</button>
+        <button class="puzzle-theme-btn" data-theme="autos"><span class="ptemoji">🚓</span>Autos</button>
+        <button class="puzzle-theme-btn" data-theme="aviones"><span class="ptemoji">✈️</span>Cosas que vuelan</button>
+        <button class="puzzle-theme-btn" data-theme="familia"><span class="ptemoji">👨‍👩‍👧</span>Familia</button>
+        <button class="puzzle-theme-btn" data-theme="objetos"><span class="ptemoji">🛏️</span>Objetos de casa</button>
+      </div>
+
+      <div id="puzzlePlayArea" style="display:none;">
+        <div class="bar">
+          <div class="stats">
+            <div class="stat"><span id="puzzlePlaced">0</span><small>Piezas</small></div>
+          </div>
+          <div class="top-actions">
+            <span class="pill">Piezas:
+              <button class="btn small" id="lvlP4">4</button>
+              <button class="btn small" id="lvlP6">6</button>
+              <button class="btn small" id="lvlP9">9</button>
+            </span>
+            <button class="btn" id="puzzleReset">🔄 Reiniciar</button>
+            <button class="btn ghost" id="puzzleVolver">⬅️ Temas</button>
+          </div>
+        </div>
+        <div id="puzzleWin" class="win" role="status" aria-live="polite">🎉 ¡Armaste el rompecabezas, Samuel!</div>
+        <div class="puzzle-stage" id="puzzleStage">
+          <div class="puzzle-slots" id="puzzleSlots"></div>
+        </div>
       </div>
     </section>
 
@@ -2751,41 +2800,116 @@
           { id:'vaca',     emoji:'🐮' },
           { id:'gallina',  emoji:'🐔' },
           { id:'cerdo',    emoji:'🐷' },
-          { id:'oveja',    emoji:'🐑' }
+          { id:'oveja',    emoji:'🐑' },
+          { id:'caballo',  emoji:'🐴' },
+          { id:'pato',     emoji:'🦆' },
+          { id:'perro',    emoji:'🐶' },
+          { id:'gato',     emoji:'🐱' },
+          { id:'conejo',   emoji:'🐰' }
         ],
         cielo: [
           { id:'sol',      emoji:'☀️' },
           { id:'nube',     emoji:'☁️' },
           { id:'luna',     emoji:'🌙' },
-          { id:'estrella', emoji:'⭐' }
+          { id:'estrella', emoji:'⭐' },
+          { id:'arcoiris', emoji:'🌈' },
+          { id:'lluvia',   emoji:'🌧️' },
+          { id:'rayo',     emoji:'⚡' },
+          { id:'cometa',   emoji:'☄️' },
+          { id:'planeta',  emoji:'🪐' }
         ],
         transporte: [
-          { id:'auto',  emoji:'🚗' },
-          { id:'avion', emoji:'✈️' },
-          { id:'barco', emoji:'🚢' },
-          { id:'tren',  emoji:'🚂' }
+          { id:'auto',     emoji:'🚗' },
+          { id:'avion',    emoji:'✈️' },
+          { id:'barco',    emoji:'🚢' },
+          { id:'tren',     emoji:'🚂' },
+          { id:'camion',   emoji:'🚚' },
+          { id:'bici',     emoji:'🚲' },
+          { id:'moto',     emoji:'🏍️' },
+          { id:'colectivo',emoji:'🚌' },
+          { id:'helicoptero', emoji:'🚁' }
+        ],
+        animales: [
+          { id:'perro2',   emoji:'🐶' },
+          { id:'gato2',    emoji:'🐱' },
+          { id:'leon',     emoji:'🦁' },
+          { id:'elefante', emoji:'🐘' },
+          { id:'mono',     emoji:'🐵' },
+          { id:'jirafa',   emoji:'🦒' },
+          { id:'oso',      emoji:'🐻' },
+          { id:'tigre',    emoji:'🐯' },
+          { id:'pinguino', emoji:'🐧' }
+        ],
+        autos: [
+          { id:'auto2',      emoji:'🚗' },
+          { id:'camion2',    emoji:'🚚' },
+          { id:'colectivo2', emoji:'🚌' },
+          { id:'moto2',      emoji:'🏍️' },
+          { id:'bici2',      emoji:'🚲' },
+          { id:'ambulancia', emoji:'🚑' },
+          { id:'bomberos',   emoji:'🚒' },
+          { id:'policia',    emoji:'🚓' },
+          { id:'tren2',      emoji:'🚂' }
+        ],
+        aviones: [
+          { id:'avion2',     emoji:'✈️' },
+          { id:'jet',        emoji:'🛩️' },
+          { id:'helicoptero2', emoji:'🚁' },
+          { id:'cohete',     emoji:'🚀' },
+          { id:'ovni',       emoji:'🛸' },
+          { id:'paracaidas', emoji:'🪂' },
+          { id:'globo',      emoji:'🎈' },
+          { id:'nube2',      emoji:'☁️' },
+          { id:'pajaro',     emoji:'🐦' }
+        ],
+        familia: [
+          { id:'papa',      emoji:'👨' },
+          { id:'mama',      emoji:'👩' },
+          { id:'hermano',   emoji:'👦' },
+          { id:'hermana',   emoji:'👧' },
+          { id:'abuelo',    emoji:'👴' },
+          { id:'abuela',    emoji:'👵' },
+          { id:'bebe',      emoji:'👶' },
+          { id:'samuel',    emoji:'🧑' },
+          { id:'familiaCompleta', emoji:'👪' }
+        ],
+        objetos: [
+          { id:'sofa',      emoji:'🛋️' },
+          { id:'cama',      emoji:'🛏️' },
+          { id:'silla',     emoji:'🪑' },
+          { id:'puerta',    emoji:'🚪' },
+          { id:'ventana',   emoji:'🪟' },
+          { id:'banera',    emoji:'🛁' },
+          { id:'ducha',     emoji:'🚿' },
+          { id:'lampara',   emoji:'💡' },
+          { id:'tv',        emoji:'📺' }
         ]
       };
 
+      const themeSelector = document.getElementById('puzzleThemeSelector');
+      const playArea = document.getElementById('puzzlePlayArea');
       const stage    = document.getElementById('puzzleStage');
       const slotsEl  = document.getElementById('puzzleSlots');
       const winEl    = document.getElementById('puzzleWin');
       const placedEl = document.getElementById('puzzlePlaced');
       const resetBtn = document.getElementById('puzzleReset');
-      const themeBtns = {
-        granja:      document.getElementById('puzzleGranja'),
-        cielo:       document.getElementById('puzzleCielo'),
-        transporte:  document.getElementById('puzzleTransporte')
+      const volverBtn = document.getElementById('puzzleVolver');
+      const levelBtns = {
+        4: document.getElementById('lvlP4'),
+        6: document.getElementById('lvlP6'),
+        9: document.getElementById('lvlP9')
       };
+      if (!themeSelector || !playArea) return;
 
       let currentTheme = 'granja';
+      let currentLevel = 4;
       let pieces = [];
       let slotEls = [];
       let activePiece = null;
 
-      function updateThemeButtons(){
-        Object.keys(themeBtns).forEach(k => {
-          if (themeBtns[k]) themeBtns[k].classList.toggle('active', k === currentTheme);
+      function updateLevelButtons(){
+        Object.keys(levelBtns).forEach(k => {
+          if (levelBtns[k]) levelBtns[k].classList.toggle('active', Number(k) === currentLevel);
         });
       }
 
@@ -2810,18 +2934,25 @@
         pieces = [];
       }
 
-      function scatterPositions(stageRect, count){
+      function scatterPositions(stageRect, count, level){
+        const cell = level === 4 ? 122 : (level === 6 ? 98 : 80);
+        const cols = level === 4 ? count : 3;
+        const rows = Math.ceil(count / cols);
+        const totalW = cols * cell;
+        const startX = Math.max(8, (stageRect.width - totalW) / 2);
+        const startY = Math.max(8, stageRect.height - rows * cell - 8);
         const positions = [];
-        const usableWidth = Math.max(0, stageRect.width - 110);
-        const startY = Math.max(0, stageRect.height - 130);
         for (let i = 0; i < count; i++){
-          const x = 14 + (usableWidth / Math.max(1, count - 1)) * i;
-          positions.push({ x, y: startY });
+          const col = i % cols;
+          const row = Math.floor(i / cols);
+          positions.push({ x: startX + col * cell, y: startY + row * cell });
         }
         return positions;
       }
 
       function buildSlots(items){
+        slotsEl.className = 'puzzle-slots count-' + currentLevel;
+        stage.className = 'puzzle-stage count-' + currentLevel;
         slotsEl.innerHTML = '';
         slotEls = [];
         items.forEach(item => {
@@ -2838,7 +2969,7 @@
         clearStage();
         const stageRect = stage.getBoundingClientRect();
         const order = shufflePuz(items);
-        const positions = scatterPositions(stageRect, order.length);
+        const positions = scatterPositions(stageRect, order.length, currentLevel);
         order.forEach((item, idx) => {
           const el = document.createElement('div');
           el.className = 'puzzle-piece';
@@ -2924,24 +3055,42 @@
       function startPuzzle(){
         if (winEl) winEl.classList.remove('show');
         if (placedEl) placedEl.textContent = '0';
-        const items = PUZZLE_THEMES[currentTheme];
+        const items = PUZZLE_THEMES[currentTheme].slice(0, currentLevel);
         buildSlots(items);
-        updateThemeButtons();
+        updateLevelButtons();
         requestAnimationFrame(() => buildPieces(items));
       }
 
       function setTheme(theme){
         currentTheme = theme;
-        startPuzzle();
-      }
-      if (themeBtns.granja)     themeBtns.granja.addEventListener('click', () => setTheme('granja'));
-      if (themeBtns.cielo)      themeBtns.cielo.addEventListener('click', () => setTheme('cielo'));
-      if (themeBtns.transporte) themeBtns.transporte.addEventListener('click', () => setTheme('transporte'));
-      if (resetBtn) resetBtn.addEventListener('click', () => startPuzzle());
-
-      window.__puzzleStart = function(){
+        currentLevel = 4;
+        themeSelector.style.display = 'none';
+        playArea.style.display = 'block';
         startPuzzle();
         speak('Arrastrá cada pieza a su casillero.');
+      }
+
+      function setLevel(n){
+        currentLevel = n;
+        startPuzzle();
+      }
+
+      function volverATemas(){
+        playArea.style.display = 'none';
+        themeSelector.style.display = 'grid';
+      }
+
+      themeSelector.querySelectorAll('.puzzle-theme-btn').forEach(btn => {
+        btn.addEventListener('click', () => setTheme(btn.dataset.theme));
+      });
+      if (levelBtns[4]) levelBtns[4].addEventListener('click', () => setLevel(4));
+      if (levelBtns[6]) levelBtns[6].addEventListener('click', () => setLevel(6));
+      if (levelBtns[9]) levelBtns[9].addEventListener('click', () => setLevel(9));
+      if (resetBtn) resetBtn.addEventListener('click', () => startPuzzle());
+      if (volverBtn) volverBtn.addEventListener('click', volverATemas);
+
+      window.__puzzleStart = function(){
+        volverATemas();
       };
     })();
 
@@ -2976,9 +3125,59 @@
           { type:'emoji', emoji:'🍽️', label:'Comer' },
           { type:'emoji', emoji:'🛁', label:'Bañarse' },
           { type:'emoji', emoji:'🌙', label:'Dormir' }
+        ],
+        animales: [
+          { type:'emoji', emoji:'🐶', label:'Perro' },
+          { type:'emoji', emoji:'🐱', label:'Gato' },
+          { type:'emoji', emoji:'🐮', label:'Vaca' },
+          { type:'emoji', emoji:'🦁', label:'León' },
+          { type:'emoji', emoji:'🐘', label:'Elefante' },
+          { type:'emoji', emoji:'🐦', label:'Pájaro' }
+        ],
+        vehiculos: [
+          { type:'emoji', emoji:'🚗', label:'Auto' },
+          { type:'emoji', emoji:'🚌', label:'Colectivo' },
+          { type:'emoji', emoji:'🚚', label:'Camión' },
+          { type:'emoji', emoji:'✈️', label:'Avión' },
+          { type:'emoji', emoji:'🚢', label:'Barco' },
+          { type:'emoji', emoji:'🚲', label:'Bicicleta' }
+        ],
+        alimentos: [
+          { type:'emoji', emoji:'🍎', label:'Manzana' },
+          { type:'emoji', emoji:'🍌', label:'Banana' },
+          { type:'emoji', emoji:'🍞', label:'Pan' },
+          { type:'emoji', emoji:'🥛', label:'Leche' },
+          { type:'emoji', emoji:'🍕', label:'Pizza' },
+          { type:'emoji', emoji:'💧', label:'Agua' }
+        ],
+        emociones: [
+          { type:'emoji', emoji:'😊', label:'Feliz' },
+          { type:'emoji', emoji:'😢', label:'Triste' },
+          { type:'emoji', emoji:'😠', label:'Enojado' },
+          { type:'emoji', emoji:'😲', label:'Sorprendido' },
+          { type:'emoji', emoji:'😨', label:'Asustado' },
+          { type:'emoji', emoji:'😌', label:'Tranquilo' }
+        ],
+        familia: [
+          { type:'emoji', emoji:'👨', label:'Papá' },
+          { type:'emoji', emoji:'👩', label:'Mamá' },
+          { type:'emoji', emoji:'👦', label:'Hermano' },
+          { type:'emoji', emoji:'👧', label:'Hermana' },
+          { type:'emoji', emoji:'👴', label:'Abuelo' },
+          { type:'emoji', emoji:'👵', label:'Abuela' }
+        ],
+        objetos: [
+          { type:'emoji', emoji:'🛏️', label:'Cama' },
+          { type:'emoji', emoji:'🪑', label:'Silla' },
+          { type:'emoji', emoji:'🚪', label:'Puerta' },
+          { type:'emoji', emoji:'🪟', label:'Ventana' },
+          { type:'emoji', emoji:'🛁', label:'Bañera' },
+          { type:'emoji', emoji:'💡', label:'Lámpara' }
         ]
       };
 
+      const categorySelector = document.getElementById('fichaCategorySelector');
+      const fichaStage = document.getElementById('fichaStage');
       const card     = document.getElementById('fichaCard');
       const visualEl = document.getElementById('fichaVisual');
       const labelEl  = document.getElementById('fichaLabel');
@@ -2987,21 +3186,16 @@
       const prevBtn  = document.getElementById('fichaPrev');
       const nextBtn  = document.getElementById('fichaNext');
       const repeatBtn= document.getElementById('fichaRepeat');
-      const catBtns = {
-        colores: document.getElementById('fichaColores'),
-        numeros: document.getElementById('fichaNumeros'),
-        formas:  document.getElementById('fichaFormas'),
-        rutina:  document.getElementById('fichaRutina')
-      };
+      const volverBtn= document.getElementById('fichaVolver');
+      if (!categorySelector || !fichaStage) return;
       const tick = makeStarTicker(6, 'aprender');
 
       let currentCat = 'colores';
       let currentIdx = 0;
 
-      function updateCatButtons(){
-        Object.keys(catBtns).forEach(k => {
-          if (catBtns[k]) catBtns[k].classList.toggle('active', k === currentCat);
-        });
+      function volverACategorias(){
+        fichaStage.style.display = 'none';
+        categorySelector.style.display = 'grid';
       }
 
       function renderFicha(){
@@ -3059,7 +3253,8 @@
       function setCategory(cat){
         currentCat = cat;
         currentIdx = 0;
-        updateCatButtons();
+        categorySelector.style.display = 'none';
+        fichaStage.style.display = 'flex';
         showFicha();
       }
 
@@ -3067,16 +3262,13 @@
       if (prevBtn)   prevBtn.addEventListener('click', goPrev);
       if (repeatBtn) repeatBtn.addEventListener('click', sayCurrent);
       if (card)      card.addEventListener('click', sayCurrent);
-      if (catBtns.colores) catBtns.colores.addEventListener('click', () => setCategory('colores'));
-      if (catBtns.numeros) catBtns.numeros.addEventListener('click', () => setCategory('numeros'));
-      if (catBtns.formas)  catBtns.formas.addEventListener('click', () => setCategory('formas'));
-      if (catBtns.rutina)  catBtns.rutina.addEventListener('click', () => setCategory('rutina'));
+      if (volverBtn) volverBtn.addEventListener('click', volverACategorias);
+      categorySelector.querySelectorAll('.ficha-cat-btn').forEach(btn => {
+        btn.addEventListener('click', () => setCategory(btn.dataset.cat));
+      });
 
       window.__fichasStart = function(){
-        currentCat = 'colores';
-        currentIdx = 0;
-        updateCatButtons();
-        showFicha();
+        volverACategorias();
       };
     })();
 
