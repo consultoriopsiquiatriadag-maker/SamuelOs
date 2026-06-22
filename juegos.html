@@ -318,6 +318,25 @@
       .drive-touch{opacity:0;} /* mantenemos invisible */
     }
 
+    /* Mundial de Fútbol 2026 (Fase 29) */
+    .mundial-grid{ margin-top:16px; display:grid; gap:12px; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); }
+    .mundial-country-btn{ border:2px solid rgba(34,197,94,.35); border-radius:20px; background:var(--card); box-shadow:var(--shadow); padding:16px 10px; display:flex; flex-direction:column; align-items:center; gap:8px; cursor:pointer; font-weight:950; font-size:15px; color:inherit; text-align:center; }
+    .mundial-country-btn .mflag{ font-size:36px; line-height:1; }
+    .mundial-country-btn .mgrupo-mini{ font-size:12px; font-weight:800; color:var(--muted); }
+    .mundial-stage{ margin-top:14px; display:flex; flex-direction:column; align-items:center; gap:18px; }
+    .mundial-card{ width:100%; max-width:380px; min-height:300px; border-radius:26px; background:var(--card); border:2px solid rgba(34,197,94,.30); box-shadow:var(--shadow); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; padding:28px; text-align:center; cursor:pointer; }
+    .mundial-flag-big{ font-size:90px; line-height:1; }
+    .mundial-name{ font-size:26px; font-weight:950; }
+    .mundial-grupo-badge{ background:rgba(34,197,94,.14); color:#15803d; border-radius:999px; padding:6px 16px; font-weight:900; font-size:15px; }
+    .mundial-host-badge{ background:rgba(245,158,11,.16); color:#b45309; border-radius:999px; padding:5px 14px; font-weight:900; font-size:13px; }
+    .mundial-dato{ font-size:18px; font-weight:800; color:var(--muted); line-height:1.35; }
+    .mundial-nav{ display:flex; gap:14px; }
+    @media (max-width:600px){
+      .mundial-card{ min-height:260px; padding:22px; }
+      .mundial-flag-big{ font-size:72px; }
+      .mundial-name{ font-size:22px; }
+    }
+
     /* Accessibility */
     :focus-visible{outline:4px solid rgba(37,99,235,.35); outline-offset:3px;}
   </style>
@@ -508,11 +527,45 @@
           <div class="gtitle">🧩 Rompecabezas</div>
           <div class="gdesc">Arrastrá cada pieza a su casillero. Elegí granja, cielo o transporte.</div>
         </button>
+
+        <button class="game" id="goMundial">
+          <div class="gtitle">⚽ Mundial de Fútbol 2026</div>
+          <div class="gdesc">Conocé los países que juegan el Mundial y sus banderas.</div>
+        </button>
       </div>
       <div class="soon-card">
         <div class="soon-emoji">💡</div>
         <div class="soon-title">Pronto vamos a sumar más juegos para pensar</div>
         <div class="soon-text">¡Vamos a seguir sumando sorpresas para Samuel!</div>
+      </div>
+    </section>
+
+    <!-- MUNDIAL DE FÚTBOL 2026 (Fase 29) -->
+    <section id="viewMundial" class="view" aria-label="Mundial de Fútbol 2026">
+      <div class="top-actions" style="margin-bottom:6px;">
+        <button class="btn ghost" id="mundialHome">⬅️ Juegos didácticos</button>
+      </div>
+
+      <div class="mundial-grid" id="mundialSelector"></div>
+
+      <div class="mundial-stage" id="mundialStage" style="display:none;">
+        <div class="bar" style="width:100%;justify-content:center;gap:18px;">
+          <div class="stats">
+            <div class="stat"><span id="mundialIndex">1</span><small>de <span id="mundialTotal">48</span></small></div>
+          </div>
+          <button class="btn ghost" id="mundialVolver">⬅️ Países</button>
+        </div>
+        <div class="mundial-card" id="mundialCard">
+          <div class="mundial-flag-big" id="mundialFlag"></div>
+          <div class="mundial-name" id="mundialName"></div>
+          <div id="mundialBadges"></div>
+          <div class="mundial-dato" id="mundialDato"></div>
+        </div>
+        <div class="mundial-nav">
+          <button class="ficha-btn" id="mundialPrev" aria-label="Anterior">⬅️</button>
+          <button class="ficha-btn" id="mundialRepeat" aria-label="Escuchar de nuevo">🔊</button>
+          <button class="ficha-btn" id="mundialNext" aria-label="Siguiente">➡️</button>
+        </div>
       </div>
     </section>
 
@@ -944,6 +997,7 @@
       arrastrar: document.getElementById('viewArrastrar'),
       tetris: document.getElementById('viewTetris'),
       puzzle: document.getElementById('viewPuzzle'),
+      mundial: document.getElementById('viewMundial'),
       sound: document.getElementById('viewSound'),
       cars: document.getElementById('viewCars'),
       race: document.getElementById('viewRace'),
@@ -1006,6 +1060,8 @@
     document.getElementById('tetrisHome').addEventListener('click', () => { window.__tetrisStop && window.__tetrisStop(); showView('didacticos'); });
     document.getElementById('goPuzzle').addEventListener('click', () => { showView('puzzle'); window.__puzzleStart && window.__puzzleStart(); });
     document.getElementById('puzzleHome').addEventListener('click', () => showView('didacticos'));
+    document.getElementById('goMundial').addEventListener('click', () => { showView('mundial'); window.__mundialStart && window.__mundialStart(); });
+    document.getElementById('mundialHome').addEventListener('click', () => showView('didacticos'));
     document.getElementById('goSound').addEventListener('click', () => { showView('sound'); renderAnimals(); });
     document.getElementById('goCars').addEventListener('click', () => { showView('cars'); renderCars(); });
     document.getElementById('goRace').addEventListener('click', () => { showView('race'); resetRace(); speak('Semáforo. Verde: avanzar. Amarillo: cuidado. Rojo: parar.'); startSemaforo(); });
@@ -3417,6 +3473,159 @@
 
       window.__historiasStart = function(){
         volverSelector();
+      };
+    })();
+
+    // --- Mundial de Fútbol 2026 (Fase 29) ---
+    // Las 48 selecciones y los 12 grupos quedaron confirmados en el sorteo del 5/12/2025
+    // (Centro Kennedy, Washington D.C.). Datos cruzados con varias fuentes en junio de 2026.
+    // Para cambiar este listado, editar el array mundial2026 más abajo.
+    // Actualizar este listado según FIFA si hubiera cambios oficiales posteriores.
+    const mundial2026 = [
+      { nombre:'México', bandera:'🇲🇽', grupo:'A', anfitrion:true, dato:'Es uno de los países que organiza el Mundial. ¡Juega en su propia casa!' },
+      { nombre:'Sudáfrica', bandera:'🇿🇦', grupo:'A', dato:'Está en África. Allí viven leones y elefantes.' },
+      { nombre:'Corea del Sur', bandera:'🇰🇷', grupo:'A', dato:'Está en Asia, muy lejos de Argentina.' },
+      { nombre:'República Checa', bandera:'🇨🇿', grupo:'A', dato:'Está en Europa. Tiene castillos muy antiguos.' },
+
+      { nombre:'Canadá', bandera:'🇨🇦', grupo:'B', anfitrion:true, dato:'También organiza el Mundial. Tiene mucha nieve y osos.' },
+      { nombre:'Bosnia y Herzegovina', bandera:'🇧🇦', grupo:'B', dato:'Está en Europa, cerca de Italia.' },
+      { nombre:'Catar', bandera:'🇶🇦', grupo:'B', dato:'Está en Asia. Allí se jugó el Mundial anterior.' },
+      { nombre:'Suiza', bandera:'🇨🇭', grupo:'B', dato:'Está en Europa. Tiene montañas muy altas.' },
+
+      { nombre:'Brasil', bandera:'🇧🇷', grupo:'C', dato:'Está en América del Sur, como Argentina. ¡Ganó el Mundial 5 veces!' },
+      { nombre:'Marruecos', bandera:'🇲🇦', grupo:'C', dato:'Está en África. Llegó muy lejos en el Mundial anterior.' },
+      { nombre:'Haití', bandera:'🇭🇹', grupo:'C', dato:'Está en América, es una isla del Caribe.' },
+      { nombre:'Escocia', bandera:'🏴', grupo:'C', dato:'Está en Europa, junto a Inglaterra.' },
+
+      { nombre:'Estados Unidos', bandera:'🇺🇸', grupo:'D', anfitrion:true, dato:'También organiza el Mundial. Tiene edificios muy altos.' },
+      { nombre:'Paraguay', bandera:'🇵🇾', grupo:'D', dato:'Está en América del Sur, cerquita de Argentina.' },
+      { nombre:'Australia', bandera:'🇦🇺', grupo:'D', dato:'Es una isla muy grande. Allí viven canguros.' },
+      { nombre:'Turquía', bandera:'🇹🇷', grupo:'D', dato:'Está entre Europa y Asia.' },
+
+      { nombre:'Alemania', bandera:'🇩🇪', grupo:'E', dato:'Está en Europa. Ganó el Mundial 4 veces.' },
+      { nombre:'Curazao', bandera:'🇨🇼', grupo:'E', dato:'Es una isla pequeña en el mar Caribe.' },
+      { nombre:'Costa de Marfil', bandera:'🇨🇮', grupo:'E', dato:'Está en África, junto al mar.' },
+      { nombre:'Ecuador', bandera:'🇪🇨', grupo:'E', dato:'Está en América del Sur. Por allí pasa la línea del Ecuador.' },
+
+      { nombre:'Países Bajos', bandera:'🇳🇱', grupo:'F', dato:'También se llama Holanda. Tiene molinos de viento.' },
+      { nombre:'Japón', bandera:'🇯🇵', grupo:'F', dato:'Está en Asia. Tiene templos muy antiguos.' },
+      { nombre:'Suecia', bandera:'🇸🇪', grupo:'F', dato:'Está en Europa. Tiene mucha nieve en invierno.' },
+      { nombre:'Túnez', bandera:'🇹🇳', grupo:'F', dato:'Está en África, junto al mar Mediterráneo.' },
+
+      { nombre:'Bélgica', bandera:'🇧🇪', grupo:'G', dato:'Está en Europa. Es un país pequeño.' },
+      { nombre:'Egipto', bandera:'🇪🇬', grupo:'G', dato:'Está en África. Allí están las pirámides.' },
+      { nombre:'Irán', bandera:'🇮🇷', grupo:'G', dato:'Está en Asia.' },
+      { nombre:'Nueva Zelanda', bandera:'🇳🇿', grupo:'G', dato:'Es una isla muy lejana. Allí viven muchas ovejas.' },
+
+      { nombre:'España', bandera:'🇪🇸', grupo:'H', dato:'Está en Europa. Ganó el Mundial una vez.' },
+      { nombre:'Cabo Verde', bandera:'🇨🇻', grupo:'H', dato:'Son islas en el océano, cerca de África.' },
+      { nombre:'Arabia Saudita', bandera:'🇸🇦', grupo:'H', dato:'Está en Asia. Tiene mucho desierto.' },
+      { nombre:'Uruguay', bandera:'🇺🇾', grupo:'H', dato:'Está en América del Sur, al lado de Argentina. ¡Ganó el primer Mundial!' },
+
+      { nombre:'Francia', bandera:'🇫🇷', grupo:'I', dato:'Está en Europa. Ganó el Mundial 2 veces.' },
+      { nombre:'Senegal', bandera:'🇸🇳', grupo:'I', dato:'Está en África.' },
+      { nombre:'Noruega', bandera:'🇳🇴', grupo:'I', dato:'Está en Europa. Tiene fiordos y mucha nieve.' },
+      { nombre:'Irak', bandera:'🇮🇶', grupo:'I', dato:'Está en Asia.' },
+
+      { nombre:'Argentina', bandera:'🇦🇷', grupo:'J', dato:'¡Es nuestro país! Ganó el Mundial 3 veces.' },
+      { nombre:'Argelia', bandera:'🇩🇿', grupo:'J', dato:'Está en África.' },
+      { nombre:'Austria', bandera:'🇦🇹', grupo:'J', dato:'Está en Europa. Tiene montañas para esquiar.' },
+      { nombre:'Jordania', bandera:'🇯🇴', grupo:'J', dato:'Está en Asia.' },
+
+      { nombre:'Portugal', bandera:'🇵🇹', grupo:'K', dato:'Está en Europa, junto al mar.' },
+      { nombre:'RD Congo', bandera:'🇨🇩', grupo:'K', dato:'Está en África. Tiene selvas muy grandes.' },
+      { nombre:'Uzbekistán', bandera:'🇺🇿', grupo:'K', dato:'Está en Asia.' },
+      { nombre:'Colombia', bandera:'🇨🇴', grupo:'K', dato:'Está en América del Sur. Allí se cultiva mucho café.' },
+
+      { nombre:'Inglaterra', bandera:'🏴', grupo:'L', dato:'Está en Europa. Allí se inventó el fútbol.' },
+      { nombre:'Croacia', bandera:'🇭🇷', grupo:'L', dato:'Está en Europa, junto al mar.' },
+      { nombre:'Panamá', bandera:'🇵🇦', grupo:'L', dato:'Está en América Central. Tiene un canal muy famoso.' },
+      { nombre:'Ghana', bandera:'🇬🇭', grupo:'L', dato:'Está en África.' },
+    ];
+
+    (function(){
+      const selector  = document.getElementById('mundialSelector');
+      const stage     = document.getElementById('mundialStage');
+      const cardEl    = document.getElementById('mundialCard');
+      const flagEl    = document.getElementById('mundialFlag');
+      const nameEl    = document.getElementById('mundialName');
+      const badgesEl  = document.getElementById('mundialBadges');
+      const datoEl    = document.getElementById('mundialDato');
+      const indexEl   = document.getElementById('mundialIndex');
+      const totalEl   = document.getElementById('mundialTotal');
+      const prevBtn   = document.getElementById('mundialPrev');
+      const nextBtn   = document.getElementById('mundialNext');
+      const repeatBtn = document.getElementById('mundialRepeat');
+      const volverBtn = document.getElementById('mundialVolver');
+      if (!selector || !stage) return;
+
+      let currentIdx = 0;
+
+      function renderSelector(){
+        selector.innerHTML = '';
+        mundial2026.forEach((pais, idx) => {
+          const b = document.createElement('button');
+          b.className = 'mundial-country-btn';
+          b.innerHTML = '<span class="mflag">' + pais.bandera + '</span>' + pais.nombre + '<span class="mgrupo-mini">Grupo ' + pais.grupo + '</span>';
+          b.addEventListener('click', () => openPais(idx));
+          selector.appendChild(b);
+        });
+      }
+
+      function renderPais(){
+        const pais = mundial2026[currentIdx];
+        if (indexEl) indexEl.textContent = String(currentIdx + 1);
+        if (totalEl) totalEl.textContent = String(mundial2026.length);
+        if (flagEl) flagEl.textContent = pais.bandera;
+        if (nameEl) nameEl.textContent = pais.nombre;
+        if (badgesEl){
+          badgesEl.innerHTML = '<span class="mundial-grupo-badge">Grupo ' + pais.grupo + '</span>' +
+            (pais.anfitrion ? ' <span class="mundial-host-badge">🏠 Anfitrión</span>' : '');
+        }
+        if (datoEl) datoEl.textContent = pais.dato;
+      }
+
+      function sayCurrent(){
+        const pais = mundial2026[currentIdx];
+        speak(pais.nombre + '. ' + pais.dato);
+      }
+
+      function openPais(idx){
+        currentIdx = idx;
+        selector.style.display = 'none';
+        stage.style.display = 'flex';
+        renderPais();
+        sayCurrent();
+        addStarJ('aprender'); // abrir ficha de país: +1 estrella
+      }
+
+      function goNext(){
+        currentIdx = (currentIdx + 1) % mundial2026.length;
+        renderPais();
+        sayCurrent();
+      }
+      function goPrev(){
+        currentIdx = (currentIdx - 1 + mundial2026.length) % mundial2026.length;
+        renderPais();
+        sayCurrent();
+      }
+
+      function volverSelector(){
+        stage.style.display = 'none';
+        selector.style.display = 'grid';
+      }
+
+      if (cardEl)    cardEl.addEventListener('click', sayCurrent);
+      if (nextBtn)   nextBtn.addEventListener('click', goNext);
+      if (prevBtn)   prevBtn.addEventListener('click', goPrev);
+      if (repeatBtn) repeatBtn.addEventListener('click', sayCurrent);
+      if (volverBtn) volverBtn.addEventListener('click', volverSelector);
+
+      renderSelector();
+
+      window.__mundialStart = function(){
+        volverSelector();
+        speak('Mundial de fútbol 2026. Elegí un país para conocerlo.');
       };
     })();
   </script>
