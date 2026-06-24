@@ -347,6 +347,21 @@
     @keyframes mundialOk{ 0%{transform:scale(1);} 40%{transform:scale(1.15);} 100%{transform:scale(1);} }
     @keyframes mundialShake{ 0%{transform:translateX(0);} 25%{transform:translateX(-8px);} 50%{transform:translateX(8px);} 75%{transform:translateX(-6px);} 100%{transform:translateX(0);} }
     .mundial-juego-feedback{ font-size:20px; font-weight:900; min-height:28px; text-align:center; }
+
+    /* Fase 34: Fixture del Mundial 2026 */
+    .mundial-fixture{ margin-top:14px; display:flex; flex-direction:column; align-items:center; gap:14px; width:100%; }
+    .mundial-day-btn{ border:2px solid rgba(34,197,94,.35); border-radius:18px; background:var(--card); box-shadow:var(--shadow); padding:14px 10px; display:flex; flex-direction:column; align-items:center; gap:4px; cursor:pointer; font-weight:900; font-size:15px; color:inherit; text-align:center; }
+    .mundial-day-btn .mdcount{ font-size:12px; font-weight:800; color:var(--muted); }
+    .mundial-fixture-dayview{ display:flex; flex-direction:column; align-items:center; gap:14px; width:100%; }
+    .mundial-fixture-title{ font-size:20px; font-weight:950; text-align:center; }
+    .mundial-fixture-list{ display:flex; flex-direction:column; gap:12px; width:100%; max-width:480px; }
+    .mundial-match-card{ border:2px solid rgba(34,197,94,.30); border-radius:18px; background:var(--card); box-shadow:var(--shadow); padding:14px 16px; cursor:pointer; text-align:left; color:inherit; width:100%; font-family:inherit; }
+    .mundial-match-row{ display:flex; align-items:center; justify-content:space-between; gap:8px; font-weight:900; font-size:15px; }
+    .mundial-match-team{ display:flex; align-items:center; gap:6px; flex:1; }
+    .mundial-match-team .mtflag{ font-size:24px; }
+    .mundial-match-score{ font-size:17px; font-weight:950; padding:3px 10px; border-radius:10px; background:rgba(34,197,94,.14); color:#15803d; min-width:54px; text-align:center; }
+    .mundial-match-score.pendiente{ background:rgba(245,158,11,.16); color:#b45309; font-size:13px; }
+    .mundial-match-meta{ margin-top:6px; font-size:13px; font-weight:800; color:var(--muted); text-align:center; }
     @media (max-width:600px){
       .mundial-card{ min-height:260px; padding:22px; }
       .mundial-flag-big{ font-size:72px; }
@@ -562,9 +577,20 @@
         <button class="btn ghost" id="mundialHome">⬅️ Juegos didácticos</button>
         <button class="btn ghost" id="mundialInfoBtn">❓ ¿Qué es el Mundial?</button>
         <button class="btn ghost" id="mundialJuegoBtn">🚩 Encontrá la bandera</button>
+        <button class="btn ghost" id="mundialFixtureBtn">📅 Fixture</button>
       </div>
 
       <div class="mundial-grid" id="mundialSelector"></div>
+
+      <div class="mundial-fixture" id="mundialFixture" style="display:none;">
+        <button class="btn ghost" id="mundialFixtureBack">⬅️ Países</button>
+        <div class="mundial-grid" id="mundialFixtureDays"></div>
+        <div class="mundial-fixture-dayview" id="mundialFixtureDayView" style="display:none;">
+          <button class="btn ghost" id="mundialFixtureDaysBack">⬅️ Días</button>
+          <div class="mundial-fixture-title" id="mundialFixtureTitle"></div>
+          <div class="mundial-fixture-list" id="mundialFixtureCards"></div>
+        </div>
+      </div>
 
       <div class="mundial-info" id="mundialInfo" style="display:none;">
         <button class="btn ghost" id="mundialInfoBack">⬅️ Países</button>
@@ -3583,6 +3609,116 @@
       { icono:'🏆', titulo:'Copa',      texto:'El equipo que gana todos los partidos se lleva una copa dorada muy famosa.' },
     ];
 
+    // Fase 34: Fixture del Mundial 2026 (Fase de Grupos)
+    // Fuente: ESPN México, "Todos los resultados del Mundial 2026, día a día hasta la final"
+    // (espn.com.mx, artículo id 16794151), consultado el 24/6/2026 a las 23:25 (fecha de la fuente).
+    // Incluye SOLO partidos confirmados por esa fuente al momento de la consulta. Los partidos sin
+    // resultado todavía (resultado:null) figuran como "Por jugar". No se inventan resultados.
+    // Actualizar este listado según FIFA / fuente oficial si faltan partidos o cambian datos.
+    const mundialFixture = [
+      { fecha:'Viernes 12 de junio', corto:'Vie 12', partidos:[
+        { local:'Canadá', visitante:'Bosnia y Herzegovina', grupo:'B', sede:'Toronto', resultado:'1-1' },
+      ]},
+      { fecha:'Sábado 13 de junio', corto:'Sáb 13', partidos:[
+        { local:'Catar', visitante:'Suiza', grupo:'B', sede:'San Francisco', resultado:'1-1' },
+        { local:'Brasil', visitante:'Marruecos', grupo:'C', sede:'Nueva Jersey', resultado:'1-1' },
+        { local:'Escocia', visitante:'Haití', grupo:'C', sede:'Boston', resultado:'1-0' },
+        { local:'Australia', visitante:'Turquía', grupo:'D', sede:'Vancouver', resultado:'2-0' },
+      ]},
+      { fecha:'Domingo 14 de junio', corto:'Dom 14', partidos:[
+        { local:'Alemania', visitante:'Curazao', grupo:'E', sede:'Houston', resultado:'7-1' },
+        { local:'Países Bajos', visitante:'Japón', grupo:'F', sede:'Dallas', resultado:'2-2' },
+        { local:'Costa de Marfil', visitante:'Ecuador', grupo:'E', sede:'Philadelphia', resultado:'1-0' },
+        { local:'Suecia', visitante:'Túnez', grupo:'F', sede:'Monterrey', resultado:'5-1' },
+      ]},
+      { fecha:'Lunes 15 de junio', corto:'Lun 15', partidos:[
+        { local:'España', visitante:'Cabo Verde', grupo:'H', sede:'Atlanta', resultado:'0-0' },
+        { local:'Bélgica', visitante:'Egipto', grupo:'G', sede:'Seattle', resultado:'1-1' },
+        { local:'Arabia Saudita', visitante:'Uruguay', grupo:'H', sede:'Miami', resultado:'1-1' },
+        { local:'Irán', visitante:'Nueva Zelanda', grupo:'G', sede:'Los Ángeles', resultado:'2-2' },
+      ]},
+      { fecha:'Martes 16 de junio', corto:'Mar 16', partidos:[
+        { local:'Francia', visitante:'Senegal', grupo:'I', sede:'Nueva Jersey', resultado:'3-1' },
+        { local:'Irak', visitante:'Noruega', grupo:'I', sede:'Boston', resultado:'1-4' },
+        { local:'Argentina', visitante:'Argelia', grupo:'J', sede:'Kansas City', resultado:'3-0' },
+        { local:'Austria', visitante:'Jordania', grupo:'J', sede:'San Francisco', resultado:'3-1' },
+      ]},
+      { fecha:'Miércoles 17 de junio', corto:'Mié 17', partidos:[
+        { local:'Portugal', visitante:'RD Congo', grupo:'K', sede:'Houston', resultado:'1-1' },
+        { local:'Inglaterra', visitante:'Croacia', grupo:'L', sede:'Dallas', resultado:'4-2' },
+        { local:'Ghana', visitante:'Panamá', grupo:'L', sede:'Toronto', resultado:'1-0' },
+        { local:'Uzbekistán', visitante:'Colombia', grupo:'K', sede:'Ciudad de México', resultado:'1-3' },
+      ]},
+      { fecha:'Jueves 18 de junio', corto:'Jue 18', partidos:[
+        { local:'República Checa', visitante:'Sudáfrica', grupo:'A', sede:'Atlanta', resultado:'1-1' },
+        { local:'Suiza', visitante:'Bosnia y Herzegovina', grupo:'B', sede:'Los Ángeles', resultado:'4-1' },
+        { local:'Canadá', visitante:'Catar', grupo:'B', sede:'Vancouver', resultado:'6-0' },
+        { local:'México', visitante:'Corea del Sur', grupo:'A', sede:'Guadalajara', resultado:'1-0' },
+      ]},
+      { fecha:'Viernes 19 de junio', corto:'Vie 19', partidos:[
+        { local:'Estados Unidos', visitante:'Australia', grupo:'D', sede:'Seattle', resultado:'2-0' },
+        { local:'Escocia', visitante:'Marruecos', grupo:'C', sede:'Boston', resultado:'0-1' },
+        { local:'Brasil', visitante:'Haití', grupo:'C', sede:'Philadelphia', resultado:'3-0' },
+        { local:'Turquía', visitante:'Paraguay', grupo:'D', sede:'San Francisco', resultado:'0-1' },
+      ]},
+      { fecha:'Sábado 20 de junio', corto:'Sáb 20', partidos:[
+        { local:'Países Bajos', visitante:'Suecia', grupo:'F', sede:'Houston', resultado:'5-1' },
+        { local:'Alemania', visitante:'Costa de Marfil', grupo:'E', sede:'Toronto', resultado:'2-1' },
+        { local:'Ecuador', visitante:'Curazao', grupo:'E', sede:'Kansas City', resultado:'0-0' },
+        { local:'Túnez', visitante:'Japón', grupo:'F', sede:'Monterrey', resultado:'0-4' },
+      ]},
+      { fecha:'Domingo 21 de junio', corto:'Dom 21', partidos:[
+        { local:'España', visitante:'Arabia Saudita', grupo:'H', sede:'Atlanta', resultado:'4-0' },
+        { local:'Bélgica', visitante:'Irán', grupo:'G', sede:'Los Ángeles', resultado:'0-0' },
+        { local:'Uruguay', visitante:'Cabo Verde', grupo:'H', sede:'Miami', resultado:'2-2' },
+        { local:'Nueva Zelanda', visitante:'Egipto', grupo:'G', sede:'Vancouver', resultado:'1-3' },
+      ]},
+      { fecha:'Lunes 22 de junio', corto:'Lun 22', partidos:[
+        { local:'Argentina', visitante:'Austria', grupo:'J', sede:'Dallas', resultado:'2-0' },
+        { local:'Francia', visitante:'Irak', grupo:'I', sede:'Philadelphia', resultado:'3-0' },
+        { local:'Noruega', visitante:'Senegal', grupo:'I', sede:'Nueva Jersey', resultado:'3-2' },
+        { local:'Jordania', visitante:'Argelia', grupo:'J', sede:'', resultado:'1-2' },
+      ]},
+      { fecha:'Martes 23 de junio', corto:'Mar 23', partidos:[
+        { local:'Portugal', visitante:'Uzbekistán', grupo:'K', sede:'Houston', resultado:'5-0' },
+        { local:'Inglaterra', visitante:'Ghana', grupo:'L', sede:'Boston', resultado:'0-0' },
+        { local:'Croacia', visitante:'Panamá', grupo:'L', sede:'Toronto', resultado:'1-0' },
+        { local:'Colombia', visitante:'RD Congo', grupo:'K', sede:'Guadalajara', resultado:'1-0' },
+      ]},
+      { fecha:'Miércoles 24 de junio', corto:'Mié 24', partidos:[
+        { local:'Suiza', visitante:'Canadá', grupo:'B', sede:'Vancouver', resultado:null },
+        { local:'Bosnia y Herzegovina', visitante:'Catar', grupo:'B', sede:'Seattle', resultado:null },
+        { local:'Marruecos', visitante:'Haití', grupo:'C', sede:'Atlanta', resultado:null },
+        { local:'Brasil', visitante:'Escocia', grupo:'C', sede:'Miami', resultado:null },
+        { local:'Sudáfrica', visitante:'Corea del Sur', grupo:'A', sede:'Monterrey', resultado:null },
+        { local:'República Checa', visitante:'México', grupo:'A', sede:'Ciudad de México', resultado:null },
+      ]},
+      { fecha:'Jueves 25 de junio', corto:'Jue 25', partidos:[
+        { local:'Curazao', visitante:'Costa de Marfil', grupo:'E', sede:'Philadelphia', resultado:null },
+        { local:'Ecuador', visitante:'Alemania', grupo:'E', sede:'Nueva Jersey', resultado:null },
+        { local:'Japón', visitante:'Suecia', grupo:'F', sede:'Dallas', resultado:null },
+        { local:'Túnez', visitante:'Países Bajos', grupo:'F', sede:'Kansas City', resultado:null },
+        { local:'Paraguay', visitante:'Australia', grupo:'D', sede:'San Francisco', resultado:null },
+        { local:'Turquía', visitante:'Estados Unidos', grupo:'D', sede:'Los Ángeles', resultado:null },
+      ]},
+      { fecha:'Viernes 26 de junio', corto:'Vie 26', partidos:[
+        { local:'Noruega', visitante:'Francia', grupo:'I', sede:'Boston', resultado:null },
+        { local:'Senegal', visitante:'Irak', grupo:'I', sede:'Toronto', resultado:null },
+        { local:'Cabo Verde', visitante:'Arabia Saudita', grupo:'H', sede:'Houston', resultado:null },
+        { local:'Uruguay', visitante:'España', grupo:'H', sede:'Guadalajara', resultado:null },
+        { local:'Egipto', visitante:'Irán', grupo:'G', sede:'Seattle', resultado:null },
+        { local:'Nueva Zelanda', visitante:'Bélgica', grupo:'G', sede:'Vancouver', resultado:null },
+      ]},
+      { fecha:'Sábado 27 de junio', corto:'Sáb 27', partidos:[
+        { local:'Croacia', visitante:'Ghana', grupo:'L', sede:'Philadelphia', resultado:null },
+        { local:'Panamá', visitante:'Inglaterra', grupo:'L', sede:'Nueva Jersey', resultado:null },
+        { local:'Colombia', visitante:'Portugal', grupo:'K', sede:'Miami', resultado:null },
+        { local:'RD Congo', visitante:'Uzbekistán', grupo:'K', sede:'Atlanta', resultado:null },
+        { local:'Argelia', visitante:'Austria', grupo:'J', sede:'Kansas City', resultado:null },
+        { local:'Jordania', visitante:'Argentina', grupo:'J', sede:'Dallas', resultado:null },
+      ]},
+    ];
+
     (function(){
       const selector  = document.getElementById('mundialSelector');
       const stage     = document.getElementById('mundialStage');
@@ -3608,9 +3744,22 @@
       const juegoPreguntaEl = document.getElementById('mundialJuegoPregunta');
       const juegoOpcionesEl = document.getElementById('mundialJuegoOpciones');
       const juegoFeedbackEl = document.getElementById('mundialJuegoFeedback');
+      const fixtureBtn        = document.getElementById('mundialFixtureBtn');
+      const fixtureBackBtn    = document.getElementById('mundialFixtureBack');
+      const fixtureEl         = document.getElementById('mundialFixture');
+      const fixtureDaysEl     = document.getElementById('mundialFixtureDays');
+      const fixtureDayViewEl  = document.getElementById('mundialFixtureDayView');
+      const fixtureDaysBackBtn= document.getElementById('mundialFixtureDaysBack');
+      const fixtureTitleEl    = document.getElementById('mundialFixtureTitle');
+      const fixtureCardsEl    = document.getElementById('mundialFixtureCards');
       if (!selector || !stage) return;
 
       let currentIdx = 0;
+
+      function banderaDe(nombre){
+        const p = mundial2026.find(x => x.nombre === nombre);
+        return p ? p.bandera : '🏳️';
+      }
 
       function renderSelector(){
         selector.innerHTML = '';
@@ -3665,6 +3814,7 @@
         stage.style.display = 'none';
         if (infoEl) infoEl.style.display = 'none';
         if (juegoEl) juegoEl.style.display = 'none';
+        if (fixtureEl) fixtureEl.style.display = 'none';
         selector.style.display = 'grid';
       }
 
@@ -3690,6 +3840,7 @@
         selector.style.display = 'none';
         stage.style.display = 'none';
         if (juegoEl) juegoEl.style.display = 'none';
+        if (fixtureEl) fixtureEl.style.display = 'none';
         if (infoEl) infoEl.style.display = 'flex';
         speak('¿Qué es el Mundial? Tocá una tarjeta para escuchar.');
       }
@@ -3757,8 +3908,80 @@
         selector.style.display = 'none';
         stage.style.display = 'none';
         if (infoEl) infoEl.style.display = 'none';
+        if (fixtureEl) fixtureEl.style.display = 'none';
         if (juegoEl) juegoEl.style.display = 'flex';
         nuevoRound();
+      }
+
+      // Fase 34: Fixture del Mundial 2026
+      function estadoDia(dia){
+        const todosJugados = dia.partidos.every(p => p.resultado !== null);
+        const ningunoJugado = dia.partidos.every(p => p.resultado === null);
+        if (todosJugados) return 'Resultados ✅';
+        if (ningunoJugado) return 'Por jugar 🕐';
+        return 'En curso ⏳';
+      }
+
+      function renderFixtureDays(){
+        if (!fixtureDaysEl) return;
+        fixtureDaysEl.innerHTML = '';
+        mundialFixture.forEach((dia, idx) => {
+          const b = document.createElement('button');
+          b.className = 'mundial-day-btn';
+          b.innerHTML = '📅 ' + dia.corto + '<span class="mdcount">' + estadoDia(dia) + '</span>';
+          b.addEventListener('click', () => openFixtureDay(idx));
+          fixtureDaysEl.appendChild(b);
+        });
+      }
+
+      function renderMatchCard(p){
+        const b = document.createElement('button');
+        b.className = 'mundial-match-card';
+        const jugado = p.resultado !== null;
+        const scoreParts = jugado ? p.resultado.split('-') : ['', ''];
+        const scoreHtml = jugado
+          ? '<span class="mundial-match-score">' + scoreParts[0] + ' - ' + scoreParts[1] + '</span>'
+          : '<span class="mundial-match-score pendiente">vs.</span>';
+        b.innerHTML =
+          '<div class="mundial-match-row">' +
+            '<span class="mundial-match-team"><span class="mtflag">' + banderaDe(p.local) + '</span>' + p.local + '</span>' +
+            scoreHtml +
+            '<span class="mundial-match-team"><span class="mtflag">' + banderaDe(p.visitante) + '</span>' + p.visitante + '</span>' +
+          '</div>' +
+          '<div class="mundial-match-meta">Grupo ' + p.grupo + (p.sede ? ' · ' + p.sede : '') + (jugado ? '' : ' · Por jugar') + '</div>';
+        b.addEventListener('click', () => {
+          const texto = jugado
+            ? p.local + ' ' + scoreParts[0] + ', ' + p.visitante + ' ' + scoreParts[1]
+            : p.local + ' contra ' + p.visitante + '. Todavía no se jugó.';
+          speak(texto);
+        });
+        return b;
+      }
+
+      function openFixtureDay(idx){
+        const dia = mundialFixture[idx];
+        if (!dia || !fixtureCardsEl) return;
+        if (fixtureDaysEl) fixtureDaysEl.style.display = 'none';
+        if (fixtureDayViewEl) fixtureDayViewEl.style.display = 'flex';
+        if (fixtureTitleEl) fixtureTitleEl.textContent = dia.fecha;
+        fixtureCardsEl.innerHTML = '';
+        dia.partidos.forEach(p => fixtureCardsEl.appendChild(renderMatchCard(p)));
+        speak(dia.fecha + '. ' + dia.partidos.length + (dia.partidos.length === 1 ? ' partido.' : ' partidos.'));
+      }
+
+      function volverFixtureDias(){
+        if (fixtureDayViewEl) fixtureDayViewEl.style.display = 'none';
+        if (fixtureDaysEl) fixtureDaysEl.style.display = 'grid';
+      }
+
+      function abrirFixture(){
+        selector.style.display = 'none';
+        stage.style.display = 'none';
+        if (infoEl) infoEl.style.display = 'none';
+        if (juegoEl) juegoEl.style.display = 'none';
+        if (fixtureEl) fixtureEl.style.display = 'flex';
+        volverFixtureDias();
+        speak('Fixture del Mundial. Elegí un día para ver los partidos.');
       }
 
       if (cardEl)    cardEl.addEventListener('click', sayCurrent);
@@ -3770,9 +3993,13 @@
       if (infoBackBtn) infoBackBtn.addEventListener('click', volverSelector);
       if (juegoBtn)     juegoBtn.addEventListener('click', abrirJuego);
       if (juegoBackBtn) juegoBackBtn.addEventListener('click', volverSelector);
+      if (fixtureBtn)         fixtureBtn.addEventListener('click', abrirFixture);
+      if (fixtureBackBtn)     fixtureBackBtn.addEventListener('click', volverSelector);
+      if (fixtureDaysBackBtn) fixtureDaysBackBtn.addEventListener('click', volverFixtureDias);
 
       renderSelector();
       renderInfo();
+      renderFixtureDays();
 
       window.__mundialStart = function(){
         volverSelector();
