@@ -84,7 +84,7 @@
         <div class="emoji">🌳</div>
         <div>El mundo se está preparando...</div>
       </div>
-      <!-- Fase 37: acá se monta el canvas de Three.js con el mundo explorable -->
+      <!-- Fase 37: el canvas de Three.js se agrega aquí dentro por JS -->
     </div>
 
     <div class="mundo-footer">
@@ -93,6 +93,14 @@
     </div>
   </div>
 
+  <!--
+    Fase 37: motor 3D con Three.js (cargado desde CDN, r128).
+    El "Mundo de Samuel" es una escena propia y simplificada, escrita desde cero para esta app:
+    NO se copió código del repo de referencia evaluado en la Fase 35
+    (ashish0kumar/Minecraft-Javascript-Edition, licencia MIT) — solo se usó como referencia
+    de qué es razonable hacer con Three.js puro, sin backend y sin build step.
+  -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script>
     // --- Estrellas compartidas con el resto de Samuel OS (mismo localStorage que juegos.html / child.html) ---
     function todayKeyM(){
@@ -136,6 +144,188 @@
 
     // Mensaje de bienvenida al entrar a la pantalla
     setTimeout(() => speak('Samuel, caminá despacio y buscá las estrellas.'), 600);
+
+    // --- Mundo de Samuel: escena 3D básica (Fase 37) ---
+    // Mundo chico, tranquilo, sin enemigos, sin violencia, modo exploración únicamente.
+    (function(){
+      const stage = document.getElementById('mundoStage');
+      const placeholder = document.getElementById('mundoPlaceholder');
+      if (!stage) return;
+
+      if (typeof THREE === 'undefined') {
+        placeholder.innerHTML = '<div class="emoji">😴</div><div>El mundo 3D no se pudo cargar. Probá con internet conectado.</div>';
+        return;
+      }
+
+      let renderer, scene, camera;
+      let avatar, avatarShadow;
+      const LIMITE = 13; // mundo chico: el personaje no puede salir de este cuadrado
+      const VELOCIDAD = 4.2; // unidades por segundo: "caminar despacio"
+      const teclas = {};
+      const avatarPos = { x: 0, z: 4 };
+      const camActual = new THREE.Vector3();
+
+      function crearArbol(x, z){
+        const grupo = new THREE.Group();
+        const tronco = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.25, 0.32, 1.4, 8),
+          new THREE.MeshLambertMaterial({ color: 0x8a5a32 })
+        );
+        tronco.position.y = 0.7;
+        const copa = new THREE.Mesh(
+          new THREE.ConeGeometry(1.05, 1.7, 9),
+          new THREE.MeshLambertMaterial({ color: 0x3fa34d })
+        );
+        copa.position.y = 2.05;
+        grupo.add(tronco, copa);
+        grupo.position.set(x, 0, z);
+        return grupo;
+      }
+
+      function crearRoca(x, z, escala){
+        const roca = new THREE.Mesh(
+          new THREE.DodecahedronGeometry(0.5 * escala, 0),
+          new THREE.MeshLambertMaterial({ color: 0x9aa3ad })
+        );
+        roca.position.set(x, 0.35 * escala, z);
+        roca.rotation.set(Math.random(), Math.random(), Math.random());
+        return roca;
+      }
+
+      function crearMundo(){
+        scene = new THREE.Scene();
+        scene.background = new THREE.Color(0xbfe3fb);
+        scene.fog = new THREE.Fog(0xbfe3fb, 18, 34);
+
+        camera = new THREE.PerspectiveCamera(55, 1, 0.1, 100);
+
+        renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+        stage.appendChild(renderer.domElement);
+        renderer.domElement.style.position = 'absolute';
+        renderer.domElement.style.inset = '0';
+
+        // Luz suave, sin sombras duras (clima tranquilo)
+        scene.add(new THREE.AmbientLight(0xffffff, 0.75));
+        const sol = new THREE.DirectionalLight(0xfff4d6, 0.7);
+        sol.position.set(8, 14, 6);
+        scene.add(sol);
+
+        // Suelo (mundo pequeño)
+        const suelo = new THREE.Mesh(
+          new THREE.PlaneGeometry(LIMITE * 2 + 4, LIMITE * 2 + 4),
+          new THREE.MeshLambertMaterial({ color: 0x7bc96f })
+        );
+        suelo.rotation.x = -Math.PI / 2;
+        scene.add(suelo);
+
+        // Borde bajo: marca visualmente el límite del mundo (sin paredes invisibles confusas)
+        const colorBorde = 0xd9a86b;
+        const pasos = 18;
+        for (let i = 0; i <= pasos; i++){
+          const t = (i / pasos) * (LIMITE * 2) - LIMITE;
+          [[t, LIMITE], [t, -LIMITE], [LIMITE, t], [-LIMITE, t]].forEach(([x, z]) => {
+            const poste = new THREE.Mesh(
+              new THREE.BoxGeometry(0.3, 0.6, 0.3),
+              new THREE.MeshLambertMaterial({ color: colorBorde })
+            );
+            poste.position.set(x, 0.3, z);
+            scene.add(poste);
+          });
+        }
+
+        // Decoración fija: árboles y rocas (no bloquean el paso, son solo paisaje en Fase 37)
+        const arboles = [[-8,-6],[8,-7],[-9,7],[9,8],[3,-9],[-4,9],[0,-11]];
+        arboles.forEach(([x,z]) => scene.add(crearArbol(x, z)));
+        const rocas = [[-3,3,1],[5,2,0.8],[-6,-2,1.2],[2,6,0.9]];
+        rocas.forEach(([x,z,e]) => scene.add(crearRoca(x, z, e)));
+
+        // Avatar de Samuel: una esfera amigable (sin caras realistas, estilo simple)
+        avatar = new THREE.Mesh(
+          new THREE.SphereGeometry(0.55, 20, 16),
+          new THREE.MeshLambertMaterial({ color: 0xf59e0b })
+        );
+        avatar.position.set(avatarPos.x, 0.55, avatarPos.z);
+        scene.add(avatar);
+
+        avatarShadow = new THREE.Mesh(
+          new THREE.CircleGeometry(0.55, 16),
+          new THREE.MeshBasicMaterial({ color: 0x1f2937, transparent: true, opacity: 0.18 })
+        );
+        avatarShadow.rotation.x = -Math.PI / 2;
+        avatarShadow.position.set(avatarPos.x, 0.02, avatarPos.z);
+        scene.add(avatarShadow);
+
+        camActual.set(avatarPos.x, 5.2, avatarPos.z + 7.5);
+
+        ajustarTamano();
+        placeholder.style.display = 'none';
+      }
+
+      function ajustarTamano(){
+        if (!renderer) return;
+        const w = stage.clientWidth || 600;
+        const h = stage.clientHeight || 420;
+        renderer.setSize(w, h);
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+      }
+      window.addEventListener('resize', ajustarTamano);
+
+      // --- Movimiento simple: flechas / WASD, sin mouse-look (evita marear) ---
+      window.addEventListener('keydown', (e) => { teclas[e.key.toLowerCase()] = true; });
+      window.addEventListener('keyup',   (e) => { teclas[e.key.toLowerCase()] = false; });
+
+      function actualizarAvatar(dt){
+        let dx = 0, dz = 0;
+        if (teclas['arrowup'] || teclas['w']) dz -= 1;
+        if (teclas['arrowdown'] || teclas['s']) dz += 1;
+        if (teclas['arrowleft'] || teclas['a']) dx -= 1;
+        if (teclas['arrowright'] || teclas['d']) dx += 1;
+        if (dx || dz){
+          const len = Math.hypot(dx, dz);
+          dx /= len; dz /= len;
+          avatarPos.x += dx * VELOCIDAD * dt;
+          avatarPos.z += dz * VELOCIDAD * dt;
+          avatarPos.x = Math.max(-LIMITE, Math.min(LIMITE, avatarPos.x));
+          avatarPos.z = Math.max(-LIMITE, Math.min(LIMITE, avatarPos.z));
+          avatar.position.x = avatarPos.x;
+          avatar.position.z = avatarPos.z;
+          avatarShadow.position.x = avatarPos.x;
+          avatarShadow.position.z = avatarPos.z;
+          // Pequeño rebote al caminar, sin física compleja
+          avatar.position.y = 0.55 + Math.abs(Math.sin(performance.now() / 140)) * 0.12;
+        } else {
+          avatar.position.y = 0.55;
+        }
+      }
+
+      function actualizarCamara(dt){
+        const objetivo = new THREE.Vector3(avatarPos.x, 5.2, avatarPos.z + 7.5);
+        camActual.lerp(objetivo, Math.min(1, dt * 3));
+        camera.position.copy(camActual);
+        camera.lookAt(avatarPos.x, 1, avatarPos.z);
+      }
+
+      let ultimoTiempo = performance.now();
+      function loop(){
+        const ahora = performance.now();
+        const dt = Math.min(0.05, (ahora - ultimoTiempo) / 1000);
+        ultimoTiempo = ahora;
+        actualizarAvatar(dt);
+        actualizarCamara(dt);
+        renderer.render(scene, camera);
+        window.__mundoRAF = requestAnimationFrame(loop);
+      }
+
+      try{
+        crearMundo();
+        loop();
+      }catch(e){
+        placeholder.style.display = 'block';
+        placeholder.innerHTML = '<div class="emoji">😴</div><div>El mundo 3D no se pudo mostrar en este dispositivo.</div>';
+      }
+    })();
 
     // --- Service worker (mismo que el resto de la app) ---
     if ('serviceWorker' in navigator) {
