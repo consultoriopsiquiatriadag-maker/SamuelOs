@@ -1,5 +1,5 @@
 /* Aplicación de Samuel - Service Worker */
-const CACHE_VERSION = 'samuel-app-v64-foto-samuel-child';
+const CACHE_VERSION = 'samuel-app-v65-quitar-nota-papas';
 const CACHE_NAME = CACHE_VERSION;
 
 const ASSETS = [
