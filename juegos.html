@@ -137,6 +137,31 @@
       .tetris-btn{ min-width:68px; min-height:68px; font-size:26px; }
     }
 
+    /* Simón Dice: secuencias de memoria (Fase 51) */
+    .simon-wrap{ margin-top:14px; display:flex; flex-direction:column; align-items:center; gap:16px; }
+    .simon-info{ font-size:18px; font-weight:950; text-align:center; }
+    .simon-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:16px; width:100%; max-width:380px; }
+    .simon-btn{ border:none; border-radius:24px; min-height:140px; cursor:pointer; box-shadow:0 14px 26px rgba(2,6,23,.30); filter:brightness(.85); transition:filter .15s ease, transform .1s ease; }
+    .simon-btn.lit{ filter:brightness(1.5); transform:scale(1.04); }
+    .simon-btn:active{ transform:scale(.95); }
+    @media (max-width:600px){ .simon-btn{ min-height:110px; } }
+
+    /* Laberinto simple (Fase 52) */
+    .laberinto-wrap{ margin-top:14px; display:flex; flex-direction:column; align-items:center; gap:18px; }
+    .laberinto-board{ display:grid; gap:4px; background:#0f172a; border-radius:18px; padding:10px; box-shadow:var(--shadow); }
+    .laberinto-cell{ width:48px; height:48px; border-radius:8px; background:rgba(255,255,255,.08); display:flex; align-items:center; justify-content:center; font-size:26px; }
+    .laberinto-cell.pared{ background:#334155; }
+    .laberinto-cell.meta{ background:rgba(34,197,94,.30); }
+    .laberinto-controls{ display:flex; flex-direction:column; align-items:center; gap:10px; }
+    @media (max-width:600px){ .laberinto-cell{ width:40px; height:40px; font-size:22px; } }
+
+    /* Contar y emparejar (Fase 53) */
+    .contar-stage{ margin-top:14px; display:flex; flex-direction:column; align-items:center; gap:28px; padding:20px 16px; }
+    .contar-objetos{ display:flex; flex-wrap:wrap; justify-content:center; gap:14px; font-size:54px; max-width:480px; }
+    .contar-numeros{ display:flex; flex-wrap:wrap; justify-content:center; gap:14px; }
+    .contar-num-btn{ width:74px; height:74px; border:none; border-radius:18px; background:#fff; box-shadow:0 14px 26px rgba(2,6,23,.18); font-size:32px; font-weight:950; cursor:pointer; }
+    .contar-num-btn:active{ transform:scale(.92); }
+
     /* Rompecabezas infantil (Fase 18) */
     .puzzle-theme-grid{ margin-top:16px; display:grid; gap:14px; grid-template-columns:repeat(auto-fit, minmax(170px, 1fr)); }
     .puzzle-theme-btn{ border:2px solid rgba(168,85,247,.35); border-radius:22px; background:var(--card); box-shadow:var(--shadow); padding:22px 14px; display:flex; flex-direction:column; align-items:center; gap:10px; cursor:pointer; font-weight:950; font-size:17px; color:inherit; }
@@ -835,11 +860,66 @@
           <div class="gtitle">🚛 Juegos de aventura</div>
           <div class="gdesc">Camión, carrera, animales y básquet.</div>
         </button>
+
+        <button class="game" id="goSimon">
+          <div class="gtitle">🎯 Simón Dice</div>
+          <div class="gdesc">Repetí el patrón de colores y sonidos. Cada vez un poco más largo.</div>
+        </button>
+
+        <button class="game" id="goLaberinto">
+          <div class="gtitle">🗺️ Laberinto</div>
+          <div class="gdesc">Movete con las flechas hasta llegar a la meta.</div>
+        </button>
+
+        <button class="game" id="goContar">
+          <div class="gtitle">🔢 Contar y emparejar</div>
+          <div class="gdesc">Contá los objetos y tocá el número correcto.</div>
+        </button>
       </div>
       <div class="soon-card">
         <div class="soon-emoji">💡</div>
         <div class="soon-title">Pronto vamos a sumar más juegos para pensar</div>
         <div class="soon-text">¡Vamos a seguir sumando sorpresas para Samuel!</div>
+      </div>
+    </section>
+
+    <!-- SIMÓN DICE: secuencias de memoria (Fase 51) -->
+    <section id="viewSimon" class="view" aria-label="Simón Dice">
+      <div class="top-actions" style="margin-bottom:6px;">
+        <button class="btn ghost" id="simonHome">⬅️ Juegos didácticos</button>
+      </div>
+      <div class="simon-wrap">
+        <div class="simon-info" id="simonInfo">Mirá y escuchá la secuencia.</div>
+        <div class="simon-grid" id="simonGrid"></div>
+      </div>
+    </section>
+
+    <!-- LABERINTO SIMPLE (Fase 52) -->
+    <section id="viewLaberinto" class="view" aria-label="Laberinto">
+      <div class="top-actions" style="margin-bottom:6px;">
+        <button class="btn ghost" id="laberintoHome">⬅️ Juegos didácticos</button>
+      </div>
+      <div class="laberinto-wrap">
+        <div class="laberinto-board" id="laberintoBoard" aria-label="Laberinto"></div>
+        <div class="laberinto-controls">
+          <button class="tetris-btn" id="laberintoUp" aria-label="Arriba">⬆️</button>
+          <div style="display:flex; gap:16px;">
+            <button class="tetris-btn" id="laberintoLeft" aria-label="Izquierda">⬅️</button>
+            <button class="tetris-btn" id="laberintoDown" aria-label="Abajo">⬇️</button>
+            <button class="tetris-btn" id="laberintoRight" aria-label="Derecha">➡️</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTAR Y EMPAREJAR (Fase 53) -->
+    <section id="viewContar" class="view" aria-label="Contar y emparejar">
+      <div class="top-actions" style="margin-bottom:6px;">
+        <button class="btn ghost" id="contarHome">⬅️ Juegos didácticos</button>
+      </div>
+      <div class="contar-stage">
+        <div class="contar-objetos" id="contarObjetos"></div>
+        <div class="contar-numeros" id="contarNumeros"></div>
       </div>
     </section>
 
@@ -1448,6 +1528,9 @@
       tetris: document.getElementById('viewTetris'),
       puzzle: document.getElementById('viewPuzzle'),
       mundial: document.getElementById('viewMundial'),
+      simon: document.getElementById('viewSimon'),
+      laberinto: document.getElementById('viewLaberinto'),
+      contar: document.getElementById('viewContar'),
       aventura: document.getElementById('viewAventura'),
       camionero: document.getElementById('viewCamionero'),
       conectar: document.getElementById('viewConectar'),
@@ -1531,6 +1614,12 @@
     document.getElementById('puzzleHome').addEventListener('click', () => showView('didacticos'));
     document.getElementById('goMundial').addEventListener('click', () => { showView('mundial'); window.__mundialStart && window.__mundialStart(); });
     document.getElementById('mundialHome').addEventListener('click', () => showView('didacticos'));
+    document.getElementById('goSimon').addEventListener('click', () => { showView('simon'); window.__simonStart && window.__simonStart(); });
+    document.getElementById('simonHome').addEventListener('click', () => showView('didacticos'));
+    document.getElementById('goLaberinto').addEventListener('click', () => { showView('laberinto'); window.__laberintoStart && window.__laberintoStart(); });
+    document.getElementById('laberintoHome').addEventListener('click', () => showView('didacticos'));
+    document.getElementById('goContar').addEventListener('click', () => { showView('contar'); window.__contarStart && window.__contarStart(); });
+    document.getElementById('contarHome').addEventListener('click', () => showView('didacticos'));
     document.getElementById('goAventura').addEventListener('click', () => { showView('aventura'); speak('Juegos de aventura.'); });
     document.getElementById('aventuraHome').addEventListener('click', () => showView('didacticos'));
     document.getElementById('goCamionero').addEventListener('click', () => { showView('camionero'); window.__camioneroStart && window.__camioneroStart(); });
@@ -2938,6 +3027,242 @@
       window.__lucesStart = function(){
         renderLuces();
         speak('Tocá un color para ver y escuchar.');
+      };
+    })();
+
+    // --- Simón Dice: secuencias de memoria (Fase 51) ---
+    (function(){
+      const grid = document.getElementById('simonGrid');
+      const info = document.getElementById('simonInfo');
+      if (!grid) return;
+      const tick = makeStarTicker(1);
+
+      const COLORES = [
+        { hex:'#ef4444', f:330 },
+        { hex:'#3b82f6', f:392 },
+        { hex:'#eab308', f:494 },
+        { hex:'#22c55e', f:262 }
+      ];
+      let botones = [];
+      let secuencia = [];
+      let inputPos = 0;
+      let aceptaToque = false;
+
+      function renderBotones(){
+        grid.innerHTML = '';
+        botones = [];
+        COLORES.forEach((c, i) => {
+          const b = document.createElement('button');
+          b.className = 'simon-btn';
+          b.style.background = c.hex;
+          b.setAttribute('aria-label', 'Color ' + (i + 1));
+          b.addEventListener('click', () => onTap(i));
+          grid.appendChild(b);
+          botones.push(b);
+        });
+      }
+
+      function destacar(i, dur){
+        return new Promise(resolve => {
+          const b = botones[i];
+          b.classList.add('lit');
+          playTone({ type:'sine', f0:COLORES[i].f, dur: dur / 1000, gain:0.6 });
+          setTimeout(() => { b.classList.remove('lit'); resolve(); }, dur);
+        });
+      }
+
+      async function reproducirSecuencia(){
+        aceptaToque = false;
+        if (info) info.textContent = 'Mirá y escuchá...';
+        await new Promise(r => setTimeout(r, 500));
+        for (const i of secuencia){
+          await destacar(i, 550);
+          await new Promise(r => setTimeout(r, 230));
+        }
+        inputPos = 0;
+        aceptaToque = true;
+        if (info) info.textContent = 'Ahora repetí tocando los colores.';
+        speak('Ahora repetí.');
+      }
+
+      function nuevoNivel(){
+        secuencia.push(Math.floor(Math.random() * COLORES.length));
+        reproducirSecuencia();
+      }
+
+      function onTap(i){
+        if (!aceptaToque) return;
+        ensureAudio();
+        destacar(i, 280);
+        if (i === secuencia[inputPos]){
+          inputPos++;
+          if (inputPos >= secuencia.length){
+            aceptaToque = false;
+            tick();
+            if (info) info.textContent = '¡Muy bien! Nivel ' + (secuencia.length + 1);
+            setTimeout(() => { speak('¡Muy bien, Samuel!'); }, 200);
+            setTimeout(nuevoNivel, 1400);
+          }
+        } else {
+          // Sin castigos: no resta ni reinicia el nivel, solo vuelve a mostrar la misma secuencia.
+          aceptaToque = false;
+          setTimeout(() => { speak('Mirá de nuevo.'); reproducirSecuencia(); }, 500);
+        }
+      }
+
+      window.__simonStart = function(){
+        renderBotones();
+        secuencia = [];
+        ensureAudio();
+        speak('Simón Dice. Repetí el patrón de colores.');
+        setTimeout(nuevoNivel, 1200);
+      };
+    })();
+
+    // --- Laberinto simple (Fase 52) ---
+    (function(){
+      const board = document.getElementById('laberintoBoard');
+      if (!board) return;
+      const tick = makeStarTicker(1);
+
+      // Cada nivel define filas/columnas, paredes (formato "fila,columna") y casillas de inicio/meta.
+      // Niveles de dificultad creciente (Fase 52): 4x4 → 5x5 → 6x6, con más vueltas en cada uno.
+      const NIVELES = [
+        { filas:4, columnas:4, paredes:['1,0','1,1','1,2','3,1','3,2','3,3'], inicio:{r:0,c:0}, meta:{r:3,c:0} },
+        { filas:5, columnas:5, paredes:['0,4','1,0','1,1','1,2','1,4','3,1','3,2','3,3','3,4'], inicio:{r:0,c:0}, meta:{r:4,c:4} },
+        { filas:6, columnas:6, paredes:['0,2','1,1','1,2','1,4','2,4','3,0','3,1','3,3','3,4','5,1','5,2','5,3','5,4'], inicio:{r:0,c:0}, meta:{r:5,c:5} }
+      ];
+      let nivelIdx = 0;
+      let pos = { r:0, c:0 };
+      let celdas = [];
+
+      function esPared(nivel, r, c){
+        return nivel.paredes.includes(r + ',' + c);
+      }
+
+      function render(){
+        const nivel = NIVELES[nivelIdx];
+        board.innerHTML = '';
+        board.style.gridTemplateColumns = 'repeat(' + nivel.columnas + ', 48px)';
+        celdas = [];
+        for (let r = 0; r < nivel.filas; r++){
+          const fila = [];
+          for (let c = 0; c < nivel.columnas; c++){
+            const div = document.createElement('div');
+            div.className = 'laberinto-cell';
+            if (esPared(nivel, r, c)) div.classList.add('pared');
+            if (r === nivel.meta.r && c === nivel.meta.c){ div.classList.add('meta'); div.textContent = '🏁'; }
+            board.appendChild(div);
+            fila.push(div);
+          }
+          celdas.push(fila);
+        }
+        pintarJugador();
+      }
+
+      function pintarJugador(){
+        celdas.forEach(fila => fila.forEach(div => { if (!div.classList.contains('meta')) div.textContent = ''; }));
+        celdas[pos.r][pos.c].textContent = '🧒';
+      }
+
+      function mover(dr, dc){
+        const nivel = NIVELES[nivelIdx];
+        const nr = pos.r + dr, nc = pos.c + dc;
+        if (nr < 0 || nc < 0 || nr >= nivel.filas || nc >= nivel.columnas) return;
+        if (esPared(nivel, nr, nc)) return;
+        pos = { r:nr, c:nc };
+        ensureAudio();
+        playTone({ type:'triangle', f0:440, dur:0.12, gain:0.4 });
+        pintarJugador();
+        if (pos.r === nivel.meta.r && pos.c === nivel.meta.c){
+          tick();
+          setTimeout(() => speak('¡Llegaste, Samuel! Muy bien.'), 150);
+          setTimeout(() => {
+            nivelIdx = (nivelIdx + 1) % NIVELES.length;
+            pos = Object.assign({}, NIVELES[nivelIdx].inicio);
+            render();
+            speak('Vamos al siguiente laberinto.');
+          }, 1800);
+        }
+      }
+
+      document.getElementById('laberintoUp').addEventListener('click', () => mover(-1, 0));
+      document.getElementById('laberintoDown').addEventListener('click', () => mover(1, 0));
+      document.getElementById('laberintoLeft').addEventListener('click', () => mover(0, -1));
+      document.getElementById('laberintoRight').addEventListener('click', () => mover(0, 1));
+
+      window.__laberintoStart = function(){
+        nivelIdx = 0;
+        pos = Object.assign({}, NIVELES[0].inicio);
+        ensureAudio();
+        render();
+        speak('Llevá al personaje hasta la bandera usando las flechas.');
+      };
+    })();
+
+    // --- Contar y emparejar (Fase 53) ---
+    (function(){
+      const objetosEl = document.getElementById('contarObjetos');
+      const numerosEl = document.getElementById('contarNumeros');
+      if (!objetosEl) return;
+      const tick = makeStarTicker(1);
+
+      const EMOJIS = ['🍎','⭐','🐶','🚗','🎈','🐱','🌼','🍪'];
+      let rondas = 0;
+      let cantidadCorrecta = 0;
+
+      // Dificultad creciente (Fase 53): empieza con 1-5, luego 1-8, luego 1-10.
+      function maxNumeroActual(){
+        if (rondas < 3) return 5;
+        if (rondas < 6) return 8;
+        return 10;
+      }
+
+      function nuevaRonda(){
+        const max = maxNumeroActual();
+        cantidadCorrecta = 1 + Math.floor(Math.random() * max);
+        const emoji = EMOJIS[Math.floor(Math.random() * EMOJIS.length)];
+        objetosEl.innerHTML = '';
+        for (let i = 0; i < cantidadCorrecta; i++){
+          const span = document.createElement('span');
+          span.textContent = emoji;
+          objetosEl.appendChild(span);
+        }
+        // Armar 4 opciones (la correcta + distractoras), sin repetir.
+        const opciones = new Set([cantidadCorrecta]);
+        let intentos = 0;
+        while (opciones.size < 4 && intentos < 50){
+          opciones.add(1 + Math.floor(Math.random() * max));
+          intentos++;
+        }
+        const lista = Array.from(opciones).sort(() => Math.random() - 0.5);
+        numerosEl.innerHTML = '';
+        lista.forEach(n => {
+          const b = document.createElement('button');
+          b.className = 'contar-num-btn';
+          b.textContent = n;
+          b.addEventListener('click', () => onTap(n));
+          numerosEl.appendChild(b);
+        });
+        speak('¿Cuántos hay? Tocá el número.');
+      }
+
+      function onTap(n){
+        if (n === cantidadCorrecta){
+          rondas++;
+          tick();
+          speak('¡Muy bien, Samuel!');
+          setTimeout(nuevaRonda, 1400);
+        } else {
+          // Sin castigos: solo invita a volver a contar, sin penalizar.
+          speak('Contemos otra vez.');
+        }
+      }
+
+      window.__contarStart = function(){
+        rondas = 0;
+        ensureAudio();
+        nuevaRonda();
       };
     })();
 
