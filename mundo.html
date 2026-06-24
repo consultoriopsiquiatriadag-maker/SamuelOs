@@ -191,6 +191,54 @@
       const teclas = {};
       const avatarPos = { x: 0, z: 4 };
       const camActual = new THREE.Vector3();
+      const coleccionables = []; // estrellas y animales (Fase 39)
+      const DISTANCIA_TOQUE = 1.15;
+
+      // --- Audio propio del Mundo de Samuel (mismo estilo de síntesis que juegos.html) ---
+      let audioCtxM = null;
+      function ensureAudioM(){
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return null;
+        if (!audioCtxM) audioCtxM = new AC();
+        if (audioCtxM.state === 'suspended') audioCtxM.resume();
+        return audioCtxM;
+      }
+      function playChimeM(f0, f1, dur){
+        const ctx = ensureAudioM();
+        if (!ctx) return;
+        const t0 = ctx.currentTime + 0.02;
+        const o = ctx.createOscillator();
+        o.type = 'sine';
+        o.frequency.setValueAtTime(f0, t0);
+        if (f1) o.frequency.exponentialRampToValueAtTime(f1, t0 + dur);
+        const g = ctx.createGain();
+        g.gain.setValueAtTime(0.0001, t0);
+        g.gain.exponentialRampToValueAtTime(0.9, t0 + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+        o.connect(g); g.connect(ctx.destination);
+        o.start(t0); o.stop(t0 + dur);
+      }
+
+      // --- Estrellas reales de Samuel OS: mismo localStorage que juegos.html / child.html ---
+      function saveProgressM(p){
+        try{ localStorage.setItem(todayKeyM(), JSON.stringify(p)); }catch(e){/* ignore */}
+      }
+      function addTotalStarsM(n){
+        try{
+          const total = (parseInt(localStorage.getItem('samuel_total_stars') || '0', 10) || 0) + (n || 0);
+          localStorage.setItem('samuel_total_stars', String(total));
+        }catch(e){/* ignore */}
+      }
+      function addStarM(missionKey){
+        const p = loadProgressM();
+        p.stars = (p.stars || 0) + 1;
+        p[missionKey || 'jugar'] = true;
+        saveProgressM(p);
+        addTotalStarsM(1);
+        updateStarsBadgeM();
+        const el = document.getElementById('starsBadge');
+        if (el){ el.classList.remove('pulse-stars'); void el.offsetWidth; el.classList.add('pulse-stars'); }
+      }
 
       function crearArbol(x, z){
         const grupo = new THREE.Group();
@@ -217,6 +265,101 @@
         roca.position.set(x, 0.35 * escala, z);
         roca.rotation.set(Math.random(), Math.random(), Math.random());
         return roca;
+      }
+
+      // --- Coleccionables (Fase 39): estrellas para juntar y animalitos para encontrar ---
+      function crearEstrella(x, z){
+        const forma = new THREE.Mesh(
+          new THREE.OctahedronGeometry(0.4, 0),
+          new THREE.MeshLambertMaterial({ color: 0xfde047, emissive: 0xca8a04, emissiveIntensity: 0.35 })
+        );
+        forma.position.set(x, 0.95, z);
+        return forma;
+      }
+
+      function crearAnimal(x, z, color){
+        const grupo = new THREE.Group();
+        const cuerpo = new THREE.Mesh(
+          new THREE.SphereGeometry(0.36, 14, 12),
+          new THREE.MeshLambertMaterial({ color })
+        );
+        cuerpo.position.y = 0.38;
+        cuerpo.scale.set(1, 0.85, 1.3);
+        const cabeza = new THREE.Mesh(
+          new THREE.SphereGeometry(0.22, 12, 10),
+          new THREE.MeshLambertMaterial({ color })
+        );
+        cabeza.position.set(0, 0.6, 0.4);
+        grupo.add(cuerpo, cabeza);
+        grupo.position.set(x, 0, z);
+        return grupo;
+      }
+
+      function crearColeccionables(){
+        const ESTRELLAS = [[-5,-3],[4,-4],[-2,5],[6,4],[-7,0],[2,1]];
+        ESTRELLAS.forEach(([x,z]) => {
+          const mesh = crearEstrella(x, z);
+          scene.add(mesh);
+          coleccionables.push({ mesh, x, z, tipo:'estrella', nombre:'una estrella', encontrado:false });
+        });
+
+        const ANIMALES = [
+          [0,-7,  0x60a5fa, 'pajarito'],
+          [-6,5,  0xf4a7c0, 'conejito'],
+          [7,-2,  0xc084fc, 'mariposa']
+        ];
+        ANIMALES.forEach(([x,z,color,nombre]) => {
+          const mesh = crearAnimal(x, z, color);
+          scene.add(mesh);
+          coleccionables.push({ mesh, x, z, tipo:'animal', nombre, encontrado:false });
+        });
+
+        actualizarObjetivoTexto();
+      }
+
+      function actualizarObjetivoTexto(){
+        const el = document.getElementById('mundoObjetivo');
+        if (!el) return;
+        const total = coleccionables.length;
+        const encontrados = coleccionables.filter(c => c.encontrado).length;
+        el.textContent = '🎯 Encontrados: ' + encontrados + '/' + total;
+      }
+
+      let celebrandoRonda = false;
+      function revisarColeccionables(){
+        coleccionables.forEach((c) => {
+          if (c.encontrado) return;
+          const d = Math.hypot(avatarPos.x - c.x, avatarPos.z - c.z);
+          if (d < DISTANCIA_TOQUE){
+            c.encontrado = true;
+            scene.remove(c.mesh);
+            if (c.tipo === 'estrella'){
+              playChimeM(523, 784, 0.35);
+              speak('¡Muy bien, Samuel! Encontraste una estrella.');
+            } else {
+              playChimeM(392, 523, 0.3);
+              speak('¡Encontraste al ' + c.nombre + '!');
+            }
+            addStarM('jugar');
+            actualizarObjetivoTexto();
+          }
+        });
+        if (!celebrandoRonda && coleccionables.length && coleccionables.every(c => c.encontrado)){
+          celebrandoRonda = true;
+          setTimeout(() => {
+            speak('¡Encontraste todo, Samuel! Muy buen trabajo.');
+            setTimeout(reaparecerColeccionables, 2600);
+          }, 500);
+        }
+      }
+
+      function reaparecerColeccionables(){
+        coleccionables.forEach((c) => {
+          c.encontrado = false;
+          scene.add(c.mesh);
+        });
+        actualizarObjetivoTexto();
+        celebrandoRonda = false;
       }
 
       function crearMundo(){
@@ -285,6 +428,8 @@
 
         camActual.set(avatarPos.x, 5.2, avatarPos.z + 7.5);
 
+        crearColeccionables();
+
         ajustarTamano();
         placeholder.style.display = 'none';
       }
@@ -300,14 +445,14 @@
       window.addEventListener('resize', ajustarTamano);
 
       // --- Movimiento simple: flechas / WASD, sin mouse-look (evita marear) ---
-      window.addEventListener('keydown', (e) => { teclas[e.key.toLowerCase()] = true; });
+      window.addEventListener('keydown', (e) => { ensureAudioM(); teclas[e.key.toLowerCase()] = true; });
       window.addEventListener('keyup',   (e) => { teclas[e.key.toLowerCase()] = false; });
 
       // --- Controles táctiles grandes (Fase 38): mantener apretado para moverse, soltar para frenar ---
       function wireBotonMovimiento(id, tecla){
         const btn = document.getElementById(id);
         if (!btn) return;
-        const activar = (ev) => { ev.preventDefault(); teclas[tecla] = true; };
+        const activar = (ev) => { ev.preventDefault(); ensureAudioM(); teclas[tecla] = true; };
         const desactivar = (ev) => { if (ev) ev.preventDefault(); teclas[tecla] = false; };
         btn.addEventListener('pointerdown', activar);
         btn.addEventListener('pointerup', desactivar);
@@ -357,6 +502,10 @@
         ultimoTiempo = ahora;
         actualizarAvatar(dt);
         actualizarCamara(dt);
+        revisarColeccionables();
+        coleccionables.forEach((c) => {
+          if (!c.encontrado && c.tipo === 'estrella'){ c.mesh.rotation.y += dt * 1.8; c.mesh.rotation.x += dt * 0.9; }
+        });
         renderer.render(scene, camera);
         window.__mundoRAF = requestAnimationFrame(loop);
       }
