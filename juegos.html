@@ -375,6 +375,17 @@
     .penales-btn-patear:disabled{ opacity:.65; cursor:not-allowed; }
     .penales-feedback{ font-size:22px; font-weight:950; text-align:center; min-height:30px; }
 
+    /* Fase 37: Minijuego Camionero (cargar el camión) */
+    .aventura-camion{ margin-top:14px; display:flex; flex-direction:column; align-items:center; gap:16px; width:100%; }
+    .camion-contador{ font-size:18px; font-weight:900; }
+    .camion-cancha{ position:relative; width:100%; max-width:420px; height:170px; border-radius:18px; background:linear-gradient(180deg,#cbd5e1,#94a3b8); overflow:hidden; border:2px solid rgba(15,23,42,.14); display:flex; align-items:center; justify-content:flex-start; padding:0 14px; }
+    .camion-truck{ font-size:64px; line-height:1; transition: transform 0.7s ease, opacity 0.7s ease; }
+    .camion-truck.saliendo{ transform: translateX(340px); opacity:0; }
+    .camion-cajas{ display:grid; grid-template-columns:repeat(5,1fr); gap:10px; width:100%; max-width:420px; }
+    .camion-caja{ border:none; border-radius:14px; background:var(--card); box-shadow:var(--shadow); font-size:36px; line-height:1; padding:10px 0; cursor:pointer; transition: transform 0.25s ease, opacity 0.25s ease; }
+    .camion-caja.cargada{ transform:scale(0); opacity:0; pointer-events:none; }
+    .camion-feedback{ font-size:22px; font-weight:950; text-align:center; min-height:30px; }
+
     @media (max-width:600px){
       .mundial-card{ min-height:260px; padding:22px; }
       .mundial-flag-big{ font-size:72px; }
@@ -382,6 +393,9 @@
       .mundial-name{ font-size:22px; }
       .penales-cancha{ height:200px; }
       .penales-arco{ width:170px; height:66px; }
+      .camion-cancha{ height:130px; }
+      .camion-truck{ font-size:48px; }
+      .camion-caja{ font-size:28px; padding:8px 0; }
     }
 
     /* Accessibility */
@@ -579,11 +593,44 @@
           <div class="gtitle">⚽ Mundial de Fútbol 2026</div>
           <div class="gdesc">Conocé los países que juegan el Mundial y sus banderas.</div>
         </button>
+
+        <button class="game" id="goAventura">
+          <div class="gtitle">🚛 Juegos de aventura</div>
+          <div class="gdesc">Camión, carrera, animales y básquet.</div>
+        </button>
       </div>
       <div class="soon-card">
         <div class="soon-emoji">💡</div>
         <div class="soon-title">Pronto vamos a sumar más juegos para pensar</div>
         <div class="soon-text">¡Vamos a seguir sumando sorpresas para Samuel!</div>
+      </div>
+    </section>
+
+    <!-- JUEGOS DE AVENTURA: sub-hub (Fase 37) -->
+    <section id="viewAventura" class="view" aria-label="Juegos de aventura">
+      <div class="top-actions" style="margin-bottom:6px;">
+        <button class="btn ghost" id="aventuraHome">⬅️ Juegos didácticos</button>
+      </div>
+      <div class="grid">
+        <button class="game" id="goCamionero">
+          <div class="gtitle">🚛 Camionero</div>
+          <div class="gdesc">Cargá el camión con las cajas.</div>
+        </button>
+      </div>
+    </section>
+
+    <!-- CAMIONERO: cargar el camión (Fase 37) -->
+    <section id="viewCamionero" class="view" aria-label="Camionero">
+      <div class="top-actions" style="margin-bottom:6px;">
+        <button class="btn ghost" id="camioneroHome">⬅️ Juegos de aventura</button>
+      </div>
+      <div class="aventura-camion">
+        <div class="camion-contador">📦 Cargadas: <span id="camionContador">0</span>/5</div>
+        <div class="camion-cancha">
+          <div class="camion-truck" id="camionTruck">🚛</div>
+        </div>
+        <div class="camion-cajas" id="camionCajas"></div>
+        <div class="camion-feedback" id="camionFeedback"></div>
       </div>
     </section>
 
@@ -1086,6 +1133,8 @@
       tetris: document.getElementById('viewTetris'),
       puzzle: document.getElementById('viewPuzzle'),
       mundial: document.getElementById('viewMundial'),
+      aventura: document.getElementById('viewAventura'),
+      camionero: document.getElementById('viewCamionero'),
       sound: document.getElementById('viewSound'),
       cars: document.getElementById('viewCars'),
       race: document.getElementById('viewRace'),
@@ -1150,6 +1199,10 @@
     document.getElementById('puzzleHome').addEventListener('click', () => showView('didacticos'));
     document.getElementById('goMundial').addEventListener('click', () => { showView('mundial'); window.__mundialStart && window.__mundialStart(); });
     document.getElementById('mundialHome').addEventListener('click', () => showView('didacticos'));
+    document.getElementById('goAventura').addEventListener('click', () => { showView('aventura'); speak('Juegos de aventura.'); });
+    document.getElementById('aventuraHome').addEventListener('click', () => showView('didacticos'));
+    document.getElementById('goCamionero').addEventListener('click', () => { showView('camionero'); window.__camioneroStart && window.__camioneroStart(); });
+    document.getElementById('camioneroHome').addEventListener('click', () => showView('aventura'));
     document.getElementById('goSound').addEventListener('click', () => { showView('sound'); renderAnimals(); });
     document.getElementById('goCars').addEventListener('click', () => { showView('cars'); renderCars(); });
     document.getElementById('goRace').addEventListener('click', () => { showView('race'); resetRace(); speak('Semáforo. Verde: avanzar. Amarillo: cuidado. Rojo: parar.'); startSemaforo(); });
@@ -4105,6 +4158,79 @@
       window.__mundialStart = function(){
         volverSelector();
         speak('Mundial de fútbol 2026. Elegí un país para conocerlo.');
+      };
+    })();
+
+    // --- Fase 37: Minijuego "Camionero" (cargar el camión) ---
+    // Causa-efecto puro: tocar una caja la "carga" en el camión. Al llegar a 5,
+    // el camión festeja y sale; siempre hay un viaje nuevo después (sin perder).
+    (function(){
+      const cajasEl    = document.getElementById('camionCajas');
+      const contadorEl = document.getElementById('camionContador');
+      const truckEl    = document.getElementById('camionTruck');
+      const feedbackEl = document.getElementById('camionFeedback');
+      if (!cajasEl || !truckEl) return;
+
+      const CAJAS_POR_VIAJE = 5;
+      const tick = makeStarTicker(CAJAS_POR_VIAJE, 'jugar');
+      let cargando = false;
+
+      const FRASES_CAMION = [
+        '¡Camión cargado! ¡Muy buen trabajo, Samuel!',
+        '¡Listo! El camión se va con todas las cajas.',
+        '¡Excelente! Cargaste todo el camión.',
+        '¡Genial! El camión sale lleno de cajas.',
+      ];
+
+      function renderCajas(){
+        cajasEl.innerHTML = '';
+        if (contadorEl) contadorEl.textContent = '0';
+        if (feedbackEl) feedbackEl.textContent = '';
+        for (let i = 0; i < CAJAS_POR_VIAJE; i++){
+          const b = document.createElement('button');
+          b.className = 'camion-caja';
+          b.setAttribute('aria-label', 'Caja para cargar');
+          b.textContent = '📦';
+          b.addEventListener('click', () => cargarCaja(b));
+          cajasEl.appendChild(b);
+        }
+      }
+
+      function cargarCaja(btn){
+        if (cargando || btn.classList.contains('cargada')) return;
+        btn.classList.add('cargada');
+
+        ensureAudio();
+        playTone({ type:'triangle', f0:500, f1:760, dur:0.16, gain:0.45 });
+
+        const cargadas = cajasEl.querySelectorAll('.cargada').length;
+        if (contadorEl) contadorEl.textContent = String(cargadas);
+
+        const completo = tick();
+        if (completo){
+          camionSale();
+        }
+      }
+
+      function camionSale(){
+        cargando = true;
+        const frase = FRASES_CAMION[Math.floor(Math.random() * FRASES_CAMION.length)];
+        if (feedbackEl) feedbackEl.textContent = '🎉 ' + frase;
+        speak(frase);
+        showConfetti();
+        truckEl.classList.add('saliendo');
+
+        setTimeout(() => {
+          truckEl.classList.remove('saliendo');
+          renderCajas();
+          cargando = false;
+        }, 900);
+      }
+
+      window.__camioneroStart = function(){
+        cargando = false;
+        renderCajas();
+        speak('Camionero. Tocá las cajas para cargar el camión.');
       };
     })();
   </script>
