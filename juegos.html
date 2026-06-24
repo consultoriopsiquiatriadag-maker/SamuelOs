@@ -376,6 +376,9 @@
     .penales-btn-patear:disabled{ opacity:.65; cursor:not-allowed; }
     .penales-feedback{ font-size:22px; font-weight:950; text-align:center; min-height:30px; }
 
+    /* Fase 41: badge de nivel reutilizado por los 3 juegos de aventura */
+    .aventura-nivel{ font-size:15px; font-weight:800; color:#0f172a; }
+
     /* Fase 37: Minijuego Camionero (cargar el camión) */
     .aventura-camion{ margin-top:14px; display:flex; flex-direction:column; align-items:center; gap:16px; width:100%; }
     .camion-contador{ font-size:18px; font-weight:900; }
@@ -661,7 +664,8 @@
         <button class="btn ghost" id="camioneroHome">⬅️ Juegos de aventura</button>
       </div>
       <div class="aventura-camion">
-        <div class="camion-contador">📦 Cargadas: <span id="camionContador">0</span>/5</div>
+        <div class="aventura-nivel">Nivel <span id="camionNivelNum">1</span></div>
+        <div class="camion-contador">📦 Cargadas: <span id="camionContador">0</span>/<span id="camionMeta">5</span></div>
         <div class="camion-cancha">
           <div class="camion-truck" id="camionTruck">🚛</div>
         </div>
@@ -676,6 +680,7 @@
         <button class="btn ghost" id="conectarHome">⬅️ Juegos de aventura</button>
       </div>
       <div class="conectar-wrap">
+        <div class="aventura-nivel">Nivel <span id="conectarNivelNum">1</span></div>
         <div class="conectar-cols">
           <div class="conectar-col" id="conectarColAdultos"></div>
           <div class="conectar-col" id="conectarColCrias"></div>
@@ -690,7 +695,8 @@
         <button class="btn ghost" id="basquetHome">⬅️ Juegos de aventura</button>
       </div>
       <div class="basquet-juego">
-        <div class="basquet-marcador">🏀 Canastas: <span id="basquetCanastas">0</span></div>
+        <div class="aventura-nivel">Nivel <span id="basquetNivelNum">1</span></div>
+        <div class="basquet-marcador">🏀 Canastas: <span id="basquetCanastas">0</span>/<span id="basquetMeta">5</span></div>
         <div class="basquet-cancha">
           <div class="basquet-tablero"></div>
           <div class="basquet-aro"></div>
@@ -4277,12 +4283,15 @@
     (function(){
       const cajasEl    = document.getElementById('camionCajas');
       const contadorEl = document.getElementById('camionContador');
+      const metaEl     = document.getElementById('camionMeta');
+      const nivelNumEl = document.getElementById('camionNivelNum');
       const truckEl    = document.getElementById('camionTruck');
       const feedbackEl = document.getElementById('camionFeedback');
       if (!cajasEl || !truckEl) return;
 
-      const CAJAS_POR_VIAJE = 5;
-      const tick = makeStarTicker(CAJAS_POR_VIAJE, 'jugar');
+      // Fase 41: niveles que escalan — cada viaje nuevo pide un poco más de cajas, sin riesgo de fallar.
+      const NIVELES_CAJAS = [5, 7, 9, 11, 13];
+      let camionNivelIdx = 0;
       let cargando = false;
 
       const FRASES_CAMION = [
@@ -4292,11 +4301,18 @@
         '¡Genial! El camión sale lleno de cajas.',
       ];
 
+      function metaCajasActual(){
+        return NIVELES_CAJAS[Math.min(camionNivelIdx, NIVELES_CAJAS.length - 1)];
+      }
+
       function renderCajas(){
+        const meta = metaCajasActual();
         cajasEl.innerHTML = '';
         if (contadorEl) contadorEl.textContent = '0';
+        if (metaEl) metaEl.textContent = String(meta);
+        if (nivelNumEl) nivelNumEl.textContent = String(camionNivelIdx + 1);
         if (feedbackEl) feedbackEl.textContent = '';
-        for (let i = 0; i < CAJAS_POR_VIAJE; i++){
+        for (let i = 0; i < meta; i++){
           const b = document.createElement('button');
           b.className = 'camion-caja';
           b.setAttribute('aria-label', 'Caja para cargar');
@@ -4315,16 +4331,20 @@
 
         const cargadas = cajasEl.querySelectorAll('.cargada').length;
         if (contadorEl) contadorEl.textContent = String(cargadas);
+        addStarJ('jugar');
 
-        const completo = tick();
-        if (completo){
+        if (cargadas >= metaCajasActual()){
           camionSale();
         }
       }
 
       function camionSale(){
         cargando = true;
-        const frase = FRASES_CAMION[Math.floor(Math.random() * FRASES_CAMION.length)];
+        const eraUltimoNivel = camionNivelIdx >= NIVELES_CAJAS.length - 1;
+        camionNivelIdx++;
+        const frase = eraUltimoNivel
+          ? FRASES_CAMION[Math.floor(Math.random() * FRASES_CAMION.length)]
+          : '¡Nivel ' + (camionNivelIdx + 1) + '! El próximo camión trae más cajas.';
         if (feedbackEl) feedbackEl.textContent = '🎉 ' + frase;
         speak(frase);
         showConfetti();
@@ -4351,6 +4371,7 @@
       const colAdultosEl = document.getElementById('conectarColAdultos');
       const colCriasEl   = document.getElementById('conectarColCrias');
       const feedbackEl   = document.getElementById('conectarFeedback');
+      const nivelNumEl   = document.getElementById('conectarNivelNum');
       if (!colAdultosEl || !colCriasEl) return;
 
       const PARES_ANIMALES = [
@@ -4361,14 +4382,24 @@
         { adulto:{ emoji:'🦆', label:'Pato' },     cria:{ emoji:'🐤', label:'Patito' } },
         { adulto:{ emoji:'🐎', label:'Caballo' },  cria:{ emoji:'🐴', label:'Potrillo' } },
       ];
-      const PARES_POR_RONDA = 4;
-      const tick = makeStarTicker(PARES_POR_RONDA, 'jugar');
+      // Fase 41: niveles que escalan — cada ronda nueva pide un poco más de pares,
+      // tope en 6 porque es todo el banco de animales disponible (no se inventan animales nuevos).
+      const NIVELES_PARES = [4, 5, 6];
+      let conectarNivelIdx = 0;
 
       const FRASES_RONDA = [
         '¡Genial! Uniste a todas las familias.',
         '¡Muy bien, Samuel! Todos los animales están con su cría.',
         '¡Excelente trabajo conectando animales!',
       ];
+      const FRASES_NIVEL = [
+        '¡Subiste de nivel! Ahora hay más animales para conectar.',
+      ];
+
+      function paresPorRondaActual(){
+        const meta = NIVELES_PARES[Math.min(conectarNivelIdx, NIVELES_PARES.length - 1)];
+        return Math.min(meta, PARES_ANIMALES.length);
+      }
 
       function shuffle(arr){
         const a = arr.slice();
@@ -4399,7 +4430,8 @@
         seleccionado = null;
         resueltos = 0;
         if (feedbackEl) feedbackEl.textContent = '';
-        rondaPares = shuffle(PARES_ANIMALES).slice(0, PARES_POR_RONDA);
+        if (nivelNumEl) nivelNumEl.textContent = String(conectarNivelIdx + 1);
+        rondaPares = shuffle(PARES_ANIMALES).slice(0, paresPorRondaActual());
 
         colAdultosEl.innerHTML = '';
         colCriasEl.innerHTML = '';
@@ -4426,14 +4458,18 @@
           seleccionado = null;
           resueltos++;
           playTone({ type:'sine', f0:520, f1:780, dur:0.2, gain:0.5 });
-          const completo = tick();
-          if (resueltos >= PARES_POR_RONDA){
-            const frase = FRASES_RONDA[Math.floor(Math.random() * FRASES_RONDA.length)];
+          addStarJ('jugar');
+          if (resueltos >= paresPorRondaActual()){
+            const eraUltimoNivel = conectarNivelIdx >= NIVELES_PARES.length - 1;
+            conectarNivelIdx++;
+            const frase = eraUltimoNivel
+              ? FRASES_RONDA[Math.floor(Math.random() * FRASES_RONDA.length)]
+              : FRASES_NIVEL[0];
             if (feedbackEl) feedbackEl.textContent = '🎉 ' + frase;
             speak(frase);
             showConfetti();
             setTimeout(renderRonda, 1400);
-          } else if (completo){
+          } else {
             speak('¡Muy bien!');
           }
         } else {
@@ -4456,10 +4492,15 @@
       const pelotaEl    = document.getElementById('basquetPelota');
       const encestarBtn = document.getElementById('basquetEncestarBtn');
       const canastasEl  = document.getElementById('basquetCanastas');
+      const metaEl      = document.getElementById('basquetMeta');
+      const nivelNumEl  = document.getElementById('basquetNivelNum');
       const feedbackEl  = document.getElementById('basquetFeedback');
       if (!pelotaEl) return;
 
-      let canastas = 0;
+      // Fase 41: niveles que escalan — cada tanda pide más canastas, sin riesgo de fallar.
+      const NIVELES_CANASTAS = [5, 7, 9, 11, 13];
+      let basquetNivelIdx = 0;
+      let canastasEnNivel = 0;
       let animando = false;
 
       const FRASES_CANASTA = [
@@ -4468,6 +4509,16 @@
         '¡Canasta! Sos un crack del básquet.',
         '¡Genial! La pelota entró derechito.',
       ];
+
+      function metaCanastasActual(){
+        return NIVELES_CANASTAS[Math.min(basquetNivelIdx, NIVELES_CANASTAS.length - 1)];
+      }
+
+      function actualizarBasquetUI(){
+        if (canastasEl) canastasEl.textContent = String(canastasEnNivel);
+        if (metaEl) metaEl.textContent = String(metaCanastasActual());
+        if (nivelNumEl) nivelNumEl.textContent = String(basquetNivelIdx + 1);
+      }
 
       function encestar(){
         if (animando || !pelotaEl) return;
@@ -4482,13 +4533,21 @@
         playTone({ type:'sine', f0:400, f1:900, dur:0.22, gain:0.5 });
 
         setTimeout(() => {
-          canastas++;
-          if (canastasEl) canastasEl.textContent = String(canastas);
-          const frase = FRASES_CANASTA[Math.floor(Math.random() * FRASES_CANASTA.length)];
+          canastasEnNivel++;
+          addStarJ('jugar');
+
+          let frase;
+          if (canastasEnNivel >= metaCanastasActual()){
+            basquetNivelIdx++;
+            canastasEnNivel = 0;
+            frase = '¡Subiste de nivel! Ahora hay que encestar más veces.';
+          } else {
+            frase = FRASES_CANASTA[Math.floor(Math.random() * FRASES_CANASTA.length)];
+          }
+          actualizarBasquetUI();
           if (feedbackEl) feedbackEl.textContent = '🎉 ' + frase;
           speak(frase);
           showConfetti();
-          addStarJ('jugar');
 
           setTimeout(() => {
             pelotaEl.style.bottom = '16px';
@@ -4504,9 +4563,8 @@
 
       window.__basquetStart = function(){
         animando = false;
-        canastas = 0;
-        if (canastasEl) canastasEl.textContent = '0';
         if (feedbackEl) feedbackEl.textContent = '';
+        actualizarBasquetUI();
         pelotaEl.style.bottom = '16px';
         pelotaEl.style.transform = 'translate(-50%,0) scale(1)';
         speak('Básquet. Tocá la pelota o el botón para encestar.');
