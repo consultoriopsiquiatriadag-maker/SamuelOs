@@ -58,9 +58,24 @@
 
     .mundo-footer{ margin-top:16px; display:flex; justify-content:center; gap:14px; flex-wrap:wrap; }
 
+    .mundo-objetivo{ position:absolute; top:14px; left:14px; z-index:3; background:rgba(255,255,255,.92); }
+
+    /* Controles táctiles grandes (Fase 38): mismo estilo que el Laberinto, para no aprender un botón nuevo */
+    .mundo-controles{
+      position:absolute; bottom:14px; left:50%; transform:translateX(-50%);
+      z-index:3; display:flex; flex-direction:column; align-items:center; gap:8px;
+      user-select:none; -webkit-user-select:none; touch-action:none;
+    }
+    .mundo-controles .fila{ display:flex; gap:12px; }
+    .mundo-btn{
+      border:none; border-radius:18px; min-width:64px; min-height:64px; font-size:26px;
+      cursor:pointer; background:rgba(255,255,255,.88); box-shadow:0 10px 22px rgba(2,6,23,.22);
+    }
+    .mundo-btn:active{ background:#fff; transform:scale(.94); }
     @media (max-width:600px){
       .mundo-stage{ min-height:320px; }
       h1{ font-size:22px; }
+      .mundo-btn{ min-width:56px; min-height:56px; font-size:22px; }
     }
   </style>
 </head>
@@ -85,6 +100,18 @@
         <div>El mundo se está preparando...</div>
       </div>
       <!-- Fase 37: el canvas de Three.js se agrega aquí dentro por JS -->
+
+      <div class="pill mundo-objetivo" id="mundoObjetivo">🎯 Buscá las estrellas</div>
+
+      <!-- Fase 38: controles táctiles grandes, mismo estilo que el Laberinto -->
+      <div class="mundo-controles" id="mundoControles" aria-label="Controles para moverse">
+        <button class="mundo-btn" id="mundoUp" aria-label="Arriba">⬆️</button>
+        <div class="fila">
+          <button class="mundo-btn" id="mundoLeft" aria-label="Izquierda">⬅️</button>
+          <button class="mundo-btn" id="mundoDown" aria-label="Abajo">⬇️</button>
+          <button class="mundo-btn" id="mundoRight" aria-label="Derecha">➡️</button>
+        </div>
+      </div>
     </div>
 
     <div class="mundo-footer">
@@ -275,6 +302,22 @@
       // --- Movimiento simple: flechas / WASD, sin mouse-look (evita marear) ---
       window.addEventListener('keydown', (e) => { teclas[e.key.toLowerCase()] = true; });
       window.addEventListener('keyup',   (e) => { teclas[e.key.toLowerCase()] = false; });
+
+      // --- Controles táctiles grandes (Fase 38): mantener apretado para moverse, soltar para frenar ---
+      function wireBotonMovimiento(id, tecla){
+        const btn = document.getElementById(id);
+        if (!btn) return;
+        const activar = (ev) => { ev.preventDefault(); teclas[tecla] = true; };
+        const desactivar = (ev) => { if (ev) ev.preventDefault(); teclas[tecla] = false; };
+        btn.addEventListener('pointerdown', activar);
+        btn.addEventListener('pointerup', desactivar);
+        btn.addEventListener('pointerleave', desactivar);
+        btn.addEventListener('pointercancel', desactivar);
+      }
+      wireBotonMovimiento('mundoUp', 'arrowup');
+      wireBotonMovimiento('mundoDown', 'arrowdown');
+      wireBotonMovimiento('mundoLeft', 'arrowleft');
+      wireBotonMovimiento('mundoRight', 'arrowright');
 
       function actualizarAvatar(dt){
         let dx = 0, dz = 0;
