@@ -25,7 +25,8 @@ Samuel app/
 ├── icons/                # Íconos de la PWA (192px, 512px)
 ├── audio/animales/        # Sonidos de animales (juegos de causa-efecto)
 ├── audio/vehiculos/       # Sonidos de vehículos (juegos de causa-efecto)
-└── FASE25_checklist_final.md, FASE8_checklist_pruebas.md   # Checklists históricos de pruebas
+└── FASE25_checklist_final.md, FASE8_checklist_pruebas.md,
+    FASE33_checklist_mundial.md                              # Checklists históricos de pruebas
 ```
 
 No hay backend ni base de datos: todo el contenido editable (frases AAC, contactos, configuración de voz, progreso) vive en `localStorage` del navegador/tablet donde se usa la app.
@@ -133,6 +134,48 @@ https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=ESE_ID&format
 ```
 
 En la Fase 26 se revisó el catálogo completo porque muchos videos antiguos ya no cargaban (borrados, privados o sin permiso de embed por parte del canal) — todos los IDs actuales fueron verificados con este método antes de subirlos.
+
+## Mundial de Fútbol 2026 (Aprender → Juegos didácticos → Mundial)
+
+Módulo dedicado al Mundial 2026, pensado para que Samuel reconozca países, banderas y partidos jugando. Vive entero dentro de `juegos.html` (sección `<section id="viewMundial">` y el IIFE de JS que arranca cerca de `const mundial2026 = [`). Tiene 5 sub-pantallas, todas accesibles desde los botones de arriba de la vista y todas vuelven a la grilla de países con "⬅️ Países":
+
+- **Selector de países**: 48 fichas (bandera, nombre, grupo) — array `mundial2026`. Tocar una abre su ficha con bandera grande, ícono genérico de jugador (👕⚽, el mismo para todos — **nunca fotos reales**, por eso es un emoji genérico y no una imagen de un jugador real), grupo, insignia de anfitrión si corresponde, y un dato curioso leído en voz alta.
+- **❓ ¿Qué es el Mundial?** (`MUNDIAL_INFO`): tarjetas informativas simples (qué es, cómo se juega, etc.), sin otorgar estrellas (es solo lectura/escucha).
+- **🚩 Encontrá la bandera**: minijuego de opción múltiple (3 banderas, una correcta). Acertar suma 2 estrellas a la misión "Aprender"; errar nunca resta, solo invita a probar otra vez.
+- **📅 Fixture** (`mundialFixture`): resultados y partidos del Mundial, organizados día por día (no por grupo, a propósito — ver regla de datos abajo). Tocar un día lista sus partidos; tocar un partido lo lee en voz alta.
+- **⚽ Patear penales**: minijuego de causa-efecto puro — tocar la pelota o "¡Patear!" siempre termina en gol (animación + confetti + frase de aliento al azar), nunca hay forma de "perder". Suma 1 estrella por patada a la misión "Jugar".
+
+### Regla de datos del Mundial — no inventar nada
+
+Esta es la regla más importante del módulo, y se aplica a `mundial2026` (países/grupos) y a `mundialFixture` (resultados/partidos):
+
+> **Si no se confirma el listado completo desde fuente oficial, no inventar datos.** Dejar el módulo preparado con los datos confirmados y un comentario explícito en el código indicando que hay que actualizar según FIFA / fuente oficial.
+
+En la práctica esto significa:
+
+- `mundialFixture` (buscar el comentario `// Fase 34: Fixture del Mundial 2026` en `juegos.html`) se armó a partir de un artículo de ESPN México fechado 24/6/2026, leído partido por partido. Está organizado **por fecha**, no por grupo, justamente para poder dejar afuera cualquier partido que no esté confirmado en la fuente, en vez de inventar un resultado o una fecha para "completar" un grupo.
+- Si falta un partido o cambia un resultado, agregar/corregir el objeto correspondiente dentro del array de esa fecha (`{ local, visitante, grupo, sede, resultado }`; `resultado: null` significa "todavía no se jugó"). Si no se tiene la fuente confirmada para un dato nuevo, no completar el campo — dejarlo afuera y sumar un comentario `// Actualizar según FIFA` en esa línea.
+- Los nombres de país en `mundialFixture.partidos[].local/visitante` tienen que coincidir exactamente con el campo `nombre` de algún país en `mundial2026` (la función `banderaDe()` busca por ese nombre exacto para mostrar la bandera correcta). Ejemplos de nombres que hay que respetar tal cual están: `'República Checa'` (no "Chequia"), `'Catar'` (no "Qatar"), `'RD Congo'` (no "RD de Congo"/"RD del Congo").
+
+### Cómo agregar o corregir un país (`mundial2026`)
+
+Cada país es un objeto con esta forma (buscar `const mundial2026 = [` en `juegos.html`):
+
+```js
+{ nombre:'Brasil', bandera:'🇧🇷', grupo:'C', anfitrion:false, dato:'Brasil ganó el Mundial más veces que cualquier otro país.' }
+```
+
+`anfitrion:true` solo corresponde a México, Estados Unidos y Canadá (los tres países organizadores). Mantener `dato` corto, simple y verificable.
+
+## Videos Argentina (`youtube.html` → banner "🇦🇷 Videos Argentina")
+
+Sección patriótica curada aparte del catálogo general, pensada para contenido sobre Argentina (himno, símbolos patrios, etc.). Vive en `youtube.html`, en el array `videosArgentina` (buscar `const videosArgentina = [`). Cada video sigue el mismo formato que el resto del catálogo:
+
+```js
+{ titulo: 'Himno Nacional Argentino', categoria: 'Himnos y canciones', youtubeId: '0Bjsv6Ft9nk', descripcion: 'La canción patria de Argentina', canal: 'Ejército Argentino' }
+```
+
+Antes de agregar un `youtubeId` nuevo, verificarlo igual que el resto del catálogo (ver sección de videos más arriba). Suma a la misión diaria "Aprender", no a "Jugar".
 
 ## No modificar
 
