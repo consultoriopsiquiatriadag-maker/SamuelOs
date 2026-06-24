@@ -1,5 +1,5 @@
 /* Aplicación de Samuel - Service Worker */
-const CACHE_VERSION = 'samuel-app-v45-fase42';
+const CACHE_VERSION = 'samuel-app-v46-fase43';
 const CACHE_NAME = CACHE_VERSION;
 
 const ASSETS = [
@@ -11,6 +11,7 @@ const ASSETS = [
   './youtube.html',
   './progreso.html',
   './app.js',
+  './flags-data.js',
   './manifest.webmanifest',
   './samuel-avatar.png',
   './icons/icon-192.png',

@@ -322,6 +322,12 @@
     .mundial-grid{ margin-top:16px; display:grid; gap:12px; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); }
     .mundial-country-btn{ border:2px solid rgba(34,197,94,.35); border-radius:20px; background:var(--card); box-shadow:var(--shadow); padding:16px 10px; display:flex; flex-direction:column; align-items:center; gap:8px; cursor:pointer; font-weight:950; font-size:15px; color:inherit; text-align:center; }
     .mundial-country-btn .mflag{ font-size:36px; line-height:1; }
+    .bandera-real{ display:inline-block; vertical-align:middle; object-fit:cover; border-radius:4px; box-shadow:0 0 0 1px rgba(0,0,0,.12); background:#fff; }
+    .bandera-real.mflag{ width:36px; height:27px; }
+    .bandera-real.mundial-flag-big{ width:90px; height:68px; border-radius:8px; }
+    .bandera-real.mtflag{ width:24px; height:18px; }
+    .bandera-real.mundial-juego-opt-img{ width:80px; height:60px; }
+    .bandera-real.penales-rival-flag{ width:24px; height:18px; margin:0 2px -3px 0; }
     .mundial-country-btn .mgrupo-mini{ font-size:12px; font-weight:800; color:var(--muted); }
     .mundial-stage{ margin-top:14px; display:flex; flex-direction:column; align-items:center; gap:18px; }
     .mundial-card{ width:100%; max-width:380px; min-height:300px; border-radius:26px; background:var(--card); border:2px solid rgba(34,197,94,.30); box-shadow:var(--shadow); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; padding:28px; text-align:center; cursor:pointer; }
@@ -416,6 +422,7 @@
     @media (max-width:600px){
       .mundial-card{ min-height:260px; padding:22px; }
       .mundial-flag-big{ font-size:72px; }
+      .bandera-real.mundial-flag-big{ width:72px; height:54px; }
       .mundial-player-icon{ font-size:38px; }
       .mundial-name{ font-size:22px; }
       .penales-cancha{ height:200px; }
@@ -1177,6 +1184,7 @@
     <div class="confetti" id="confetti" aria-hidden="true"></div>
   </div>
 
+  <script src="./flags-data.js"></script>
   <script>
     // --- SW ---
     if ('serviceWorker' in navigator) {
@@ -3703,66 +3711,77 @@
     // Para cambiar este listado, editar el array mundial2026 más abajo.
     // Actualizar este listado según FIFA si hubiera cambios oficiales posteriores.
     const mundial2026 = [
-      { nombre:'México', bandera:'🇲🇽', grupo:'A', anfitrion:true, dato:'Es uno de los países que organiza el Mundial. ¡Juega en su propia casa!' },
-      { nombre:'Sudáfrica', bandera:'🇿🇦', grupo:'A', dato:'Está en África. Allí viven leones y elefantes.' },
-      { nombre:'Corea del Sur', bandera:'🇰🇷', grupo:'A', dato:'Está en Asia, muy lejos de Argentina.' },
-      { nombre:'República Checa', bandera:'🇨🇿', grupo:'A', dato:'Está en Europa. Tiene castillos muy antiguos.' },
+      { nombre:'México', bandera:'🇲🇽', codigo:'mx', grupo:'A', anfitrion:true, dato:'Es uno de los países que organiza el Mundial. ¡Juega en su propia casa!' },
+      { nombre:'Sudáfrica', bandera:'🇿🇦', codigo:'za', grupo:'A', dato:'Está en África. Allí viven leones y elefantes.' },
+      { nombre:'Corea del Sur', bandera:'🇰🇷', codigo:'kr', grupo:'A', dato:'Está en Asia, muy lejos de Argentina.' },
+      { nombre:'República Checa', bandera:'🇨🇿', codigo:'cz', grupo:'A', dato:'Está en Europa. Tiene castillos muy antiguos.' },
 
-      { nombre:'Canadá', bandera:'🇨🇦', grupo:'B', anfitrion:true, dato:'También organiza el Mundial. Tiene mucha nieve y osos.' },
-      { nombre:'Bosnia y Herzegovina', bandera:'🇧🇦', grupo:'B', dato:'Está en Europa, cerca de Italia.' },
-      { nombre:'Catar', bandera:'🇶🇦', grupo:'B', dato:'Está en Asia. Allí se jugó el Mundial anterior.' },
-      { nombre:'Suiza', bandera:'🇨🇭', grupo:'B', dato:'Está en Europa. Tiene montañas muy altas.' },
+      { nombre:'Canadá', bandera:'🇨🇦', codigo:'ca', grupo:'B', anfitrion:true, dato:'También organiza el Mundial. Tiene mucha nieve y osos.' },
+      { nombre:'Bosnia y Herzegovina', bandera:'🇧🇦', codigo:'ba', grupo:'B', dato:'Está en Europa, cerca de Italia.' },
+      { nombre:'Catar', bandera:'🇶🇦', codigo:'qa', grupo:'B', dato:'Está en Asia. Allí se jugó el Mundial anterior.' },
+      { nombre:'Suiza', bandera:'🇨🇭', codigo:'ch', grupo:'B', dato:'Está en Europa. Tiene montañas muy altas.' },
 
-      { nombre:'Brasil', bandera:'🇧🇷', grupo:'C', dato:'Está en América del Sur, como Argentina. ¡Ganó el Mundial 5 veces!' },
-      { nombre:'Marruecos', bandera:'🇲🇦', grupo:'C', dato:'Está en África. Llegó muy lejos en el Mundial anterior.' },
-      { nombre:'Haití', bandera:'🇭🇹', grupo:'C', dato:'Está en América, es una isla del Caribe.' },
-      { nombre:'Escocia', bandera:'🏴', grupo:'C', dato:'Está en Europa, junto a Inglaterra.' },
+      { nombre:'Brasil', bandera:'🇧🇷', codigo:'br', grupo:'C', dato:'Está en América del Sur, como Argentina. ¡Ganó el Mundial 5 veces!' },
+      { nombre:'Marruecos', bandera:'🇲🇦', codigo:'ma', grupo:'C', dato:'Está en África. Llegó muy lejos en el Mundial anterior.' },
+      { nombre:'Haití', bandera:'🇭🇹', codigo:'ht', grupo:'C', dato:'Está en América, es una isla del Caribe.' },
+      { nombre:'Escocia', bandera:'🏴', codigo:'gb-sct', grupo:'C', dato:'Está en Europa, junto a Inglaterra.' },
 
-      { nombre:'Estados Unidos', bandera:'🇺🇸', grupo:'D', anfitrion:true, dato:'También organiza el Mundial. Tiene edificios muy altos.' },
-      { nombre:'Paraguay', bandera:'🇵🇾', grupo:'D', dato:'Está en América del Sur, cerquita de Argentina.' },
-      { nombre:'Australia', bandera:'🇦🇺', grupo:'D', dato:'Es una isla muy grande. Allí viven canguros.' },
-      { nombre:'Turquía', bandera:'🇹🇷', grupo:'D', dato:'Está entre Europa y Asia.' },
+      { nombre:'Estados Unidos', bandera:'🇺🇸', codigo:'us', grupo:'D', anfitrion:true, dato:'También organiza el Mundial. Tiene edificios muy altos.' },
+      { nombre:'Paraguay', bandera:'🇵🇾', codigo:'py', grupo:'D', dato:'Está en América del Sur, cerquita de Argentina.' },
+      { nombre:'Australia', bandera:'🇦🇺', codigo:'au', grupo:'D', dato:'Es una isla muy grande. Allí viven canguros.' },
+      { nombre:'Turquía', bandera:'🇹🇷', codigo:'tr', grupo:'D', dato:'Está entre Europa y Asia.' },
 
-      { nombre:'Alemania', bandera:'🇩🇪', grupo:'E', dato:'Está en Europa. Ganó el Mundial 4 veces.' },
-      { nombre:'Curazao', bandera:'🇨🇼', grupo:'E', dato:'Es una isla pequeña en el mar Caribe.' },
-      { nombre:'Costa de Marfil', bandera:'🇨🇮', grupo:'E', dato:'Está en África, junto al mar.' },
-      { nombre:'Ecuador', bandera:'🇪🇨', grupo:'E', dato:'Está en América del Sur. Por allí pasa la línea del Ecuador.' },
+      { nombre:'Alemania', bandera:'🇩🇪', codigo:'de', grupo:'E', dato:'Está en Europa. Ganó el Mundial 4 veces.' },
+      { nombre:'Curazao', bandera:'🇨🇼', codigo:'cw', grupo:'E', dato:'Es una isla pequeña en el mar Caribe.' },
+      { nombre:'Costa de Marfil', bandera:'🇨🇮', codigo:'ci', grupo:'E', dato:'Está en África, junto al mar.' },
+      { nombre:'Ecuador', bandera:'🇪🇨', codigo:'ec', grupo:'E', dato:'Está en América del Sur. Por allí pasa la línea del Ecuador.' },
 
-      { nombre:'Países Bajos', bandera:'🇳🇱', grupo:'F', dato:'También se llama Holanda. Tiene molinos de viento.' },
-      { nombre:'Japón', bandera:'🇯🇵', grupo:'F', dato:'Está en Asia. Tiene templos muy antiguos.' },
-      { nombre:'Suecia', bandera:'🇸🇪', grupo:'F', dato:'Está en Europa. Tiene mucha nieve en invierno.' },
-      { nombre:'Túnez', bandera:'🇹🇳', grupo:'F', dato:'Está en África, junto al mar Mediterráneo.' },
+      { nombre:'Países Bajos', bandera:'🇳🇱', codigo:'nl', grupo:'F', dato:'También se llama Holanda. Tiene molinos de viento.' },
+      { nombre:'Japón', bandera:'🇯🇵', codigo:'jp', grupo:'F', dato:'Está en Asia. Tiene templos muy antiguos.' },
+      { nombre:'Suecia', bandera:'🇸🇪', codigo:'se', grupo:'F', dato:'Está en Europa. Tiene mucha nieve en invierno.' },
+      { nombre:'Túnez', bandera:'🇹🇳', codigo:'tn', grupo:'F', dato:'Está en África, junto al mar Mediterráneo.' },
 
-      { nombre:'Bélgica', bandera:'🇧🇪', grupo:'G', dato:'Está en Europa. Es un país pequeño.' },
-      { nombre:'Egipto', bandera:'🇪🇬', grupo:'G', dato:'Está en África. Allí están las pirámides.' },
-      { nombre:'Irán', bandera:'🇮🇷', grupo:'G', dato:'Está en Asia.' },
-      { nombre:'Nueva Zelanda', bandera:'🇳🇿', grupo:'G', dato:'Es una isla muy lejana. Allí viven muchas ovejas.' },
+      { nombre:'Bélgica', bandera:'🇧🇪', codigo:'be', grupo:'G', dato:'Está en Europa. Es un país pequeño.' },
+      { nombre:'Egipto', bandera:'🇪🇬', codigo:'eg', grupo:'G', dato:'Está en África. Allí están las pirámides.' },
+      { nombre:'Irán', bandera:'🇮🇷', codigo:'ir', grupo:'G', dato:'Está en Asia.' },
+      { nombre:'Nueva Zelanda', bandera:'🇳🇿', codigo:'nz', grupo:'G', dato:'Es una isla muy lejana. Allí viven muchas ovejas.' },
 
-      { nombre:'España', bandera:'🇪🇸', grupo:'H', dato:'Está en Europa. Ganó el Mundial una vez.' },
-      { nombre:'Cabo Verde', bandera:'🇨🇻', grupo:'H', dato:'Son islas en el océano, cerca de África.' },
-      { nombre:'Arabia Saudita', bandera:'🇸🇦', grupo:'H', dato:'Está en Asia. Tiene mucho desierto.' },
-      { nombre:'Uruguay', bandera:'🇺🇾', grupo:'H', dato:'Está en América del Sur, al lado de Argentina. ¡Ganó el primer Mundial!' },
+      { nombre:'España', bandera:'🇪🇸', codigo:'es', grupo:'H', dato:'Está en Europa. Ganó el Mundial una vez.' },
+      { nombre:'Cabo Verde', bandera:'🇨🇻', codigo:'cv', grupo:'H', dato:'Son islas en el océano, cerca de África.' },
+      { nombre:'Arabia Saudita', bandera:'🇸🇦', codigo:'sa', grupo:'H', dato:'Está en Asia. Tiene mucho desierto.' },
+      { nombre:'Uruguay', bandera:'🇺🇾', codigo:'uy', grupo:'H', dato:'Está en América del Sur, al lado de Argentina. ¡Ganó el primer Mundial!' },
 
-      { nombre:'Francia', bandera:'🇫🇷', grupo:'I', dato:'Está en Europa. Ganó el Mundial 2 veces.' },
-      { nombre:'Senegal', bandera:'🇸🇳', grupo:'I', dato:'Está en África.' },
-      { nombre:'Noruega', bandera:'🇳🇴', grupo:'I', dato:'Está en Europa. Tiene fiordos y mucha nieve.' },
-      { nombre:'Irak', bandera:'🇮🇶', grupo:'I', dato:'Está en Asia.' },
+      { nombre:'Francia', bandera:'🇫🇷', codigo:'fr', grupo:'I', dato:'Está en Europa. Ganó el Mundial 2 veces.' },
+      { nombre:'Senegal', bandera:'🇸🇳', codigo:'sn', grupo:'I', dato:'Está en África.' },
+      { nombre:'Noruega', bandera:'🇳🇴', codigo:'no', grupo:'I', dato:'Está en Europa. Tiene fiordos y mucha nieve.' },
+      { nombre:'Irak', bandera:'🇮🇶', codigo:'iq', grupo:'I', dato:'Está en Asia.' },
 
-      { nombre:'Argentina', bandera:'🇦🇷', grupo:'J', dato:'¡Es nuestro país! Ganó el Mundial 3 veces.' },
-      { nombre:'Argelia', bandera:'🇩🇿', grupo:'J', dato:'Está en África.' },
-      { nombre:'Austria', bandera:'🇦🇹', grupo:'J', dato:'Está en Europa. Tiene montañas para esquiar.' },
-      { nombre:'Jordania', bandera:'🇯🇴', grupo:'J', dato:'Está en Asia.' },
+      { nombre:'Argentina', bandera:'🇦🇷', codigo:'ar', grupo:'J', dato:'¡Es nuestro país! Ganó el Mundial 3 veces.' },
+      { nombre:'Argelia', bandera:'🇩🇿', codigo:'dz', grupo:'J', dato:'Está en África.' },
+      { nombre:'Austria', bandera:'🇦🇹', codigo:'at', grupo:'J', dato:'Está en Europa. Tiene montañas para esquiar.' },
+      { nombre:'Jordania', bandera:'🇯🇴', codigo:'jo', grupo:'J', dato:'Está en Asia.' },
 
-      { nombre:'Portugal', bandera:'🇵🇹', grupo:'K', dato:'Está en Europa, junto al mar.' },
-      { nombre:'RD Congo', bandera:'🇨🇩', grupo:'K', dato:'Está en África. Tiene selvas muy grandes.' },
-      { nombre:'Uzbekistán', bandera:'🇺🇿', grupo:'K', dato:'Está en Asia.' },
-      { nombre:'Colombia', bandera:'🇨🇴', grupo:'K', dato:'Está en América del Sur. Allí se cultiva mucho café.' },
+      { nombre:'Portugal', bandera:'🇵🇹', codigo:'pt', grupo:'K', dato:'Está en Europa, junto al mar.' },
+      { nombre:'RD Congo', bandera:'🇨🇩', codigo:'cd', grupo:'K', dato:'Está en África. Tiene selvas muy grandes.' },
+      { nombre:'Uzbekistán', bandera:'🇺🇿', codigo:'uz', grupo:'K', dato:'Está en Asia.' },
+      { nombre:'Colombia', bandera:'🇨🇴', codigo:'co', grupo:'K', dato:'Está en América del Sur. Allí se cultiva mucho café.' },
 
-      { nombre:'Inglaterra', bandera:'🏴', grupo:'L', dato:'Está en Europa. Allí se inventó el fútbol.' },
-      { nombre:'Croacia', bandera:'🇭🇷', grupo:'L', dato:'Está en Europa, junto al mar.' },
-      { nombre:'Panamá', bandera:'🇵🇦', grupo:'L', dato:'Está en América Central. Tiene un canal muy famoso.' },
-      { nombre:'Ghana', bandera:'🇬🇭', grupo:'L', dato:'Está en África.' },
+      { nombre:'Inglaterra', bandera:'🏴', codigo:'gb-eng', grupo:'L', dato:'Está en Europa. Allí se inventó el fútbol.' },
+      { nombre:'Croacia', bandera:'🇭🇷', codigo:'hr', grupo:'L', dato:'Está en Europa, junto al mar.' },
+      { nombre:'Panamá', bandera:'🇵🇦', codigo:'pa', grupo:'L', dato:'Está en América Central. Tiene un canal muy famoso.' },
+      { nombre:'Ghana', bandera:'🇬🇭', codigo:'gh', grupo:'L', dato:'Está en África.' },
     ];
+
+    // Devuelve HTML para la bandera real (imagen) de un país, con respaldo al emoji
+    // si no hay imagen disponible (por ejemplo, si flags-data.js no cargó).
+    function banderaHtml(pais, claseExtra) {
+      claseExtra = claseExtra || '';
+      const src = (typeof FLAGS_PNG !== 'undefined' && pais && pais.codigo) ? FLAGS_PNG[pais.codigo] : null;
+      if (src) {
+        return '<img src="' + src + '" alt="" class="bandera-real ' + claseExtra + '" draggable="false">';
+      }
+      return '<span class="' + claseExtra + '">' + (pais ? pais.bandera : '🏳️') + '</span>';
+    }
 
     // Fase 30: tarjetas didácticas "¿Qué es el Mundial?"
     const MUNDIAL_INFO = [
@@ -3932,7 +3951,7 @@
 
       function banderaDe(nombre){
         const p = mundial2026.find(x => x.nombre === nombre);
-        return p ? p.bandera : '🏳️';
+        return banderaHtml(p, 'mtflag');
       }
 
       function renderSelector(){
@@ -3940,7 +3959,7 @@
         mundial2026.forEach((pais, idx) => {
           const b = document.createElement('button');
           b.className = 'mundial-country-btn';
-          b.innerHTML = '<span class="mflag">' + pais.bandera + '</span>' + pais.nombre + '<span class="mgrupo-mini">Grupo ' + pais.grupo + '</span>';
+          b.innerHTML = banderaHtml(pais, 'mflag') + pais.nombre + '<span class="mgrupo-mini">Grupo ' + pais.grupo + '</span>';
           b.addEventListener('click', () => openPais(idx));
           selector.appendChild(b);
         });
@@ -3950,7 +3969,7 @@
         const pais = mundial2026[currentIdx];
         if (indexEl) indexEl.textContent = String(currentIdx + 1);
         if (totalEl) totalEl.textContent = String(mundial2026.length);
-        if (flagEl) flagEl.textContent = pais.bandera;
+        if (flagEl) flagEl.innerHTML = banderaHtml(pais, 'mundial-flag-big');
         if (nameEl) nameEl.textContent = pais.nombre;
         if (badgesEl){
           badgesEl.innerHTML = '<span class="mundial-grupo-badge">Grupo ' + pais.grupo + '</span>' +
@@ -4053,7 +4072,7 @@
           opciones.forEach(pais => {
             const b = document.createElement('button');
             b.className = 'mundial-juego-opt';
-            b.textContent = pais.bandera;
+            b.innerHTML = banderaHtml(pais, 'mundial-juego-opt-img');
             b.setAttribute('aria-label', pais.nombre);
             b.addEventListener('click', () => onElegirBandera(b, pais));
             juegoOpcionesEl.appendChild(b);
@@ -4121,9 +4140,9 @@
           : '<span class="mundial-match-score pendiente">vs.</span>';
         b.innerHTML =
           '<div class="mundial-match-row">' +
-            '<span class="mundial-match-team"><span class="mtflag">' + banderaDe(p.local) + '</span>' + p.local + '</span>' +
+            '<span class="mundial-match-team">' + banderaDe(p.local) + p.local + '</span>' +
             scoreHtml +
-            '<span class="mundial-match-team"><span class="mtflag">' + banderaDe(p.visitante) + '</span>' + p.visitante + '</span>' +
+            '<span class="mundial-match-team">' + banderaDe(p.visitante) + p.visitante + '</span>' +
           '</div>' +
           '<div class="mundial-match-meta">Grupo ' + p.grupo + (p.sede ? ' · ' + p.sede : '') + (jugado ? '' : ' · Por jugar') + '</div>';
         b.addEventListener('click', () => {
@@ -4182,7 +4201,7 @@
 
       function elegirRival(){
         penalesRival = mundial2026[Math.floor(Math.random() * mundial2026.length)];
-        if (penalesRivalBadgeEl) penalesRivalBadgeEl.textContent = penalesRival.bandera + ' ' + penalesRival.nombre;
+        if (penalesRivalBadgeEl) penalesRivalBadgeEl.innerHTML = banderaHtml(penalesRival, 'penales-rival-flag') + ' ' + penalesRival.nombre;
       }
 
       function actualizarNivelUI(){
