@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#2563eb" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <title>Mundo de Samuel</title>
+  <style>
+    :root{
+      --bg:#f2f5f8;
+      --card:#ffffff;
+      --stroke:#e5e7eb;
+      --shadow: 0 16px 34px rgba(2,6,23,.14);
+      --blue:#2563eb;
+      --text:#0f172a;
+      --muted:#475569;
+      --ok:#16a34a;
+      --warn:#f59e0b;
+    }
+    *{box-sizing:border-box;}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial; background:var(--bg); color:var(--text);}
+    .shell{max-width:1120px;margin:0 auto;padding:18px 18px 26px;}
+
+    header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+    .brand{display:flex;align-items:center;gap:14px;}
+    .avatar{width:64px;height:64px;border-radius:999px;background:#fff;border:2px solid var(--stroke);box-shadow:0 10px 20px rgba(2,6,23,.08);overflow:hidden;display:flex;align-items:center;justify-content:center;flex:0 0 auto;}
+    .avatar img{width:100%;height:100%;object-fit:cover;}
+    h1{margin:0;font-size:26px;letter-spacing:-.02em;}
+    .hint{margin-top:6px;color:var(--muted);font-weight:750;}
+
+    #starsBadge{transition:transform .25s ease;}
+    #starsBadge.pulse-stars{transform:scale(1.15);}
+
+    .top-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+    .btn{border:2px solid rgba(15,23,42,.12); background:#fff; padding:14px 18px; border-radius:16px; font-weight:900; cursor:pointer; text-decoration:none; color:var(--text); display:inline-flex; align-items:center; gap:10px; box-shadow:0 14px 28px rgba(2,6,23,.10); font-size:17px;}
+    .btn.primary{background:var(--blue); color:#fff; border-color:transparent;}
+    .btn.big{padding:18px 26px;border-radius:20px;font-size:20px;}
+    .pill{display:inline-flex;align-items:center;gap:8px;border:2px solid rgba(15,23,42,.12);background:#fff;padding:10px 12px;border-radius:999px;font-weight:900;}
+
+    /* Escenario del Mundo de Samuel (Fase 36: esqueleto, sin motor 3D todavía) */
+    .mundo-stage{
+      margin-top:18px;
+      border-radius:24px;
+      background:linear-gradient(180deg,#bfe3fb,#e0f2fe);
+      border:2px solid rgba(15,23,42,.12);
+      box-shadow:var(--shadow);
+      min-height:420px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      position:relative;
+      overflow:hidden;
+    }
+    #mundoCanvas{ width:100%; height:100%; display:block; }
+    .mundo-placeholder{ text-align:center; color:var(--muted); font-weight:800; padding:40px; }
+    .mundo-placeholder .emoji{ font-size:64px; margin-bottom:10px; }
+
+    .mundo-footer{ margin-top:16px; display:flex; justify-content:center; gap:14px; flex-wrap:wrap; }
+
+    @media (max-width:600px){
+      .mundo-stage{ min-height:320px; }
+      h1{ font-size:22px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <div class="brand">
+        <div class="avatar"><img src="./samuel-avatar.png" alt="" /></div>
+        <div>
+          <h1>🌍 Mundo de Samuel</h1>
+          <div class="hint">Caminá despacio y buscá las estrellas.</div>
+        </div>
+      </div>
+      <div class="top-actions">
+        <div class="pill" id="starsBadge">⭐ 0</div>
+      </div>
+    </header>
+
+    <div class="mundo-stage" id="mundoStage">
+      <div class="mundo-placeholder" id="mundoPlaceholder">
+        <div class="emoji">🌳</div>
+        <div>El mundo se está preparando...</div>
+      </div>
+      <!-- Fase 37: acá se monta el canvas de Three.js con el mundo explorable -->
+    </div>
+
+    <div class="mundo-footer">
+      <a class="btn primary big" href="./juegos.html">⬅️ Volver</a>
+      <button class="btn big" id="btnAyuda">🔊 Escuchar ayuda</button>
+    </div>
+  </div>
+
+  <script>
+    // --- Estrellas compartidas con el resto de Samuel OS (mismo localStorage que juegos.html / child.html) ---
+    function todayKeyM(){
+      const d = new Date();
+      return 'samuel_progress_' + d.toISOString().slice(0,10);
+    }
+    function loadProgressM(){
+      try{
+        const raw = localStorage.getItem(todayKeyM());
+        if (!raw) return { stars:0, jugar:false, hablar:false, aprender:false };
+        return JSON.parse(raw);
+      }catch(e){
+        return { stars:0, jugar:false, hablar:false, aprender:false };
+      }
+    }
+    function updateStarsBadgeM(){
+      const el = document.getElementById('starsBadge');
+      if (!el) return;
+      el.textContent = '⭐ ' + (loadProgressM().stars || 0);
+    }
+    updateStarsBadgeM();
+
+    // --- Voz (igual que en juegos.html) ---
+    function speak(text){
+      try{
+        window.speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(text);
+        const voices = window.speechSynthesis.getVoices?.() || [];
+        const es = voices.find(v => /es/i.test(v.lang)) || voices.find(v => /spanish/i.test(v.name)) || voices[0];
+        if (es) u.voice = es;
+        u.rate = 0.95;
+        u.pitch = 1.05;
+        u.volume = 1;
+        window.speechSynthesis.speak(u);
+      }catch(e){/* ignore */}
+    }
+
+    document.getElementById('btnAyuda').addEventListener('click', () => {
+      speak('Samuel, caminá despacio y buscá las estrellas.');
+    });
+
+    // Mensaje de bienvenida al entrar a la pantalla
+    setTimeout(() => speak('Samuel, caminá despacio y buscá las estrellas.'), 600);
+
+    // --- Service worker (mismo que el resto de la app) ---
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw-aac.js');
+    }
+  </script>
+</body>
+</html>
