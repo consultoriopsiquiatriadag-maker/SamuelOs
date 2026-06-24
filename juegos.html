@@ -78,6 +78,7 @@
     .hub-explotar{ --hub-color:#22c55e; }
     .hub-movimiento{ --hub-color:#f97316; }
     .hub-instrumentos{ --hub-color:#a855f7; }
+    .hub-guitarra{ --hub-color:#b45309; }
 
     .soon-card{ margin-top:18px; border:2px solid rgba(15,23,42,.14); border-radius:18px; background:var(--card); box-shadow:var(--shadow); padding:30px 22px; text-align:center; }
     .soon-emoji{ font-size:64px; margin-bottom:8px; }
@@ -222,6 +223,16 @@
     .lluvia-arcoiris{ position:absolute; left:50%; top:55%; transform:translate(-50%,-50%) scale(0); font-size:120px; transition:transform .5s ease; pointer-events:none; }
     .lluvia-arcoiris.show{ transform:translate(-50%,-50%) scale(1); }
     .lluvia-hint{ position:absolute; left:50%; bottom:16px; transform:translateX(-50%); color:#fff; font-weight:950; font-size:18px; text-shadow:0 2px 6px rgba(0,0,0,.4); pointer-events:none; }
+
+    /* Tutorial de guitarra (Fase 46) */
+    .guitarra-wrap{ margin-top:14px; display:flex; flex-direction:column; align-items:center; gap:18px; }
+    .guitarra-stage{ width:100%; max-width:380px; min-height:280px; border-radius:26px; background:var(--card); border:2px solid rgba(180,83,9,.30); box-shadow:var(--shadow); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:18px; padding:28px; text-align:center; }
+    .guitarra-emoji{ font-size:96px; line-height:1; }
+    .guitarra-intro-text{ font-size:22px; font-weight:950; }
+    .guitarra-cuerdas{ width:100%; max-width:480px; display:flex; flex-direction:column; gap:10px; background:#7c4a21; border-radius:18px; padding:20px; box-shadow:var(--shadow); }
+    .guitarra-cuerda{ height:42px; border-radius:8px; border:none; cursor:pointer; font-weight:950; color:#fff; display:flex; align-items:center; padding-left:14px; font-size:16px; box-shadow:0 4px 8px rgba(0,0,0,.25); transition:transform .12s ease; }
+    .guitarra-cuerda:active{ transform:scaleY(.7); }
+    @media (max-width:600px){ .guitarra-stage{ padding:20px; min-height:240px; } .guitarra-emoji{ font-size:72px; } }
 
     /* Memotest */
     .bar{margin-top:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
@@ -538,7 +549,7 @@
 
         <button class="game hub-card hub-instrumentos" id="goInstrumentos">
           <div class="gtitle"><span class="gicon">🥁</span>Instrumentos</div>
-          <div class="gdesc">Tambor, maracas, campana y trompeta.</div>
+          <div class="gdesc">Tocá instrumentos o aprendé guitarra.</div>
         </button>
       </div>
     </section>
@@ -627,12 +638,45 @@
       </div>
     </section>
 
-    <!-- INSTRUMENTOS MUSICALES (sub-hub de Juegos simples, Fase 45) -->
+    <!-- INSTRUMENTOS MUSICALES: mini-hub (Fase 45/46) -->
     <section id="viewInstrumentos" class="view" aria-label="Instrumentos musicales">
       <div class="top-actions" style="margin-bottom:6px;">
         <button class="btn ghost" id="instrumentosHome">⬅️ Juegos simples</button>
       </div>
+      <div class="grid">
+        <button class="game hub-card hub-instrumentos" id="goInstrumentosTocar">
+          <div class="gtitle"><span class="gicon">🥁</span>Tocar instrumentos</div>
+          <div class="gdesc">Tambor, maracas, campana, trompeta, piano y guitarra.</div>
+        </button>
+
+        <button class="game hub-card hub-guitarra" id="goGuitarraTutorial">
+          <div class="gtitle"><span class="gicon">🎸</span>Aprender guitarra</div>
+          <div class="gdesc">Conocé la guitarra y probá tocar sus cuerdas.</div>
+        </button>
+      </div>
+    </section>
+
+    <!-- TOCAR INSTRUMENTOS (sub-vista, Fase 45/46) -->
+    <section id="viewInstrumentosTocar" class="view" aria-label="Tocar instrumentos">
+      <div class="top-actions" style="margin-bottom:6px;">
+        <button class="btn ghost" id="instrumentosTocarHome">⬅️ Instrumentos</button>
+      </div>
       <div id="instrumentosGrid" class="sound-grid" aria-label="Instrumentos musicales"></div>
+    </section>
+
+    <!-- APRENDER GUITARRA (Fase 46) -->
+    <section id="viewGuitarra" class="view" aria-label="Aprender guitarra">
+      <div class="top-actions" style="margin-bottom:6px;">
+        <button class="btn ghost" id="guitarraHome">⬅️ Instrumentos</button>
+      </div>
+      <div class="guitarra-wrap" id="guitarraWrap">
+        <div class="guitarra-stage" id="guitarraIntroStage">
+          <div class="guitarra-emoji" id="guitarraIntroEmoji">🎸</div>
+          <div class="guitarra-intro-text" id="guitarraIntroText"></div>
+          <button class="historia-btn-nav" id="guitarraIntroNext">Siguiente ➡️</button>
+        </div>
+        <div class="guitarra-cuerdas" id="guitarraCuerdas" style="display:none;"></div>
+      </div>
     </section>
 
     <!-- JUEGOS DIDÁCTICOS -->
@@ -1265,6 +1309,8 @@
       explotar: document.getElementById('viewExplotar'),
       movimiento: document.getElementById('viewMovimiento'),
       instrumentos: document.getElementById('viewInstrumentos'),
+      instrumentosTocar: document.getElementById('viewInstrumentosTocar'),
+      guitarra: document.getElementById('viewGuitarra'),
       pintar: document.getElementById('viewPintar'),
       lluvia: document.getElementById('viewLluvia'),
       didacticos: document.getElementById('viewDidacticos'),
@@ -1316,11 +1362,16 @@
     document.getElementById('goSonidos').addEventListener('click', () => { showView('sonidos'); speak('Sonidos.'); });
     document.getElementById('goExplotar').addEventListener('click', () => { showView('explotar'); speak('Para tocar.'); });
     document.getElementById('goMovimiento').addEventListener('click', () => { showView('movimiento'); speak('Movimiento.'); });
-    document.getElementById('goInstrumentos').addEventListener('click', () => { showView('instrumentos'); renderInstrumentos(); });
+    document.getElementById('goInstrumentos').addEventListener('click', () => { showView('instrumentos'); speak('Instrumentos.'); });
     document.getElementById('sonidosHome').addEventListener('click', () => showView('simples'));
     document.getElementById('explotarHome').addEventListener('click', () => showView('simples'));
     document.getElementById('movimientoHome').addEventListener('click', () => showView('simples'));
     document.getElementById('instrumentosHome').addEventListener('click', () => showView('simples'));
+
+    document.getElementById('goInstrumentosTocar').addEventListener('click', () => { showView('instrumentosTocar'); renderInstrumentos(); });
+    document.getElementById('instrumentosTocarHome').addEventListener('click', () => showView('instrumentos'));
+    document.getElementById('goGuitarraTutorial').addEventListener('click', () => { showView('guitarra'); window.__guitarraStart && window.__guitarraStart(); });
+    document.getElementById('guitarraHome').addEventListener('click', () => showView('instrumentos'));
 
     document.getElementById('goBurbujas').addEventListener('click', () => { showView('burbujas'); window.__burbujasStart && window.__burbujasStart(); });
     document.getElementById('goGlobos').addEventListener('click', () => { showView('globos'); window.__globosStart && window.__globosStart(); });
@@ -2868,11 +2919,45 @@
       o.connect(lp); lp.connect(g); g.connect(out); o.start(t0); o.stop(t0 + 0.45);
       currentNodes.push(o, g, lp);
     }
+    function playPiano(){
+      if (!audioCtx) return;
+      const t0 = audioCtx.currentTime + 0.02;
+      const out = audioCtx.createGain(); out.gain.value = 0.7; out.connect(audioCtx.destination);
+      currentNodes.push(out);
+      const o = audioCtx.createOscillator(); o.type = 'triangle'; o.frequency.value = 523;
+      const g = audioCtx.createGain(); env(g, t0, 0.5);
+      o.connect(g); g.connect(out); o.start(t0); o.stop(t0 + 0.5);
+      const o2 = audioCtx.createOscillator(); o2.type = 'sine'; o2.frequency.value = 1046;
+      const g2 = audioCtx.createGain(); env(g2, t0, 0.3);
+      o2.connect(g2); g2.connect(out); o2.start(t0); o2.stop(t0 + 0.3);
+      currentNodes.push(o, g, o2, g2);
+    }
+    // Pulsada de cuerda (estilo guitarra): ruido filtrado en banda + tono triangular, con decaimiento.
+    // Reutilizada por el instrumento "Guitarra" y por el tutorial de guitarra (cuerdas EADGBE).
+    function pluckString(freq, dur){
+      if (!audioCtx) return;
+      dur = dur || 1.0;
+      const t0 = audioCtx.currentTime + 0.02;
+      const out = audioCtx.createGain(); out.gain.value = 0.65; out.connect(audioCtx.destination);
+      currentNodes.push(out);
+      const n = mkNoise(dur);
+      const bp = audioCtx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = freq; bp.Q.value = 16;
+      const ng = audioCtx.createGain(); env(ng, t0, dur);
+      n.connect(bp); bp.connect(ng); ng.connect(out);
+      n.start(t0); n.stop(t0 + dur);
+      const o = audioCtx.createOscillator(); o.type = 'triangle'; o.frequency.value = freq;
+      const og = audioCtx.createGain(); env(og, t0, dur * 0.7);
+      o.connect(og); og.connect(out); o.start(t0); o.stop(t0 + dur * 0.7);
+      currentNodes.push(n, bp, ng, o, og);
+    }
+    function playGuitarra(){ pluckString(196, 0.9); }
     const INSTRUMENTOS = [
       { name:'Tambor',   emoji:'🥁', play: playTambor },
       { name:'Maracas',  emoji:'🪇', play: playMaracas },
       { name:'Campana',  emoji:'🔔', play: playCampana },
-      { name:'Trompeta', emoji:'🎺', play: playTrompeta }
+      { name:'Trompeta', emoji:'🎺', play: playTrompeta },
+      { name:'Piano',    emoji:'🎹', play: playPiano },
+      { name:'Guitarra', emoji:'🎸', play: playGuitarra }
     ];
     function renderInstrumentos(){
       const grid = document.getElementById('instrumentosGrid');
@@ -2895,6 +2980,76 @@
       });
       speak('Instrumentos musicales. Tocá para escuchar.');
     }
+
+    // --- Tutorial de guitarra (Fase 46) ---
+    (function(){
+      const introStage = document.getElementById('guitarraIntroStage');
+      const introEmoji = document.getElementById('guitarraIntroEmoji');
+      const introText = document.getElementById('guitarraIntroText');
+      const introNext = document.getElementById('guitarraIntroNext');
+      const cuerdasEl = document.getElementById('guitarraCuerdas');
+      if (!introStage) return;
+
+      const GUITARRA_INTRO = [
+        { emoji:'🎸', texto:'Esta es una guitarra.' },
+        { emoji:'🪕', texto:'Tiene cuerdas que vibran.' },
+        { emoji:'👆', texto:'Las tocamos con los dedos.' },
+        { emoji:'🎵', texto:'Cada cuerda suena distinto.' }
+      ];
+      // Afinación estándar de guitarra (E-A-D-G-B-E), frecuencias aproximadas en Hz.
+      const CUERDAS = [
+        { label:'Cuerda 1', freq:82,  color:'#7c2d12' },
+        { label:'Cuerda 2', freq:110, color:'#9a3412' },
+        { label:'Cuerda 3', freq:147, color:'#b45309' },
+        { label:'Cuerda 4', freq:196, color:'#ca8a04' },
+        { label:'Cuerda 5', freq:247, color:'#d97706' },
+        { label:'Cuerda 6', freq:330, color:'#f59e0b' }
+      ];
+      const tick = makeStarTicker(8);
+      let step = 0;
+
+      function renderIntroStep(){
+        const s = GUITARRA_INTRO[step];
+        introEmoji.textContent = s.emoji;
+        introText.textContent = s.texto;
+        introNext.textContent = (step === GUITARRA_INTRO.length - 1) ? '¡A tocar! 🎸' : 'Siguiente ➡️';
+        speak(s.texto);
+      }
+      function renderCuerdas(){
+        cuerdasEl.innerHTML = '';
+        CUERDAS.forEach(c => {
+          const b = document.createElement('button');
+          b.className = 'guitarra-cuerda';
+          b.style.background = c.color;
+          b.textContent = c.label;
+          b.setAttribute('aria-label', c.label);
+          b.addEventListener('click', () => {
+            ensureAudio();
+            pluckString(c.freq, 1.1);
+            if (tick()) setTimeout(() => speak('¡Muy bien, Samuel!'), 1000);
+          });
+          cuerdasEl.appendChild(b);
+        });
+      }
+      introNext.addEventListener('click', () => {
+        step++;
+        if (step >= GUITARRA_INTRO.length){
+          introStage.style.display = 'none';
+          cuerdasEl.style.display = 'flex';
+          renderCuerdas();
+          speak('Tocá las cuerdas para escuchar.');
+          return;
+        }
+        renderIntroStep();
+      });
+      window.__guitarraStart = function(){
+        step = 0;
+        introStage.style.display = 'flex';
+        cuerdasEl.style.display = 'none';
+        ensureAudio();
+        renderIntroStep();
+      };
+    })();
 
     // --- Pintar con el dedo (Fase 45) ---
     (function(){
