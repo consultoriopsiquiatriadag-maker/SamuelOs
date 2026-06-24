@@ -219,6 +219,44 @@
         o.start(t0); o.stop(t0 + dur);
       }
 
+      // --- Sonido ambiente (Fase 41): colchón muy suave + "viento" filtrado, en loop ---
+      // Todo sintetizado (sin archivos de audio), igual filosofía que el resto de la app.
+      let ambienteIniciadoM = false;
+      function iniciarAmbienteM(){
+        if (ambienteIniciadoM) return;
+        const ctx = ensureAudioM();
+        if (!ctx) return;
+        ambienteIniciadoM = true;
+        try{
+          const master = ctx.createGain();
+          master.gain.value = 0.05; // muy de fondo, no debe tapar la voz ni los chimes
+          master.connect(ctx.destination);
+
+          [220, 221.4].forEach((f) => {
+            const o = ctx.createOscillator();
+            o.type = 'sine';
+            o.frequency.value = f;
+            o.connect(master);
+            o.start();
+          });
+
+          const bufferSize = 2 * ctx.sampleRate;
+          const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+          const data = buffer.getChannelData(0);
+          for (let i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1) * 0.5;
+          const viento = ctx.createBufferSource();
+          viento.buffer = buffer;
+          viento.loop = true;
+          const filtro = ctx.createBiquadFilter();
+          filtro.type = 'lowpass';
+          filtro.frequency.value = 480;
+          const ganViento = ctx.createGain();
+          ganViento.gain.value = 0.045;
+          viento.connect(filtro); filtro.connect(ganViento); ganViento.connect(ctx.destination);
+          viento.start();
+        }catch(e){ ambienteIniciadoM = false; }
+      }
+
       // --- Estrellas reales de Samuel OS: mismo localStorage que juegos.html / child.html ---
       function saveProgressM(p){
         try{ localStorage.setItem(todayKeyM(), JSON.stringify(p)); }catch(e){/* ignore */}
@@ -241,18 +279,26 @@
       }
 
       function crearArbol(x, z){
+        // Fase 41: copa en dos capas + tamaño variable, para que se distingan entre sí
         const grupo = new THREE.Group();
+        const escala = 0.85 + Math.random() * 0.3;
         const tronco = new THREE.Mesh(
           new THREE.CylinderGeometry(0.25, 0.32, 1.4, 8),
           new THREE.MeshLambertMaterial({ color: 0x8a5a32 })
         );
         tronco.position.y = 0.7;
-        const copa = new THREE.Mesh(
-          new THREE.ConeGeometry(1.05, 1.7, 9),
-          new THREE.MeshLambertMaterial({ color: 0x3fa34d })
+        const copaBase = new THREE.Mesh(
+          new THREE.ConeGeometry(1.05, 1.5, 9),
+          new THREE.MeshLambertMaterial({ color: 0x2f8f44 })
         );
-        copa.position.y = 2.05;
-        grupo.add(tronco, copa);
+        copaBase.position.y = 1.85;
+        const copaArriba = new THREE.Mesh(
+          new THREE.ConeGeometry(0.7, 1.15, 9),
+          new THREE.MeshLambertMaterial({ color: 0x47b85b })
+        );
+        copaArriba.position.y = 2.7;
+        grupo.add(tronco, copaBase, copaArriba);
+        grupo.scale.set(escala, escala, escala);
         grupo.position.set(x, 0, z);
         return grupo;
       }
@@ -267,6 +313,46 @@
         return roca;
       }
 
+      // --- Vegetación chica del suelo (Fase 41): pasto y flores, solo decoración (no se tocan) ---
+      function crearPasto(x, z){
+        const mat = new THREE.MeshLambertMaterial({ color: 0x3fa34d });
+        const tuft = new THREE.Mesh(new THREE.ConeGeometry(0.07, 0.26, 5), mat);
+        tuft.position.set(x, 0.13, z);
+        tuft.rotation.y = Math.random() * Math.PI;
+        return tuft;
+      }
+
+      function crearFlor(x, z, color){
+        const grupo = new THREE.Group();
+        const tallo = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.025, 0.025, 0.22, 5),
+          new THREE.MeshLambertMaterial({ color: 0x3fa34d })
+        );
+        tallo.position.y = 0.11;
+        const flor = new THREE.Mesh(
+          new THREE.SphereGeometry(0.07, 8, 6),
+          new THREE.MeshBasicMaterial({ color })
+        );
+        flor.position.y = 0.24;
+        grupo.add(tallo, flor);
+        grupo.position.set(x, 0, z);
+        return grupo;
+      }
+
+      // --- Cielo decorativo (Fase 41): nubes y sol, solo paisaje ---
+      function crearNube(x, y, z){
+        const grupo = new THREE.Group();
+        const mat = new THREE.MeshLambertMaterial({ color: 0xffffff });
+        [[0,0,0,0.9],[0.7,0.08,0.1,0.7],[-0.7,0.05,-0.05,0.65],[0.2,0.18,0.2,0.55]].forEach(([dx,dy,dz,r]) => {
+          const bola = new THREE.Mesh(new THREE.SphereGeometry(r, 8, 8), mat);
+          bola.position.set(dx, dy, dz);
+          grupo.add(bola);
+        });
+        grupo.position.set(x, y, z);
+        grupo.scale.set(1.4, 1, 1.4);
+        return grupo;
+      }
+
       // --- Coleccionables (Fase 39): estrellas para juntar y animalitos para encontrar ---
       function crearEstrella(x, z){
         const forma = new THREE.Mesh(
@@ -277,22 +363,70 @@
         return forma;
       }
 
-      function crearAnimal(x, z, color){
+      // --- Animales (Fase 41): formas simples pero distintas entre sí, para reconocerlos ---
+      function crearPajarito(x, z, color){
         const grupo = new THREE.Group();
-        const cuerpo = new THREE.Mesh(
-          new THREE.SphereGeometry(0.36, 14, 12),
-          new THREE.MeshLambertMaterial({ color })
-        );
-        cuerpo.position.y = 0.38;
-        cuerpo.scale.set(1, 0.85, 1.3);
-        const cabeza = new THREE.Mesh(
-          new THREE.SphereGeometry(0.22, 12, 10),
-          new THREE.MeshLambertMaterial({ color })
-        );
-        cabeza.position.set(0, 0.6, 0.4);
-        grupo.add(cuerpo, cabeza);
+        const cuerpo = new THREE.Mesh(new THREE.SphereGeometry(0.3, 12, 10), new THREE.MeshLambertMaterial({ color }));
+        cuerpo.position.y = 0.4; cuerpo.scale.set(1, 0.95, 1.2);
+        const cabeza = new THREE.Mesh(new THREE.SphereGeometry(0.18, 10, 10), new THREE.MeshLambertMaterial({ color }));
+        cabeza.position.set(0, 0.62, 0.32);
+        const pico = new THREE.Mesh(new THREE.ConeGeometry(0.06, 0.16, 6), new THREE.MeshLambertMaterial({ color: 0xf59e0b }));
+        pico.rotation.x = Math.PI / 2; pico.position.set(0, 0.6, 0.48);
+        [-1, 1].forEach((lado) => {
+          const ala = new THREE.Mesh(new THREE.ConeGeometry(0.14, 0.32, 6), new THREE.MeshLambertMaterial({ color: 0x3b82c4 }));
+          ala.rotation.z = lado * Math.PI / 2.4;
+          ala.position.set(lado * 0.22, 0.45, -0.02);
+          grupo.add(ala);
+        });
+        grupo.add(cuerpo, cabeza, pico);
         grupo.position.set(x, 0, z);
         return grupo;
+      }
+
+      function crearConejito(x, z, color){
+        const grupo = new THREE.Group();
+        const cuerpo = new THREE.Mesh(new THREE.SphereGeometry(0.32, 12, 10), new THREE.MeshLambertMaterial({ color }));
+        cuerpo.position.y = 0.32; cuerpo.scale.set(1, 0.9, 1.2);
+        const cabeza = new THREE.Mesh(new THREE.SphereGeometry(0.22, 12, 10), new THREE.MeshLambertMaterial({ color }));
+        cabeza.position.set(0, 0.56, 0.34);
+        [-1, 1].forEach((lado) => {
+          const oreja = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.06, 0.36, 6), new THREE.MeshLambertMaterial({ color }));
+          oreja.position.set(lado * 0.1, 0.86, 0.3);
+          oreja.rotation.z = lado * 0.12;
+          grupo.add(oreja);
+        });
+        const cola = new THREE.Mesh(new THREE.SphereGeometry(0.1, 8, 8), new THREE.MeshLambertMaterial({ color: 0xffffff }));
+        cola.position.set(0, 0.36, -0.36);
+        grupo.add(cuerpo, cabeza, cola);
+        grupo.position.set(x, 0, z);
+        return grupo;
+      }
+
+      function crearMariposa(x, z, color){
+        const grupo = new THREE.Group();
+        const cuerpo = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.4, 8), new THREE.MeshLambertMaterial({ color: 0x4b3621 }));
+        cuerpo.rotation.x = Math.PI / 2;
+        cuerpo.position.y = 0.55;
+        const matAla = new THREE.MeshLambertMaterial({ color, side: THREE.DoubleSide });
+        [-1, 1].forEach((lado) => {
+          const alaGrande = new THREE.Mesh(new THREE.CircleGeometry(0.26, 10), matAla);
+          alaGrande.position.set(lado * 0.22, 0.62, 0);
+          alaGrande.rotation.y = lado * 0.5;
+          const alaChica = new THREE.Mesh(new THREE.CircleGeometry(0.16, 10), matAla);
+          alaChica.position.set(lado * 0.16, 0.44, 0);
+          alaChica.rotation.y = lado * 0.5;
+          grupo.add(alaGrande, alaChica);
+        });
+        grupo.add(cuerpo);
+        grupo.position.set(x, 0.25, z);
+        return grupo;
+      }
+
+      function crearAnimal(tipo, x, z, color){
+        if (tipo === 'pajarito') return crearPajarito(x, z, color);
+        if (tipo === 'conejito') return crearConejito(x, z, color);
+        if (tipo === 'mariposa') return crearMariposa(x, z, color);
+        return crearPajarito(x, z, color);
       }
 
       function crearColeccionables(){
@@ -309,7 +443,7 @@
           [7,-2,  0xc084fc, 'mariposa']
         ];
         ANIMALES.forEach(([x,z,color,nombre]) => {
-          const mesh = crearAnimal(x, z, color);
+          const mesh = crearAnimal(nombre, x, z, color);
           scene.add(mesh);
           coleccionables.push({ mesh, x, z, tipo:'animal', nombre, encontrado:false });
         });
@@ -362,6 +496,51 @@
         celebrandoRonda = false;
       }
 
+      // --- Personaje de Samuel (Fase 41): parecido simple a samuel-avatar.png ---
+      // Pelo castaño, piel clara y buzo azul con cierre rojo, en formas simples (sin caras realistas).
+      function crearAvatarSamuel(){
+        const grupo = new THREE.Group();
+
+        const cuerpo = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.32, 0.4, 0.6, 12),
+          new THREE.MeshLambertMaterial({ color: 0x2f6fed }) // buzo azul
+        );
+        cuerpo.position.y = 0.42;
+
+        const cierre = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.07, 0.07, 0.22, 8),
+          new THREE.MeshLambertMaterial({ color: 0xe23b3b }) // detalle rojo del cuello
+        );
+        cierre.position.y = 0.64;
+
+        const cabeza = new THREE.Mesh(
+          new THREE.SphereGeometry(0.32, 16, 14),
+          new THREE.MeshLambertMaterial({ color: 0xf0c39a }) // piel
+        );
+        cabeza.position.y = 0.95;
+
+        const pelo = new THREE.Mesh(
+          new THREE.SphereGeometry(0.34, 14, 10, 0, Math.PI * 2, 0, Math.PI * 0.6),
+          new THREE.MeshLambertMaterial({ color: 0x6b4226 }) // pelo castaño
+        );
+        pelo.position.y = 1.04;
+
+        grupo.add(cuerpo, cierre, cabeza, pelo);
+
+        [[-0.13, 0.32], [0.13, 0.32]].forEach(([x, zOff]) => {
+          const ojo = new THREE.Mesh(new THREE.SphereGeometry(0.045, 8, 8), new THREE.MeshBasicMaterial({ color: 0x3a2415 }));
+          ojo.position.set(x, 0.98, zOff);
+          grupo.add(ojo);
+        });
+        [[-0.22, 0.24], [0.22, 0.24]].forEach(([x, zOff]) => {
+          const mejilla = new THREE.Mesh(new THREE.SphereGeometry(0.05, 8, 8), new THREE.MeshBasicMaterial({ color: 0xf6a9a0 }));
+          mejilla.position.set(x, 0.88, zOff);
+          grupo.add(mejilla);
+        });
+
+        return grupo;
+      }
+
       function crearMundo(){
         scene = new THREE.Scene();
         scene.background = new THREE.Color(0xbfe3fb);
@@ -377,9 +556,9 @@
 
         // Luz suave, sin sombras duras (clima tranquilo)
         scene.add(new THREE.AmbientLight(0xffffff, 0.75));
-        const sol = new THREE.DirectionalLight(0xfff4d6, 0.7);
-        sol.position.set(8, 14, 6);
-        scene.add(sol);
+        const luzSol = new THREE.DirectionalLight(0xfff4d6, 0.7);
+        luzSol.position.set(8, 14, 6);
+        scene.add(luzSol);
 
         // Suelo (mundo pequeño)
         const suelo = new THREE.Mesh(
@@ -410,12 +589,33 @@
         const rocas = [[-3,3,1],[5,2,0.8],[-6,-2,1.2],[2,6,0.9]];
         rocas.forEach(([x,z,e]) => scene.add(crearRoca(x, z, e)));
 
-        // Avatar de Samuel: una esfera amigable (sin caras realistas, estilo simple)
-        avatar = new THREE.Mesh(
-          new THREE.SphereGeometry(0.55, 20, 16),
-          new THREE.MeshLambertMaterial({ color: 0xf59e0b })
+        // Pasto y flores (Fase 41): solo textura visual del suelo, no interactúan
+        for (let i = 0; i < 36; i++){
+          const x = (Math.random() * 2 - 1) * (LIMITE - 1);
+          const z = (Math.random() * 2 - 1) * (LIMITE - 1);
+          scene.add(crearPasto(x, z));
+        }
+        const coloresFlor = [0xffffff, 0xf472b6, 0x60a5fa];
+        for (let i = 0; i < 14; i++){
+          const x = (Math.random() * 2 - 1) * (LIMITE - 2);
+          const z = (Math.random() * 2 - 1) * (LIMITE - 2);
+          scene.add(crearFlor(x, z, coloresFlor[i % coloresFlor.length]));
+        }
+
+        // Cielo (Fase 41): nubes y sol, decoración fija
+        scene.add(crearNube(-9, 9, -10));
+        scene.add(crearNube(7, 10.5, -8));
+        scene.add(crearNube(-4, 8.5, -14));
+        const sol = new THREE.Mesh(
+          new THREE.SphereGeometry(1.3, 16, 16),
+          new THREE.MeshBasicMaterial({ color: 0xfff1b8 })
         );
-        avatar.position.set(avatarPos.x, 0.55, avatarPos.z);
+        sol.position.set(11, 13, -13);
+        scene.add(sol);
+
+        // Avatar de Samuel (Fase 41): personaje simple parecido a samuel-avatar.png
+        avatar = crearAvatarSamuel();
+        avatar.position.set(avatarPos.x, 0, avatarPos.z);
         scene.add(avatar);
 
         avatarShadow = new THREE.Mesh(
@@ -445,14 +645,14 @@
       window.addEventListener('resize', ajustarTamano);
 
       // --- Movimiento simple: flechas / WASD, sin mouse-look (evita marear) ---
-      window.addEventListener('keydown', (e) => { ensureAudioM(); teclas[e.key.toLowerCase()] = true; });
+      window.addEventListener('keydown', (e) => { ensureAudioM(); iniciarAmbienteM(); teclas[e.key.toLowerCase()] = true; });
       window.addEventListener('keyup',   (e) => { teclas[e.key.toLowerCase()] = false; });
 
       // --- Controles táctiles grandes (Fase 38): mantener apretado para moverse, soltar para frenar ---
       function wireBotonMovimiento(id, tecla){
         const btn = document.getElementById(id);
         if (!btn) return;
-        const activar = (ev) => { ev.preventDefault(); ensureAudioM(); teclas[tecla] = true; };
+        const activar = (ev) => { ev.preventDefault(); ensureAudioM(); iniciarAmbienteM(); teclas[tecla] = true; };
         const desactivar = (ev) => { if (ev) ev.preventDefault(); teclas[tecla] = false; };
         btn.addEventListener('pointerdown', activar);
         btn.addEventListener('pointerup', desactivar);
@@ -482,9 +682,9 @@
           avatarShadow.position.x = avatarPos.x;
           avatarShadow.position.z = avatarPos.z;
           // Pequeño rebote al caminar, sin física compleja
-          avatar.position.y = 0.55 + Math.abs(Math.sin(performance.now() / 140)) * 0.12;
+          avatar.position.y = Math.abs(Math.sin(performance.now() / 140)) * 0.12;
         } else {
-          avatar.position.y = 0.55;
+          avatar.position.y = 0;
         }
       }
 
