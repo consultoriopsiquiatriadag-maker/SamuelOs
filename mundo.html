@@ -193,6 +193,10 @@
       const camActual = new THREE.Vector3();
       const coleccionables = []; // estrellas y animales (Fase 39)
       const DISTANCIA_TOQUE = 1.15;
+      // Fase 42: cámara un poco más baja/lejana para que se vea una franja de horizonte y cielo
+      const CAMARA_ALTURA = 4.4;
+      const CAMARA_DISTANCIA = 9;
+      let avatarRotActual = 0; // rotación suave del personaje sobre su eje (Fase 42)
 
       // --- Audio propio del Mundo de Samuel (mismo estilo de síntesis que juegos.html) ---
       let audioCtxM = null;
@@ -303,14 +307,24 @@
         return grupo;
       }
 
+      // Fase 42: rocas hechas de bloques apilados (estilo del repo de referencia evaluado en
+      // la Fase 35 — solo inspiración visual, sin copiar código) para más definición y volumen.
       function crearRoca(x, z, escala){
-        const roca = new THREE.Mesh(
-          new THREE.DodecahedronGeometry(0.5 * escala, 0),
-          new THREE.MeshLambertMaterial({ color: 0x9aa3ad })
-        );
-        roca.position.set(x, 0.35 * escala, z);
-        roca.rotation.set(Math.random(), Math.random(), Math.random());
-        return roca;
+        const grupo = new THREE.Group();
+        const tonos = [0x9aa3ad, 0x868f99, 0xb3bac1];
+        const bloques = 2 + Math.floor(Math.random() * 2);
+        for (let i = 0; i < bloques; i++){
+          const tam = (0.32 + Math.random() * 0.24) * escala;
+          const cubo = new THREE.Mesh(
+            new THREE.BoxGeometry(tam, tam, tam),
+            new THREE.MeshLambertMaterial({ color: tonos[i % tonos.length] })
+          );
+          cubo.position.set((Math.random() - 0.5) * 0.32 * escala, tam / 2, (Math.random() - 0.5) * 0.32 * escala);
+          cubo.rotation.y = Math.random() * Math.PI;
+          grupo.add(cubo);
+        }
+        grupo.position.set(x, 0, z);
+        return grupo;
       }
 
       // --- Vegetación chica del suelo (Fase 41): pasto y flores, solo decoración (no se tocan) ---
@@ -353,14 +367,73 @@
         return grupo;
       }
 
+      // --- Cielo con horizonte, estrellas y sol (Fase 42) ---
+      // Se "pinta" en un canvas, así siempre se ve completo sin importar el ángulo de cámara.
+      function crearTexturaCielo(){
+        const canvas = document.createElement('canvas');
+        canvas.width = 2;
+        canvas.height = 256;
+        const ctx = canvas.getContext('2d');
+
+        const grad = ctx.createLinearGradient(0, 0, 0, 256);
+        grad.addColorStop(0, '#3457a6');
+        grad.addColorStop(0.45, '#6fb3e8');
+        grad.addColorStop(0.78, '#bfe3fb');
+        grad.addColorStop(1, '#eef8ff');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, 2, 256);
+
+        // Estrellitas, solo en la parte alta del cielo
+        ctx.fillStyle = 'rgba(255,255,255,0.9)';
+        for (let i = 0; i < 50; i++){
+          const sx = Math.random() * 2;
+          const sy = Math.random() * 100;
+          const r = 0.6 + Math.random() * 0.9;
+          ctx.beginPath();
+          ctx.arc(sx, sy, r, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // Sol cálido cerca del horizonte
+        const solY = 175;
+        const brillo = ctx.createRadialGradient(1, solY, 0, 1, solY, 70);
+        brillo.addColorStop(0, 'rgba(255,247,196,0.95)');
+        brillo.addColorStop(0.4, 'rgba(255,236,150,0.55)');
+        brillo.addColorStop(1, 'rgba(255,236,150,0)');
+        ctx.fillStyle = brillo;
+        ctx.fillRect(0, solY - 70, 2, 140);
+
+        return new THREE.CanvasTexture(canvas);
+      }
+
       // --- Coleccionables (Fase 39): estrellas para juntar y animalitos para encontrar ---
+      // Fase 42: silueta real de estrella de 5 puntas (en vez del octaedro), para que se reconozca mejor.
       function crearEstrella(x, z){
-        const forma = new THREE.Mesh(
-          new THREE.OctahedronGeometry(0.4, 0),
-          new THREE.MeshLambertMaterial({ color: 0xfde047, emissive: 0xca8a04, emissiveIntensity: 0.35 })
+        const grupo = new THREE.Group();
+        const puntas = 5;
+        const rExterior = 0.4, rInterior = 0.17;
+        const contorno = new THREE.Shape();
+        for (let i = 0; i < puntas * 2; i++){
+          const r = (i % 2 === 0) ? rExterior : rInterior;
+          const ang = (i / (puntas * 2)) * Math.PI * 2 - Math.PI / 2;
+          const px = Math.cos(ang) * r;
+          const py = Math.sin(ang) * r;
+          if (i === 0) contorno.moveTo(px, py); else contorno.lineTo(px, py);
+        }
+        contorno.closePath();
+        const geo = new THREE.ExtrudeGeometry(contorno, { depth: 0.1, bevelEnabled: true, bevelThickness: 0.02, bevelSize: 0.015, bevelSegments: 1 });
+        geo.center();
+        const cuerpo = new THREE.Mesh(
+          geo,
+          new THREE.MeshLambertMaterial({ color: 0xfde047, emissive: 0xca8a04, emissiveIntensity: 0.45 })
         );
-        forma.position.set(x, 0.95, z);
-        return forma;
+        const brillo = new THREE.Mesh(
+          new THREE.SphereGeometry(0.46, 10, 10),
+          new THREE.MeshBasicMaterial({ color: 0xfff6c2, transparent: true, opacity: 0.16 })
+        );
+        grupo.add(brillo, cuerpo);
+        grupo.position.set(x, 0.95, z);
+        return grupo;
       }
 
       // --- Animales (Fase 41): formas simples pero distintas entre sí, para reconocerlos ---
@@ -543,8 +616,9 @@
 
       function crearMundo(){
         scene = new THREE.Scene();
-        scene.background = new THREE.Color(0xbfe3fb);
-        scene.fog = new THREE.Fog(0xbfe3fb, 18, 34);
+        // Fase 42: cielo pintado (horizonte + estrellas + sol) en vez de un color plano
+        scene.background = crearTexturaCielo();
+        scene.fog = new THREE.Fog(0xcfe9fb, 18, 34);
 
         camera = new THREE.PerspectiveCamera(55, 1, 0.1, 100);
 
@@ -602,16 +676,11 @@
           scene.add(crearFlor(x, z, coloresFlor[i % coloresFlor.length]));
         }
 
-        // Cielo (Fase 41): nubes y sol, decoración fija
-        scene.add(crearNube(-9, 9, -10));
-        scene.add(crearNube(7, 10.5, -8));
-        scene.add(crearNube(-4, 8.5, -14));
-        const sol = new THREE.Mesh(
-          new THREE.SphereGeometry(1.3, 16, 16),
-          new THREE.MeshBasicMaterial({ color: 0xfff1b8 })
-        );
-        sol.position.set(11, 13, -13);
-        scene.add(sol);
+        // Cielo (Fase 41/42): nubes cercanas; el sol y las estrellas ahora están
+        // pintados en el fondo (crearTexturaCielo) para que siempre se vean.
+        scene.add(crearNube(-9, 6, -10));
+        scene.add(crearNube(7, 7, -8));
+        scene.add(crearNube(-4, 5.5, -14));
 
         // Avatar de Samuel (Fase 41): personaje simple parecido a samuel-avatar.png
         avatar = crearAvatarSamuel();
@@ -626,7 +695,7 @@
         avatarShadow.position.set(avatarPos.x, 0.02, avatarPos.z);
         scene.add(avatarShadow);
 
-        camActual.set(avatarPos.x, 5.2, avatarPos.z + 7.5);
+        camActual.set(avatarPos.x, CAMARA_ALTURA, avatarPos.z + CAMARA_DISTANCIA);
 
         crearColeccionables();
 
@@ -670,9 +739,11 @@
         if (teclas['arrowdown'] || teclas['s']) dz += 1;
         if (teclas['arrowleft'] || teclas['a']) dx -= 1;
         if (teclas['arrowright'] || teclas['d']) dx += 1;
+        let rotObjetivo = 0; // de frente a la cámara cuando está quieto (se le ve la cara)
         if (dx || dz){
           const len = Math.hypot(dx, dz);
           dx /= len; dz /= len;
+          rotObjetivo = Math.atan2(dx, dz); // gira sobre su eje hacia donde camina (Fase 42)
           avatarPos.x += dx * VELOCIDAD * dt;
           avatarPos.z += dz * VELOCIDAD * dt;
           avatarPos.x = Math.max(-LIMITE, Math.min(LIMITE, avatarPos.x));
@@ -686,10 +757,16 @@
         } else {
           avatar.position.y = 0;
         }
+        // Rotación suave hacia el objetivo (camino más corto), así al quedarse quieto
+        // vuelve a mirar de frente y se le ve la cara (Fase 42).
+        let diferencia = rotObjetivo - avatarRotActual;
+        diferencia = Math.atan2(Math.sin(diferencia), Math.cos(diferencia));
+        avatarRotActual += diferencia * Math.min(1, dt * 6);
+        avatar.rotation.y = avatarRotActual;
       }
 
       function actualizarCamara(dt){
-        const objetivo = new THREE.Vector3(avatarPos.x, 5.2, avatarPos.z + 7.5);
+        const objetivo = new THREE.Vector3(avatarPos.x, CAMARA_ALTURA, avatarPos.z + CAMARA_DISTANCIA);
         camActual.lerp(objetivo, Math.min(1, dt * 3));
         camera.position.copy(camActual);
         camera.lookAt(avatarPos.x, 1, avatarPos.z);
