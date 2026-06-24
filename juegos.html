@@ -261,6 +261,12 @@
     .piano-tecla:active{ transform:translateY(4px); background:#e5e7eb; }
     @media (max-width:600px){ .piano-teclado{ padding:10px; gap:3px; } .piano-tecla{ height:110px; font-size:12px; } }
 
+    /* Selector de canciones para guitarra y piano (Fase 49) */
+    .cancion-grid{ margin-top:14px; display:grid; gap:14px; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); width:100%; max-width:480px; }
+    .cancion-btn{ border:2px solid rgba(15,23,42,.14); border-bottom:8px solid var(--cancion-color, #2563eb); border-radius:22px; background:var(--card); box-shadow:var(--shadow); padding:20px 12px; display:flex; flex-direction:column; align-items:center; gap:8px; cursor:pointer; font-weight:950; font-size:16px; color:inherit; }
+    .cancion-btn .cemoji{ font-size:40px; line-height:1; }
+    .cancion-play{ width:100%; max-width:520px; display:flex; flex-direction:column; align-items:center; gap:14px; }
+
     /* Memotest */
     .bar{margin-top:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
     .stats{display:flex;gap:10px;flex-wrap:wrap;}
@@ -731,8 +737,12 @@
 
         <div id="guitarraCancionWrap" style="display:none;">
           <button class="btn ghost" id="guitarraCancionBack">⬅️ Modo</button>
-          <div class="guitarra-cancion-hint">Tocá la nota que brilla</div>
-          <div class="guitarra-notas-row" id="guitarraNotas"></div>
+          <div class="cancion-grid" id="guitarraCancionLista"></div>
+          <div class="cancion-play" id="guitarraCancionPlay" style="display:none;">
+            <button class="btn ghost" id="guitarraCancionListaBack">⬅️ Canciones</button>
+            <div class="guitarra-cancion-hint" id="guitarraCancionTitulo">Tocá la nota que brilla</div>
+            <div class="guitarra-notas-row" id="guitarraNotas"></div>
+          </div>
         </div>
       </div>
     </section>
@@ -775,8 +785,12 @@
 
         <div id="pianoCancionWrap" style="display:none;">
           <button class="btn ghost" id="pianoCancionBack">⬅️ Modo</button>
-          <div class="guitarra-cancion-hint">Tocá la nota que brilla</div>
-          <div class="guitarra-notas-row" id="pianoNotas"></div>
+          <div class="cancion-grid" id="pianoCancionLista"></div>
+          <div class="cancion-play" id="pianoCancionPlay" style="display:none;">
+            <button class="btn ghost" id="pianoCancionListaBack">⬅️ Canciones</button>
+            <div class="guitarra-cancion-hint" id="pianoCancionTitulo">Tocá la nota que brilla</div>
+            <div class="guitarra-notas-row" id="pianoNotas"></div>
+          </div>
         </div>
       </div>
     </section>
@@ -1047,6 +1061,7 @@
         <button class="historia-btn" data-historia="avion"><span class="hemoji">✈️</span>Viajar en avión</button>
         <button class="historia-btn" data-historia="compu"><span class="hemoji">💻</span>Usar la computadora con calma</button>
         <button class="historia-btn" data-historia="bano"><span class="hemoji">🚽</span>Usar el baño</button>
+        <button class="historia-btn" data-historia="perdido"><span class="hemoji">🧭</span>Si me pierdo</button>
       </div>
 
       <div class="historia-stage" id="historiaStage" style="display:none;">
@@ -3093,7 +3108,29 @@
       speak('Instrumentos musicales. Tocá para escuchar.');
     }
 
-    // --- Tutorial de guitarra (Fase 46/47) ---
+    // Canciones disponibles para el modo guiado de guitarra y piano (Fase 49).
+    // Todas usan solo las notas Do-Re-Mi-Fa-Sol-La (grados 1 a 6, sin Si), para
+    // calzar con las 6 notas ya definidas en NOTAS de cada instrumento.
+    const CANCIONES = [
+      { id:'estrellita', emoji:'⭐', label:'Estrellita', color:'#3b82f6', secuencia:[
+        1,1,5,5,6,6,5, 4,4,3,3,2,2,1,
+        5,5,4,4,3,3,2, 5,5,4,4,3,3,2,
+        1,1,5,5,6,6,5, 4,4,3,3,2,2,1
+      ]},
+      { id:'escalera', emoji:'🪜', label:'La escalera', color:'#22c55e', secuencia:[
+        1,2,3,4,5,6,5,4,3,2,1
+      ]},
+      { id:'corderito', emoji:'🐑', label:'El corderito', color:'#f59e0b', secuencia:[
+        3,2,1,2,3,3,3, 2,2,2, 3,5,5,
+        3,2,1,2,3,3,3,3, 2,2,3,2,1
+      ]},
+      { id:'martinillo', emoji:'🔔', label:'Martinillo', color:'#a855f7', secuencia:[
+        1,2,3,1, 1,2,3,1, 3,4,5, 3,4,5,
+        5,6,5,4,3,1, 5,6,5,4,3,1, 1,5,1, 1,5,1
+      ]}
+    ];
+
+    // --- Tutorial de guitarra (Fase 46/47/49) ---
     (function(){
       const introStage = document.getElementById('guitarraIntroStage');
       const introEmoji = document.getElementById('guitarraIntroEmoji');
@@ -3108,6 +3145,10 @@
       const cancionBack = document.getElementById('guitarraCancionBack');
       const goLibre = document.getElementById('goGuitarraLibre');
       const goCancion = document.getElementById('goGuitarraCancion');
+      const cancionLista = document.getElementById('guitarraCancionLista');
+      const cancionPlay = document.getElementById('guitarraCancionPlay');
+      const cancionListaBack = document.getElementById('guitarraCancionListaBack');
+      const cancionTitulo = document.getElementById('guitarraCancionTitulo');
       if (!introStage) return;
 
       const GUITARRA_INTRO = [
@@ -3192,7 +3233,7 @@
         modoSelector.style.display = 'grid';
       });
 
-      // --- Modo canción: notas do-re-mi-fa-sol-la, secuencia guiada (Estrellita dónde estás) ---
+      // --- Modo canción: elegir una de varias canciones y seguir la nota que brilla (Fase 49) ---
       const tickCancion = makeStarTicker(1, 'aprender');
       const NOTAS = [
         { label:'Do',  freq:262, color:'#ef4444' },
@@ -3202,31 +3243,26 @@
         { label:'Sol', freq:392, color:'#3b82f6' },
         { label:'La',  freq:440, color:'#a855f7' }
       ];
-      // Melodía de "Estrellita dónde estás", en grados de escala (1=Do ... 6=La), sin la nota Ti.
-      const CANCION = [
-        1,1,5,5,6,6,5, 4,4,3,3,2,2,1,
-        5,5,4,4,3,3,2, 5,5,4,4,3,3,2,
-        1,1,5,5,6,6,5, 4,4,3,3,2,2,1
-      ];
+      let cancionSecuencia = [];
       let cancionPos = 0;
       let notaBtns = [];
 
       function resaltarNota(){
         notaBtns.forEach(b => b.classList.remove('highlight'));
-        if (cancionPos < CANCION.length){
-          notaBtns[CANCION[cancionPos] - 1].classList.add('highlight');
+        if (cancionPos < cancionSecuencia.length){
+          notaBtns[cancionSecuencia[cancionPos] - 1].classList.add('highlight');
         }
       }
       function onNotaTap(idx, freq){
         ensureAudio();
         pluckString(freq, 0.55);
-        if (idx === CANCION[cancionPos]){
+        if (idx === cancionSecuencia[cancionPos]){
           cancionPos++;
-          if (cancionPos >= CANCION.length){
+          if (cancionPos >= cancionSecuencia.length){
             notaBtns.forEach(b => b.classList.remove('highlight'));
             setTimeout(() => speak('¡Lo lograste, Samuel! Muy bien.'), 150);
             tickCancion();
-            setTimeout(() => { cancionPos = 0; resaltarNota(); }, 2600);
+            setTimeout(() => { cancionPlay.style.display = 'none'; cancionLista.style.display = 'grid'; }, 2600);
           } else {
             resaltarNota();
           }
@@ -3248,12 +3284,38 @@
         cancionPos = 0;
         resaltarNota();
       }
+      function renderCancionLista(){
+        cancionLista.innerHTML = '';
+        CANCIONES.forEach(c => {
+          const b = document.createElement('button');
+          b.className = 'cancion-btn';
+          b.style.setProperty('--cancion-color', c.color);
+          b.innerHTML = `<span class="cemoji">${c.emoji}</span>${c.label}`;
+          b.setAttribute('aria-label', c.label);
+          b.addEventListener('click', () => {
+            cancionSecuencia = c.secuencia;
+            cancionLista.style.display = 'none';
+            cancionPlay.style.display = 'flex';
+            cancionTitulo.textContent = `Canción: ${c.label}`;
+            ensureAudio();
+            renderCuerdasCancion();
+            speak(`Vamos a tocar ${c.label}. Tocá la nota que brilla.`);
+          });
+          cancionLista.appendChild(b);
+        });
+      }
       goCancion.addEventListener('click', () => {
         ocultarTodo();
         cancionWrap.style.display = 'flex';
+        cancionPlay.style.display = 'none';
+        cancionLista.style.display = 'grid';
         ensureAudio();
-        renderCuerdasCancion();
-        speak('Tocá la nota que brilla para armar la canción.');
+        renderCancionLista();
+        speak('Elegí una canción para tocar.');
+      });
+      cancionListaBack.addEventListener('click', () => {
+        cancionPlay.style.display = 'none';
+        cancionLista.style.display = 'grid';
       });
       cancionBack.addEventListener('click', () => {
         ocultarTodo();
@@ -3284,6 +3346,10 @@
       const cancionBack = document.getElementById('pianoCancionBack');
       const goLibre = document.getElementById('goPianoLibre');
       const goCancion = document.getElementById('goPianoCancion');
+      const cancionLista = document.getElementById('pianoCancionLista');
+      const cancionPlay = document.getElementById('pianoCancionPlay');
+      const cancionListaBack = document.getElementById('pianoCancionListaBack');
+      const cancionTitulo = document.getElementById('pianoCancionTitulo');
       if (!introStage) return;
 
       const PIANO_INTRO = [
@@ -3357,7 +3423,7 @@
         modoSelector.style.display = 'grid';
       });
 
-      // --- Modo canción: misma melodía que en guitarra ("Estrellita dónde estás") ---
+      // --- Modo canción: elegir una de varias canciones (mismas que guitarra, Fase 49) ---
       const tickCancion = makeStarTicker(1, 'aprender');
       const NOTAS = [
         { label:'Do',  freq:262, color:'#ef4444' },
@@ -3367,30 +3433,26 @@
         { label:'Sol', freq:392, color:'#3b82f6' },
         { label:'La',  freq:440, color:'#a855f7' }
       ];
-      const CANCION = [
-        1,1,5,5,6,6,5, 4,4,3,3,2,2,1,
-        5,5,4,4,3,3,2, 5,5,4,4,3,3,2,
-        1,1,5,5,6,6,5, 4,4,3,3,2,2,1
-      ];
+      let cancionSecuencia = [];
       let cancionPos = 0;
       let notaBtns = [];
 
       function resaltarNota(){
         notaBtns.forEach(b => b.classList.remove('highlight'));
-        if (cancionPos < CANCION.length){
-          notaBtns[CANCION[cancionPos] - 1].classList.add('highlight');
+        if (cancionPos < cancionSecuencia.length){
+          notaBtns[cancionSecuencia[cancionPos] - 1].classList.add('highlight');
         }
       }
       function onNotaTap(idx, freq){
         ensureAudio();
         pianoTone(freq, 0.45);
-        if (idx === CANCION[cancionPos]){
+        if (idx === cancionSecuencia[cancionPos]){
           cancionPos++;
-          if (cancionPos >= CANCION.length){
+          if (cancionPos >= cancionSecuencia.length){
             notaBtns.forEach(b => b.classList.remove('highlight'));
             setTimeout(() => speak('¡Lo lograste, Samuel! Muy bien.'), 150);
             tickCancion();
-            setTimeout(() => { cancionPos = 0; resaltarNota(); }, 2600);
+            setTimeout(() => { cancionPlay.style.display = 'none'; cancionLista.style.display = 'grid'; }, 2600);
           } else {
             resaltarNota();
           }
@@ -3412,12 +3474,38 @@
         cancionPos = 0;
         resaltarNota();
       }
+      function renderCancionLista(){
+        cancionLista.innerHTML = '';
+        CANCIONES.forEach(c => {
+          const b = document.createElement('button');
+          b.className = 'cancion-btn';
+          b.style.setProperty('--cancion-color', c.color);
+          b.innerHTML = `<span class="cemoji">${c.emoji}</span>${c.label}`;
+          b.setAttribute('aria-label', c.label);
+          b.addEventListener('click', () => {
+            cancionSecuencia = c.secuencia;
+            cancionLista.style.display = 'none';
+            cancionPlay.style.display = 'flex';
+            cancionTitulo.textContent = `Canción: ${c.label}`;
+            ensureAudio();
+            renderNotasCancion();
+            speak(`Vamos a tocar ${c.label}. Tocá la nota que brilla.`);
+          });
+          cancionLista.appendChild(b);
+        });
+      }
       goCancion.addEventListener('click', () => {
         ocultarTodo();
         cancionWrap.style.display = 'flex';
+        cancionPlay.style.display = 'none';
+        cancionLista.style.display = 'grid';
         ensureAudio();
-        renderNotasCancion();
-        speak('Tocá la nota que brilla para armar la canción.');
+        renderCancionLista();
+        speak('Elegí una canción para tocar.');
+      });
+      cancionListaBack.addEventListener('click', () => {
+        cancionPlay.style.display = 'none';
+        cancionLista.style.display = 'grid';
       });
       cancionBack.addEventListener('click', () => {
         ocultarTodo();
@@ -3498,14 +3586,44 @@
         o.connect(g); g.connect(out); o.start(t0); o.stop(t0 + 0.28);
         currentNodes.push(o, g);
       }
+      // Tom de piso (Fase 49): mismo timbre que playTom pero una octava más grave y con más cuerpo.
+      function playTom2(){
+        if (!audioCtx) return;
+        const t0 = audioCtx.currentTime + 0.02;
+        const out = audioCtx.createGain(); out.gain.value = 0.85; out.connect(audioCtx.destination);
+        currentNodes.push(out);
+        const o = audioCtx.createOscillator(); o.type = 'sine';
+        o.frequency.setValueAtTime(140, t0);
+        o.frequency.exponentialRampToValueAtTime(60, t0 + 0.32);
+        const g = audioCtx.createGain(); env(g, t0, 0.4);
+        o.connect(g); g.connect(out); o.start(t0); o.stop(t0 + 0.4);
+        currentNodes.push(o, g);
+      }
+      // Platillo Ride (Fase 49): como el Crash pero más grave y con un "ping" tonal sostenido.
+      function playRide(){
+        if (!audioCtx) return;
+        const t0 = audioCtx.currentTime + 0.02;
+        const out = audioCtx.createGain(); out.gain.value = 0.6; out.connect(audioCtx.destination);
+        currentNodes.push(out);
+        const n = mkNoise(1.6);
+        const hp = audioCtx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 3000;
+        const ng = audioCtx.createGain(); env(ng, t0, 1.6);
+        n.connect(hp); hp.connect(ng); ng.connect(out); n.start(t0); n.stop(t0 + 1.6);
+        const o = audioCtx.createOscillator(); o.type = 'sine'; o.frequency.value = 600;
+        const og = audioCtx.createGain(); env(og, t0, 0.5);
+        o.connect(og); og.connect(out); o.start(t0); o.stop(t0 + 0.5);
+        currentNodes.push(n, hp, ng, o, og);
+      }
 
       // Posiciones aproximadas de una batería real fotografiada desde arriba.
       const PIEZAS = [
-        { label:'Hi-hat',  top:'52%', left:'14%', size:78,  color:'#fbbf24', play: playHihat },
-        { label:'Platillo', top:'14%', left:'82%', size:92, color:'#f97316', play: playCrash },
-        { label:'Tom',     top:'18%', left:'52%', size:80,  color:'#22c55e', play: playTom },
-        { label:'Tambor',  top:'50%', left:'50%', size:96,  color:'#3b82f6', play: playRedoblante },
-        { label:'Bombo',   top:'82%', left:'50%', size:134, color:'#7c3aed', play: playBombo }
+        { label:'Hi-hat',         top:'54%', left:'12%', size:74,  color:'#fbbf24', play: playHihat },
+        { label:'Platillo Crash', top:'14%', left:'80%', size:88,  color:'#f97316', play: playCrash },
+        { label:'Platillo Ride',  top:'42%', left:'90%', size:96,  color:'#eab308', play: playRide },
+        { label:'Tom 1',          top:'16%', left:'46%', size:72,  color:'#22c55e', play: playTom },
+        { label:'Tom 2',          top:'72%', left:'80%', size:96,  color:'#15803d', play: playTom2 },
+        { label:'Tambor',         top:'50%', left:'46%', size:90,  color:'#3b82f6', play: playRedoblante },
+        { label:'Bombo',          top:'84%', left:'44%', size:124, color:'#7c3aed', play: playBombo }
       ];
       function renderBateria(){
         stopAll();
@@ -3527,7 +3645,7 @@
           });
           stage.appendChild(b);
         });
-        speak('Batería. Tocá los platillos y los bombos.');
+        speak('Batería. Tocá los platillos, los tambores y el bombo.');
       }
       window.__renderBateria = renderBateria;
     })();
@@ -4596,6 +4714,14 @@
           {emoji:'🚽', texto:'Me bajo la ropa y me siento.'},
           {emoji:'🧻', texto:'Hago pis o caca y me limpio.'},
           {emoji:'🧼', texto:'Me lavo las manos. ¡Lo logré!'}
+        ]},
+        perdido: { titulo:'Si me pierdo', pasos:[
+          {emoji:'😟', texto:'Si no veo a mis papás, me quedo tranquilo.'},
+          {emoji:'🗣️', texto:'Busco a una persona grande y le digo: estoy perdido.'},
+          {emoji:'🙋', texto:'Digo mi nombre: Samuel.'},
+          {emoji:'🏠', texto:'Digo mi dirección: calle Tucumán 2126, Capital Federal.'},
+          {emoji:'👨‍👩‍👦', texto:'Digo que mi papá se llama Omer, es médico de un hospital, y mi mamá se llama Margarita.'},
+          {emoji:'😊', texto:'Espero tranquilo. Mis papás me van a buscar. ¡Bien hecho, Samuel!'}
         ]}
       };
 
