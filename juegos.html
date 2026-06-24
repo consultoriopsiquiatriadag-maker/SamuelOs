@@ -331,6 +331,13 @@
     .mundial-host-badge{ background:rgba(245,158,11,.16); color:#b45309; border-radius:999px; padding:5px 14px; font-weight:900; font-size:13px; }
     .mundial-dato{ font-size:18px; font-weight:800; color:var(--muted); line-height:1.35; }
     .mundial-nav{ display:flex; gap:14px; }
+    .mundial-info{ margin-top:14px; display:flex; flex-direction:column; gap:14px; align-items:center; }
+    .mundial-info-intro{ font-size:17px; font-weight:800; color:var(--muted); text-align:center; max-width:480px; }
+    .mundial-info-grid{ display:grid; gap:12px; grid-template-columns:repeat(auto-fit, minmax(150px,1fr)); width:100%; }
+    .mundial-info-card{ border:2px solid rgba(34,197,94,.30); border-radius:20px; background:var(--card); box-shadow:var(--shadow); padding:18px 12px; display:flex; flex-direction:column; align-items:center; gap:8px; cursor:pointer; text-align:center; font-weight:900; font-size:15px; color:inherit; }
+    .mundial-info-card .micon{ font-size:38px; line-height:1; }
+    .mundial-info-card.tapped{ animation:mundialInfoTap .45s ease; }
+    @keyframes mundialInfoTap{ 0%{ transform:scale(1); } 35%{ transform:scale(1.08); background:rgba(34,197,94,.16); } 100%{ transform:scale(1); } }
     @media (max-width:600px){
       .mundial-card{ min-height:260px; padding:22px; }
       .mundial-flag-big{ font-size:72px; }
@@ -542,11 +549,18 @@
 
     <!-- MUNDIAL DE FÚTBOL 2026 (Fase 29) -->
     <section id="viewMundial" class="view" aria-label="Mundial de Fútbol 2026">
-      <div class="top-actions" style="margin-bottom:6px;">
+      <div class="top-actions" style="margin-bottom:6px; gap:10px; flex-wrap:wrap;">
         <button class="btn ghost" id="mundialHome">⬅️ Juegos didácticos</button>
+        <button class="btn ghost" id="mundialInfoBtn">❓ ¿Qué es el Mundial?</button>
       </div>
 
       <div class="mundial-grid" id="mundialSelector"></div>
+
+      <div class="mundial-info" id="mundialInfo" style="display:none;">
+        <button class="btn ghost" id="mundialInfoBack">⬅️ Países</button>
+        <p class="mundial-info-intro" id="mundialInfoIntro"></p>
+        <div class="mundial-info-grid" id="mundialInfoGrid"></div>
+      </div>
 
       <div class="mundial-stage" id="mundialStage" style="display:none;">
         <div class="bar" style="width:100%;justify-content:center;gap:18px;">
@@ -3543,6 +3557,15 @@
       { nombre:'Ghana', bandera:'🇬🇭', grupo:'L', dato:'Está en África.' },
     ];
 
+    // Fase 30: tarjetas didácticas "¿Qué es el Mundial?"
+    const MUNDIAL_INFO = [
+      { icono:'🌍', titulo:'Países',    texto:'Muchos países del mundo armaron un equipo de fútbol. Por eso hay banderas de tantos lugares.' },
+      { icono:'🚩', titulo:'Banderas',  texto:'Cada país tiene su propia bandera. Sirve para reconocer de dónde es cada equipo.' },
+      { icono:'👕', titulo:'Camisetas', texto:'Cada equipo tiene una camiseta con sus colores. Así los jugadores se distinguen en la cancha.' },
+      { icono:'🏟️', titulo:'Estadios',  texto:'Los partidos se juegan en estadios muy grandes, con miles de personas mirando.' },
+      { icono:'🏆', titulo:'Copa',      texto:'El equipo que gana todos los partidos se lleva una copa dorada muy famosa.' },
+    ];
+
     (function(){
       const selector  = document.getElementById('mundialSelector');
       const stage     = document.getElementById('mundialStage');
@@ -3557,6 +3580,11 @@
       const nextBtn   = document.getElementById('mundialNext');
       const repeatBtn = document.getElementById('mundialRepeat');
       const volverBtn = document.getElementById('mundialVolver');
+      const infoBtn      = document.getElementById('mundialInfoBtn');
+      const infoBackBtn  = document.getElementById('mundialInfoBack');
+      const infoEl       = document.getElementById('mundialInfo');
+      const infoIntroEl  = document.getElementById('mundialInfoIntro');
+      const infoGridEl   = document.getElementById('mundialInfoGrid');
       if (!selector || !stage) return;
 
       let currentIdx = 0;
@@ -3612,7 +3640,33 @@
 
       function volverSelector(){
         stage.style.display = 'none';
+        if (infoEl) infoEl.style.display = 'none';
         selector.style.display = 'grid';
+      }
+
+      function renderInfo(){
+        if (!infoGridEl) return;
+        if (infoIntroEl) infoIntroEl.textContent = 'El Mundial es un torneo de fútbol donde participan los mejores equipos de muchos países. Se juega cada 4 años.';
+        infoGridEl.innerHTML = '';
+        MUNDIAL_INFO.forEach(item => {
+          const b = document.createElement('button');
+          b.className = 'mundial-info-card';
+          b.innerHTML = '<span class="micon">' + item.icono + '</span>' + item.titulo;
+          b.addEventListener('click', () => {
+            speak(item.titulo + '. ' + item.texto);
+            b.classList.remove('tapped');
+            void b.offsetWidth;
+            b.classList.add('tapped');
+          });
+          infoGridEl.appendChild(b);
+        });
+      }
+
+      function abrirInfo(){
+        selector.style.display = 'none';
+        stage.style.display = 'none';
+        if (infoEl) infoEl.style.display = 'flex';
+        speak('¿Qué es el Mundial? Tocá una tarjeta para escuchar.');
       }
 
       if (cardEl)    cardEl.addEventListener('click', sayCurrent);
@@ -3620,8 +3674,11 @@
       if (prevBtn)   prevBtn.addEventListener('click', goPrev);
       if (repeatBtn) repeatBtn.addEventListener('click', sayCurrent);
       if (volverBtn) volverBtn.addEventListener('click', volverSelector);
+      if (infoBtn)     infoBtn.addEventListener('click', abrirInfo);
+      if (infoBackBtn) infoBackBtn.addEventListener('click', volverSelector);
 
       renderSelector();
+      renderInfo();
 
       window.__mundialStart = function(){
         volverSelector();
