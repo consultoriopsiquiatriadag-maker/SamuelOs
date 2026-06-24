@@ -79,6 +79,7 @@
     .hub-movimiento{ --hub-color:#f97316; }
     .hub-instrumentos{ --hub-color:#a855f7; }
     .hub-guitarra{ --hub-color:#b45309; }
+    .hub-bateria{ --hub-color:#7c3aed; }
 
     .soon-card{ margin-top:18px; border:2px solid rgba(15,23,42,.14); border-radius:18px; background:var(--card); box-shadow:var(--shadow); padding:30px 22px; text-align:center; }
     .soon-emoji{ font-size:64px; margin-bottom:8px; }
@@ -233,6 +234,25 @@
     .guitarra-cuerda{ height:42px; border-radius:8px; border:none; cursor:pointer; font-weight:950; color:#fff; display:flex; align-items:center; padding-left:14px; font-size:16px; box-shadow:0 4px 8px rgba(0,0,0,.25); transition:transform .12s ease; }
     .guitarra-cuerda:active{ transform:scaleY(.7); }
     @media (max-width:600px){ .guitarra-stage{ padding:20px; min-height:240px; } .guitarra-emoji{ font-size:72px; } }
+
+    /* Guitarra: modo selector + trastes + modo canción (Fase 47) */
+    #guitarraModoSelector{ margin-top:14px; }
+    #guitarraLibreWrap, #guitarraCancionWrap{ width:100%; max-width:520px; display:flex; flex-direction:column; align-items:center; gap:14px; margin-top:10px; }
+    .guitarra-cuerda-row{ width:100%; display:flex; align-items:center; gap:8px; border-radius:12px; padding:8px 12px; box-shadow:0 4px 8px rgba(0,0,0,.2); }
+    .guitarra-cuerda-label{ color:#fff; font-weight:950; font-size:13px; min-width:64px; }
+    .guitarra-fret{ flex:1; height:44px; border:none; border-radius:10px; background:rgba(255,255,255,.9); color:#1f2937; font-weight:950; font-size:16px; cursor:pointer; box-shadow:0 3px 6px rgba(0,0,0,.2); transition:transform .1s ease; }
+    .guitarra-fret:active{ transform:scale(.88); }
+    .guitarra-cancion-hint{ font-size:18px; font-weight:950; color:var(--text); }
+    .guitarra-notas-row{ display:flex; flex-wrap:wrap; justify-content:center; gap:14px; max-width:420px; }
+    .guitarra-nota{ width:66px; height:66px; border-radius:50%; border:none; color:#fff; font-weight:950; font-size:15px; cursor:pointer; box-shadow:0 8px 14px rgba(0,0,0,.22); transition:transform .12s ease; }
+    .guitarra-nota:active{ transform:scale(.9); }
+    .guitarra-nota.highlight{ animation: notaPulso .9s ease-in-out infinite; box-shadow:0 0 0 6px rgba(255,255,255,.55), 0 8px 14px rgba(0,0,0,.22); }
+    @keyframes notaPulso{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.16); } }
+
+    /* Batería vista desde arriba (Fase 47) */
+    .bateria-stage{ position:relative; width:100%; max-width:380px; aspect-ratio:1/1; margin:14px auto 0; border-radius:50%; background:radial-gradient(circle at 50% 60%, #475569, #1e293b); box-shadow:var(--shadow); }
+    .bateria-pieza{ position:absolute; border:none; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:950; font-size:13px; text-align:center; box-shadow:0 8px 16px rgba(0,0,0,.35); transform:translate(-50%,-50%); transition:transform .08s ease; }
+    .bateria-pieza:active{ transform:translate(-50%,-50%) scale(.88); }
 
     /* Memotest */
     .bar{margin-top:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
@@ -549,7 +569,7 @@
 
         <button class="game hub-card hub-instrumentos" id="goInstrumentos">
           <div class="gtitle"><span class="gicon">🥁</span>Instrumentos</div>
-          <div class="gdesc">Tocá instrumentos o aprendé guitarra.</div>
+          <div class="gdesc">Instrumentos, guitarra y batería.</div>
         </button>
       </div>
     </section>
@@ -653,6 +673,11 @@
           <div class="gtitle"><span class="gicon">🎸</span>Aprender guitarra</div>
           <div class="gdesc">Conocé la guitarra y probá tocar sus cuerdas.</div>
         </button>
+
+        <button class="game hub-card hub-bateria" id="goBateriaTutorial">
+          <div class="gtitle"><span class="gicon">🥁</span>Tocar batería</div>
+          <div class="gdesc">Bombo, tambor y platillos, vistos desde arriba.</div>
+        </button>
       </div>
     </section>
 
@@ -664,7 +689,7 @@
       <div id="instrumentosGrid" class="sound-grid" aria-label="Instrumentos musicales"></div>
     </section>
 
-    <!-- APRENDER GUITARRA (Fase 46) -->
+    <!-- APRENDER GUITARRA (Fase 46/47) -->
     <section id="viewGuitarra" class="view" aria-label="Aprender guitarra">
       <div class="top-actions" style="margin-bottom:6px;">
         <button class="btn ghost" id="guitarraHome">⬅️ Instrumentos</button>
@@ -675,8 +700,37 @@
           <div class="guitarra-intro-text" id="guitarraIntroText"></div>
           <button class="historia-btn-nav" id="guitarraIntroNext">Siguiente ➡️</button>
         </div>
-        <div class="guitarra-cuerdas" id="guitarraCuerdas" style="display:none;"></div>
+
+        <div class="grid" id="guitarraModoSelector" style="display:none;">
+          <button class="game hub-card hub-instrumentos" id="goGuitarraLibre">
+            <div class="gtitle"><span class="gicon">🎸</span>Tocar libre</div>
+            <div class="gdesc">Las 6 cuerdas, cada una con 3 trastes.</div>
+          </button>
+          <button class="game hub-card hub-guitarra" id="goGuitarraCancion">
+            <div class="gtitle"><span class="gicon">🎵</span>Tocar una canción</div>
+            <div class="gdesc">Seguí la nota que brilla y armá una melodía.</div>
+          </button>
+        </div>
+
+        <div id="guitarraLibreWrap" style="display:none;">
+          <button class="btn ghost" id="guitarraLibreBack">⬅️ Modo</button>
+          <div class="guitarra-cuerdas" id="guitarraCuerdas"></div>
+        </div>
+
+        <div id="guitarraCancionWrap" style="display:none;">
+          <button class="btn ghost" id="guitarraCancionBack">⬅️ Modo</button>
+          <div class="guitarra-cancion-hint">Tocá la nota que brilla</div>
+          <div class="guitarra-notas-row" id="guitarraNotas"></div>
+        </div>
       </div>
+    </section>
+
+    <!-- BATERÍA, vista desde arriba (Fase 47) -->
+    <section id="viewBateria" class="view" aria-label="Tocar batería">
+      <div class="top-actions" style="margin-bottom:6px;">
+        <button class="btn ghost" id="bateriaHome">⬅️ Instrumentos</button>
+      </div>
+      <div class="bateria-stage" id="bateriaStage" aria-label="Batería vista desde arriba"></div>
     </section>
 
     <!-- JUEGOS DIDÁCTICOS -->
@@ -1311,6 +1365,7 @@
       instrumentos: document.getElementById('viewInstrumentos'),
       instrumentosTocar: document.getElementById('viewInstrumentosTocar'),
       guitarra: document.getElementById('viewGuitarra'),
+      bateria: document.getElementById('viewBateria'),
       pintar: document.getElementById('viewPintar'),
       lluvia: document.getElementById('viewLluvia'),
       didacticos: document.getElementById('viewDidacticos'),
@@ -1372,6 +1427,8 @@
     document.getElementById('instrumentosTocarHome').addEventListener('click', () => showView('instrumentos'));
     document.getElementById('goGuitarraTutorial').addEventListener('click', () => { showView('guitarra'); window.__guitarraStart && window.__guitarraStart(); });
     document.getElementById('guitarraHome').addEventListener('click', () => showView('instrumentos'));
+    document.getElementById('goBateriaTutorial').addEventListener('click', () => { showView('bateria'); window.__renderBateria && window.__renderBateria(); });
+    document.getElementById('bateriaHome').addEventListener('click', () => showView('instrumentos'));
 
     document.getElementById('goBurbujas').addEventListener('click', () => { showView('burbujas'); window.__burbujasStart && window.__burbujasStart(); });
     document.getElementById('goGlobos').addEventListener('click', () => { showView('globos'); window.__globosStart && window.__globosStart(); });
@@ -2981,13 +3038,21 @@
       speak('Instrumentos musicales. Tocá para escuchar.');
     }
 
-    // --- Tutorial de guitarra (Fase 46) ---
+    // --- Tutorial de guitarra (Fase 46/47) ---
     (function(){
       const introStage = document.getElementById('guitarraIntroStage');
       const introEmoji = document.getElementById('guitarraIntroEmoji');
       const introText = document.getElementById('guitarraIntroText');
       const introNext = document.getElementById('guitarraIntroNext');
+      const modoSelector = document.getElementById('guitarraModoSelector');
+      const libreWrap = document.getElementById('guitarraLibreWrap');
+      const cancionWrap = document.getElementById('guitarraCancionWrap');
       const cuerdasEl = document.getElementById('guitarraCuerdas');
+      const notasEl = document.getElementById('guitarraNotas');
+      const libreBack = document.getElementById('guitarraLibreBack');
+      const cancionBack = document.getElementById('guitarraCancionBack');
+      const goLibre = document.getElementById('goGuitarraLibre');
+      const goCancion = document.getElementById('goGuitarraCancion');
       if (!introStage) return;
 
       const GUITARRA_INTRO = [
@@ -2996,17 +3061,14 @@
         { emoji:'👆', texto:'Las tocamos con los dedos.' },
         { emoji:'🎵', texto:'Cada cuerda suena distinto.' }
       ];
-      // Afinación estándar de guitarra (E-A-D-G-B-E), frecuencias aproximadas en Hz.
-      const CUERDAS = [
-        { label:'Cuerda 1', freq:82,  color:'#7c2d12' },
-        { label:'Cuerda 2', freq:110, color:'#9a3412' },
-        { label:'Cuerda 3', freq:147, color:'#b45309' },
-        { label:'Cuerda 4', freq:196, color:'#ca8a04' },
-        { label:'Cuerda 5', freq:247, color:'#d97706' },
-        { label:'Cuerda 6', freq:330, color:'#f59e0b' }
-      ];
-      const tick = makeStarTicker(8);
       let step = 0;
+
+      function ocultarTodo(){
+        introStage.style.display = 'none';
+        modoSelector.style.display = 'none';
+        libreWrap.style.display = 'none';
+        cancionWrap.style.display = 'none';
+      }
 
       function renderIntroStep(){
         const s = GUITARRA_INTRO[step];
@@ -3015,40 +3077,240 @@
         introNext.textContent = (step === GUITARRA_INTRO.length - 1) ? '¡A tocar! 🎸' : 'Siguiente ➡️';
         speak(s.texto);
       }
-      function renderCuerdas(){
-        cuerdasEl.innerHTML = '';
-        CUERDAS.forEach(c => {
-          const b = document.createElement('button');
-          b.className = 'guitarra-cuerda';
-          b.style.background = c.color;
-          b.textContent = c.label;
-          b.setAttribute('aria-label', c.label);
-          b.addEventListener('click', () => {
-            ensureAudio();
-            pluckString(c.freq, 1.1);
-            if (tick()) setTimeout(() => speak('¡Muy bien, Samuel!'), 1000);
-          });
-          cuerdasEl.appendChild(b);
-        });
-      }
       introNext.addEventListener('click', () => {
         step++;
         if (step >= GUITARRA_INTRO.length){
-          introStage.style.display = 'none';
-          cuerdasEl.style.display = 'flex';
-          renderCuerdas();
-          speak('Tocá las cuerdas para escuchar.');
+          ocultarTodo();
+          modoSelector.style.display = 'grid';
+          speak('Elegí: tocar libre o tocar una canción.');
           return;
         }
         renderIntroStep();
       });
+
+      // --- Modo libre: 6 cuerdas (afinación estándar E-A-D-G-B-E) x 3 trastes cada una ---
+      const tickLibre = makeStarTicker(8);
+      const CUERDAS = [
+        { label:'Cuerda 1', freq:82,  color:'#7c2d12' },
+        { label:'Cuerda 2', freq:110, color:'#9a3412' },
+        { label:'Cuerda 3', freq:147, color:'#b45309' },
+        { label:'Cuerda 4', freq:196, color:'#ca8a04' },
+        { label:'Cuerda 5', freq:247, color:'#d97706' },
+        { label:'Cuerda 6', freq:330, color:'#f59e0b' }
+      ];
+      function renderCuerdasLibre(){
+        cuerdasEl.innerHTML = '';
+        CUERDAS.forEach(c => {
+          const row = document.createElement('div');
+          row.className = 'guitarra-cuerda-row';
+          row.style.background = c.color;
+          const label = document.createElement('span');
+          label.className = 'guitarra-cuerda-label';
+          label.textContent = c.label;
+          row.appendChild(label);
+          [0, 1, 2].forEach(fretN => {
+            // Cada traste sube un semitono real (razón 2^(1/12)) respecto a la cuerda abierta.
+            const freq = c.freq * Math.pow(2, fretN / 12);
+            const b = document.createElement('button');
+            b.className = 'guitarra-fret';
+            b.textContent = fretN === 0 ? '○' : String(fretN);
+            b.setAttribute('aria-label', `${c.label}, traste ${fretN}`);
+            b.addEventListener('click', () => {
+              ensureAudio();
+              pluckString(freq, 1.0);
+              if (tickLibre()) setTimeout(() => speak('¡Muy bien, Samuel!'), 950);
+            });
+            row.appendChild(b);
+          });
+          cuerdasEl.appendChild(row);
+        });
+      }
+      goLibre.addEventListener('click', () => {
+        ocultarTodo();
+        libreWrap.style.display = 'flex';
+        ensureAudio();
+        renderCuerdasLibre();
+        speak('Tocá las cuerdas para escuchar.');
+      });
+      libreBack.addEventListener('click', () => {
+        ocultarTodo();
+        modoSelector.style.display = 'grid';
+      });
+
+      // --- Modo canción: notas do-re-mi-fa-sol-la, secuencia guiada (Estrellita dónde estás) ---
+      const tickCancion = makeStarTicker(1, 'aprender');
+      const NOTAS = [
+        { label:'Do',  freq:262, color:'#ef4444' },
+        { label:'Re',  freq:294, color:'#f97316' },
+        { label:'Mi',  freq:330, color:'#eab308' },
+        { label:'Fa',  freq:349, color:'#22c55e' },
+        { label:'Sol', freq:392, color:'#3b82f6' },
+        { label:'La',  freq:440, color:'#a855f7' }
+      ];
+      // Melodía de "Estrellita dónde estás", en grados de escala (1=Do ... 6=La), sin la nota Ti.
+      const CANCION = [
+        1,1,5,5,6,6,5, 4,4,3,3,2,2,1,
+        5,5,4,4,3,3,2, 5,5,4,4,3,3,2,
+        1,1,5,5,6,6,5, 4,4,3,3,2,2,1
+      ];
+      let cancionPos = 0;
+      let notaBtns = [];
+
+      function resaltarNota(){
+        notaBtns.forEach(b => b.classList.remove('highlight'));
+        if (cancionPos < CANCION.length){
+          notaBtns[CANCION[cancionPos] - 1].classList.add('highlight');
+        }
+      }
+      function onNotaTap(idx, freq){
+        ensureAudio();
+        pluckString(freq, 0.55);
+        if (idx === CANCION[cancionPos]){
+          cancionPos++;
+          if (cancionPos >= CANCION.length){
+            notaBtns.forEach(b => b.classList.remove('highlight'));
+            setTimeout(() => speak('¡Lo lograste, Samuel! Muy bien.'), 150);
+            tickCancion();
+            setTimeout(() => { cancionPos = 0; resaltarNota(); }, 2600);
+          } else {
+            resaltarNota();
+          }
+        }
+      }
+      function renderCuerdasCancion(){
+        notasEl.innerHTML = '';
+        notaBtns = [];
+        NOTAS.forEach((n, i) => {
+          const b = document.createElement('button');
+          b.className = 'guitarra-nota';
+          b.style.background = n.color;
+          b.textContent = n.label;
+          b.setAttribute('aria-label', n.label);
+          b.addEventListener('click', () => onNotaTap(i + 1, n.freq));
+          notasEl.appendChild(b);
+          notaBtns.push(b);
+        });
+        cancionPos = 0;
+        resaltarNota();
+      }
+      goCancion.addEventListener('click', () => {
+        ocultarTodo();
+        cancionWrap.style.display = 'flex';
+        ensureAudio();
+        renderCuerdasCancion();
+        speak('Tocá la nota que brilla para armar la canción.');
+      });
+      cancionBack.addEventListener('click', () => {
+        ocultarTodo();
+        modoSelector.style.display = 'grid';
+      });
+
       window.__guitarraStart = function(){
         step = 0;
+        ocultarTodo();
         introStage.style.display = 'flex';
-        cuerdasEl.style.display = 'none';
         ensureAudio();
         renderIntroStep();
       };
+    })();
+
+    // --- Batería, vista desde arriba (Fase 47) ---
+    (function(){
+      const stage = document.getElementById('bateriaStage');
+      if (!stage) return;
+
+      function playBombo(){
+        if (!audioCtx) return;
+        const t0 = audioCtx.currentTime + 0.02;
+        const out = audioCtx.createGain(); out.gain.value = 0.9; out.connect(audioCtx.destination);
+        currentNodes.push(out);
+        const o = audioCtx.createOscillator(); o.type = 'sine';
+        o.frequency.setValueAtTime(120, t0);
+        o.frequency.exponentialRampToValueAtTime(45, t0 + 0.25);
+        const g = audioCtx.createGain(); env(g, t0, 0.32);
+        o.connect(g); g.connect(out); o.start(t0); o.stop(t0 + 0.32);
+        currentNodes.push(o, g);
+      }
+      function playRedoblante(){
+        if (!audioCtx) return;
+        const t0 = audioCtx.currentTime + 0.02;
+        const out = audioCtx.createGain(); out.gain.value = 0.85; out.connect(audioCtx.destination);
+        currentNodes.push(out);
+        const n = mkNoise(0.18);
+        const hp = audioCtx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 1200;
+        const ng = audioCtx.createGain(); env(ng, t0, 0.18);
+        n.connect(hp); hp.connect(ng); ng.connect(out); n.start(t0); n.stop(t0 + 0.18);
+        const o = audioCtx.createOscillator(); o.type = 'triangle'; o.frequency.value = 190;
+        const og = audioCtx.createGain(); env(og, t0, 0.12);
+        o.connect(og); og.connect(out); o.start(t0); o.stop(t0 + 0.12);
+        currentNodes.push(n, hp, ng, o, og);
+      }
+      function playHihat(){
+        if (!audioCtx) return;
+        const t0 = audioCtx.currentTime + 0.02;
+        const out = audioCtx.createGain(); out.gain.value = 0.55; out.connect(audioCtx.destination);
+        currentNodes.push(out);
+        const n = mkNoise(0.07);
+        const hp = audioCtx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 6000;
+        const g = audioCtx.createGain(); env(g, t0, 0.07);
+        n.connect(hp); hp.connect(g); g.connect(out); n.start(t0); n.stop(t0 + 0.07);
+        currentNodes.push(n, hp, g);
+      }
+      function playCrash(){
+        if (!audioCtx) return;
+        const t0 = audioCtx.currentTime + 0.02;
+        const out = audioCtx.createGain(); out.gain.value = 0.65; out.connect(audioCtx.destination);
+        currentNodes.push(out);
+        const n = mkNoise(1.1);
+        const hp = audioCtx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 4500;
+        const g = audioCtx.createGain(); env(g, t0, 1.1);
+        n.connect(hp); hp.connect(g); g.connect(out); n.start(t0); n.stop(t0 + 1.1);
+        currentNodes.push(n, hp, g);
+      }
+      function playTom(){
+        if (!audioCtx) return;
+        const t0 = audioCtx.currentTime + 0.02;
+        const out = audioCtx.createGain(); out.gain.value = 0.8; out.connect(audioCtx.destination);
+        currentNodes.push(out);
+        const o = audioCtx.createOscillator(); o.type = 'sine';
+        o.frequency.setValueAtTime(220, t0);
+        o.frequency.exponentialRampToValueAtTime(110, t0 + 0.22);
+        const g = audioCtx.createGain(); env(g, t0, 0.28);
+        o.connect(g); g.connect(out); o.start(t0); o.stop(t0 + 0.28);
+        currentNodes.push(o, g);
+      }
+
+      // Posiciones aproximadas de una batería real fotografiada desde arriba.
+      const PIEZAS = [
+        { label:'Hi-hat',  top:'52%', left:'14%', size:78,  color:'#fbbf24', play: playHihat },
+        { label:'Platillo', top:'14%', left:'82%', size:92, color:'#f97316', play: playCrash },
+        { label:'Tom',     top:'18%', left:'52%', size:80,  color:'#22c55e', play: playTom },
+        { label:'Tambor',  top:'50%', left:'50%', size:96,  color:'#3b82f6', play: playRedoblante },
+        { label:'Bombo',   top:'82%', left:'50%', size:134, color:'#7c3aed', play: playBombo }
+      ];
+      function renderBateria(){
+        stopAll();
+        ensureAudio();
+        stage.innerHTML = '';
+        const tick = makeStarTicker(10);
+        PIEZAS.forEach(p => {
+          const b = document.createElement('button');
+          b.className = 'bateria-pieza';
+          b.style.top = p.top; b.style.left = p.left;
+          b.style.width = p.size + 'px'; b.style.height = p.size + 'px';
+          b.style.background = p.color;
+          b.textContent = p.label;
+          b.setAttribute('aria-label', p.label);
+          b.addEventListener('click', () => {
+            ensureAudio();
+            p.play();
+            if (tick()) setTimeout(() => speak('¡Muy bien, Samuel!'), 700);
+          });
+          stage.appendChild(b);
+        });
+        speak('Batería. Tocá los platillos y los bombos.');
+      }
+      window.__renderBateria = renderBateria;
     })();
 
     // --- Pintar con el dedo (Fase 45) ---
