@@ -364,11 +364,24 @@
     .mundial-match-score{ font-size:17px; font-weight:950; padding:3px 10px; border-radius:10px; background:rgba(34,197,94,.14); color:#15803d; min-width:54px; text-align:center; }
     .mundial-match-score.pendiente{ background:rgba(245,158,11,.16); color:#b45309; font-size:13px; }
     .mundial-match-meta{ margin-top:6px; font-size:13px; font-weight:800; color:var(--muted); text-align:center; }
+
+    /* Fase 36: Mini-juego Patear penales */
+    .mundial-penales{ margin-top:14px; display:flex; flex-direction:column; align-items:center; gap:16px; width:100%; }
+    .penales-marcador{ font-size:18px; font-weight:900; }
+    .penales-cancha{ position:relative; width:100%; max-width:420px; height:240px; border-radius:18px; background:linear-gradient(180deg,#16a34a,#15803d); overflow:hidden; border:2px solid rgba(15,23,42,.14); }
+    .penales-arco{ position:absolute; top:14px; left:50%; transform:translateX(-50%); width:220px; height:84px; border:6px solid #fff; border-bottom:none; border-radius:6px 6px 0 0; background:repeating-linear-gradient(0deg, rgba(255,255,255,.22) 0 4px, transparent 4px 10px), repeating-linear-gradient(90deg, rgba(255,255,255,.22) 0 4px, transparent 4px 10px); }
+    .penales-pelota{ position:absolute; left:50%; bottom:16px; transform:translate(-50%,0) scale(1); font-size:50px; line-height:1; cursor:pointer; transition: left 0.55s ease, bottom 0.55s ease, transform 0.55s ease; user-select:none; }
+    .penales-btn-patear{ border:none; border-radius:18px; min-height:64px; padding:0 28px; font-size:20px; font-weight:950; cursor:pointer; background:#16a34a; color:#fff; box-shadow:0 14px 26px rgba(2,6,23,.18); }
+    .penales-btn-patear:disabled{ opacity:.65; cursor:not-allowed; }
+    .penales-feedback{ font-size:22px; font-weight:950; text-align:center; min-height:30px; }
+
     @media (max-width:600px){
       .mundial-card{ min-height:260px; padding:22px; }
       .mundial-flag-big{ font-size:72px; }
       .mundial-player-icon{ font-size:38px; }
       .mundial-name{ font-size:22px; }
+      .penales-cancha{ height:200px; }
+      .penales-arco{ width:170px; height:66px; }
     }
 
     /* Accessibility */
@@ -581,9 +594,21 @@
         <button class="btn ghost" id="mundialInfoBtn">❓ ¿Qué es el Mundial?</button>
         <button class="btn ghost" id="mundialJuegoBtn">🚩 Encontrá la bandera</button>
         <button class="btn ghost" id="mundialFixtureBtn">📅 Fixture</button>
+        <button class="btn ghost" id="mundialPenalesBtn">⚽ Patear penales</button>
       </div>
 
       <div class="mundial-grid" id="mundialSelector"></div>
+
+      <div class="mundial-penales" id="mundialPenales" style="display:none;">
+        <button class="btn ghost" id="mundialPenalesBack">⬅️ Países</button>
+        <div class="penales-marcador">⚽ Goles: <span id="penalesGoles">0</span></div>
+        <div class="penales-cancha">
+          <div class="penales-arco"></div>
+          <div class="penales-pelota" id="penalesPelota">⚽</div>
+        </div>
+        <button class="penales-btn-patear" id="penalesPatearBtn">¡Patear! 🦵</button>
+        <div class="penales-feedback" id="penalesFeedback"></div>
+      </div>
 
       <div class="mundial-fixture" id="mundialFixture" style="display:none;">
         <button class="btn ghost" id="mundialFixtureBack">⬅️ Países</button>
@@ -3758,6 +3783,13 @@
       const fixtureDaysBackBtn= document.getElementById('mundialFixtureDaysBack');
       const fixtureTitleEl    = document.getElementById('mundialFixtureTitle');
       const fixtureCardsEl    = document.getElementById('mundialFixtureCards');
+      const penalesBtn      = document.getElementById('mundialPenalesBtn');
+      const penalesBackBtn  = document.getElementById('mundialPenalesBack');
+      const penalesEl       = document.getElementById('mundialPenales');
+      const penalesGolesEl  = document.getElementById('penalesGoles');
+      const penalesPelotaEl = document.getElementById('penalesPelota');
+      const penalesPatearBtn= document.getElementById('penalesPatearBtn');
+      const penalesFeedbackEl = document.getElementById('penalesFeedback');
       if (!selector || !stage) return;
 
       let currentIdx = 0;
@@ -3821,6 +3853,7 @@
         if (infoEl) infoEl.style.display = 'none';
         if (juegoEl) juegoEl.style.display = 'none';
         if (fixtureEl) fixtureEl.style.display = 'none';
+        if (penalesEl) penalesEl.style.display = 'none';
         selector.style.display = 'grid';
       }
 
@@ -3847,6 +3880,7 @@
         stage.style.display = 'none';
         if (juegoEl) juegoEl.style.display = 'none';
         if (fixtureEl) fixtureEl.style.display = 'none';
+        if (penalesEl) penalesEl.style.display = 'none';
         if (infoEl) infoEl.style.display = 'flex';
         speak('¿Qué es el Mundial? Tocá una tarjeta para escuchar.');
       }
@@ -3915,6 +3949,7 @@
         stage.style.display = 'none';
         if (infoEl) infoEl.style.display = 'none';
         if (fixtureEl) fixtureEl.style.display = 'none';
+        if (penalesEl) penalesEl.style.display = 'none';
         if (juegoEl) juegoEl.style.display = 'flex';
         nuevoRound();
       }
@@ -3985,9 +4020,65 @@
         stage.style.display = 'none';
         if (infoEl) infoEl.style.display = 'none';
         if (juegoEl) juegoEl.style.display = 'none';
+        if (penalesEl) penalesEl.style.display = 'none';
         if (fixtureEl) fixtureEl.style.display = 'flex';
         volverFixtureDias();
         speak('Fixture del Mundial. Elegí un día para ver los partidos.');
+      }
+
+      // Fase 36: Mini-juego "Patear penales" — tocar para patear, siempre con resultado positivo (sin perder)
+      let penalesGoles = 0;
+      let penalesAnimando = false;
+      const FRASES_GOL = [
+        '¡GOOOL! ¡Excelente tiro, Samuel!',
+        '¡Gol! ¡Qué patada increíble!',
+        '¡Gol! ¡Sos un crack!',
+        '¡GOOOL! ¡Muy bien, Samuel!',
+      ];
+
+      function patear(){
+        if (penalesAnimando || !penalesPelotaEl) return;
+        penalesAnimando = true;
+        if (penalesPatearBtn) penalesPatearBtn.disabled = true;
+        if (penalesFeedbackEl) penalesFeedbackEl.textContent = '';
+
+        const destinos = ['-70px', '0px', '70px'];
+        const destinoX = destinos[Math.floor(Math.random() * destinos.length)];
+        penalesPelotaEl.style.left = 'calc(50% + ' + destinoX + ')';
+        penalesPelotaEl.style.bottom = '150px';
+        penalesPelotaEl.style.transform = 'translate(-50%,0) scale(0.7)';
+
+        ensureAudio();
+        playTone({ type:'sine', f0:300, f1:700, dur:0.22, gain:0.5 });
+
+        setTimeout(() => {
+          penalesGoles++;
+          if (penalesGolesEl) penalesGolesEl.textContent = String(penalesGoles);
+          const frase = FRASES_GOL[Math.floor(Math.random() * FRASES_GOL.length)];
+          if (penalesFeedbackEl) penalesFeedbackEl.textContent = '🎉 ' + frase;
+          speak(frase);
+          showConfetti();
+          addStarJ('jugar');
+
+          setTimeout(() => {
+            penalesPelotaEl.style.left = '50%';
+            penalesPelotaEl.style.bottom = '16px';
+            penalesPelotaEl.style.transform = 'translate(-50%,0) scale(1)';
+            penalesAnimando = false;
+            if (penalesPatearBtn) penalesPatearBtn.disabled = false;
+          }, 700);
+        }, 600);
+      }
+
+      function abrirPenales(){
+        selector.style.display = 'none';
+        stage.style.display = 'none';
+        if (infoEl) infoEl.style.display = 'none';
+        if (juegoEl) juegoEl.style.display = 'none';
+        if (fixtureEl) fixtureEl.style.display = 'none';
+        if (penalesEl) penalesEl.style.display = 'flex';
+        if (penalesFeedbackEl) penalesFeedbackEl.textContent = '';
+        speak('Patear penales. Tocá la pelota o el botón para patear.');
       }
 
       if (cardEl)    cardEl.addEventListener('click', sayCurrent);
@@ -4002,6 +4093,10 @@
       if (fixtureBtn)         fixtureBtn.addEventListener('click', abrirFixture);
       if (fixtureBackBtn)     fixtureBackBtn.addEventListener('click', volverSelector);
       if (fixtureDaysBackBtn) fixtureDaysBackBtn.addEventListener('click', volverFixtureDias);
+      if (penalesBtn)      penalesBtn.addEventListener('click', abrirPenales);
+      if (penalesBackBtn)  penalesBackBtn.addEventListener('click', volverSelector);
+      if (penalesPatearBtn) penalesPatearBtn.addEventListener('click', patear);
+      if (penalesPelotaEl)  penalesPelotaEl.addEventListener('click', patear);
 
       renderSelector();
       renderInfo();
