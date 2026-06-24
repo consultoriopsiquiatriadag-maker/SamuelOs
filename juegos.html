@@ -398,6 +398,17 @@
     @keyframes conectarShake{ 0%,100%{ transform:translateX(0); } 25%{ transform:translateX(-6px); } 75%{ transform:translateX(6px); } }
     .conectar-feedback{ font-size:20px; font-weight:900; text-align:center; min-height:28px; }
 
+    /* Fase 40: Minijuego Básquet (encestar) */
+    .basquet-juego{ margin-top:14px; display:flex; flex-direction:column; align-items:center; gap:16px; width:100%; }
+    .basquet-marcador{ font-size:18px; font-weight:900; }
+    .basquet-cancha{ position:relative; width:100%; max-width:420px; height:240px; border-radius:18px; background:linear-gradient(180deg,#fb923c,#ea580c); overflow:hidden; border:2px solid rgba(15,23,42,.14); }
+    .basquet-tablero{ position:absolute; top:0; left:50%; transform:translateX(-50%); width:110px; height:54px; background:#fff; border-radius:0 0 10px 10px; opacity:.9; }
+    .basquet-aro{ position:absolute; top:46px; left:50%; transform:translateX(-50%); width:70px; height:16px; border:6px solid #fff; border-radius:50%; background:transparent; }
+    .basquet-pelota{ position:absolute; left:50%; bottom:16px; transform:translate(-50%,0) scale(1); font-size:50px; line-height:1; cursor:pointer; transition: bottom 0.5s ease, transform 0.5s ease; user-select:none; }
+    .basquet-btn-encestar{ border:none; border-radius:18px; min-height:64px; padding:0 28px; font-size:20px; font-weight:950; cursor:pointer; background:#ea580c; color:#fff; box-shadow:0 14px 26px rgba(2,6,23,.18); }
+    .basquet-btn-encestar:disabled{ opacity:.65; cursor:not-allowed; }
+    .basquet-feedback{ font-size:22px; font-weight:950; text-align:center; min-height:30px; }
+
     @media (max-width:600px){
       .mundial-card{ min-height:260px; padding:22px; }
       .mundial-flag-big{ font-size:72px; }
@@ -635,6 +646,11 @@
           <div class="gtitle">🐾 Conectar animales</div>
           <div class="gdesc">Uní cada animal con su cría.</div>
         </button>
+
+        <button class="game" id="goBasquet">
+          <div class="gtitle">🏀 Básquet</div>
+          <div class="gdesc">Tocá la pelota para encestar.</div>
+        </button>
       </div>
     </section>
 
@@ -664,6 +680,23 @@
           <div class="conectar-col" id="conectarColCrias"></div>
         </div>
         <div class="conectar-feedback" id="conectarFeedback"></div>
+      </div>
+    </section>
+
+    <!-- BÁSQUET: encestar (Fase 40) -->
+    <section id="viewBasquet" class="view" aria-label="Básquet">
+      <div class="top-actions" style="margin-bottom:6px;">
+        <button class="btn ghost" id="basquetHome">⬅️ Juegos de aventura</button>
+      </div>
+      <div class="basquet-juego">
+        <div class="basquet-marcador">🏀 Canastas: <span id="basquetCanastas">0</span></div>
+        <div class="basquet-cancha">
+          <div class="basquet-tablero"></div>
+          <div class="basquet-aro"></div>
+          <div class="basquet-pelota" id="basquetPelota">🏀</div>
+        </div>
+        <button class="basquet-btn-encestar" id="basquetEncestarBtn">¡Encestar! 🏀</button>
+        <div class="basquet-feedback" id="basquetFeedback"></div>
       </div>
     </section>
 
@@ -1169,6 +1202,7 @@
       aventura: document.getElementById('viewAventura'),
       camionero: document.getElementById('viewCamionero'),
       conectar: document.getElementById('viewConectar'),
+      basquet: document.getElementById('viewBasquet'),
       sound: document.getElementById('viewSound'),
       cars: document.getElementById('viewCars'),
       race: document.getElementById('viewRace'),
@@ -1239,6 +1273,8 @@
     document.getElementById('camioneroHome').addEventListener('click', () => showView('aventura'));
     document.getElementById('goConectar').addEventListener('click', () => { showView('conectar'); window.__conectarStart && window.__conectarStart(); });
     document.getElementById('conectarHome').addEventListener('click', () => showView('aventura'));
+    document.getElementById('goBasquet').addEventListener('click', () => { showView('basquet'); window.__basquetStart && window.__basquetStart(); });
+    document.getElementById('basquetHome').addEventListener('click', () => showView('aventura'));
     document.getElementById('goSound').addEventListener('click', () => { showView('sound'); renderAnimals(); });
     document.getElementById('goCars').addEventListener('click', () => { showView('cars'); renderCars(); });
     document.getElementById('goRace').addEventListener('click', () => { showView('race'); resetRace(); speak('Semáforo. Verde: avanzar. Amarillo: cuidado. Rojo: parar.'); startSemaforo(); });
@@ -4373,6 +4409,69 @@
       window.__conectarStart = function(){
         renderRonda();
         speak('Conectar animales. Tocá un animal y después su cría.');
+      };
+    })();
+
+    // --- Fase 40: Minijuego "Básquet" (encestar) ---
+    // Igual filosofía que "Patear penales": tocar siempre termina en canasta, sin perder.
+    (function(){
+      const pelotaEl    = document.getElementById('basquetPelota');
+      const encestarBtn = document.getElementById('basquetEncestarBtn');
+      const canastasEl  = document.getElementById('basquetCanastas');
+      const feedbackEl  = document.getElementById('basquetFeedback');
+      if (!pelotaEl) return;
+
+      let canastas = 0;
+      let animando = false;
+
+      const FRASES_CANASTA = [
+        '¡Canasta! ¡Excelente tiro, Samuel!',
+        '¡Encestaste! ¡Muy bien!',
+        '¡Canasta! Sos un crack del básquet.',
+        '¡Genial! La pelota entró derechito.',
+      ];
+
+      function encestar(){
+        if (animando || !pelotaEl) return;
+        animando = true;
+        if (encestarBtn) encestarBtn.disabled = true;
+        if (feedbackEl) feedbackEl.textContent = '';
+
+        pelotaEl.style.bottom = '170px';
+        pelotaEl.style.transform = 'translate(-50%,0) scale(0.6)';
+
+        ensureAudio();
+        playTone({ type:'sine', f0:400, f1:900, dur:0.22, gain:0.5 });
+
+        setTimeout(() => {
+          canastas++;
+          if (canastasEl) canastasEl.textContent = String(canastas);
+          const frase = FRASES_CANASTA[Math.floor(Math.random() * FRASES_CANASTA.length)];
+          if (feedbackEl) feedbackEl.textContent = '🎉 ' + frase;
+          speak(frase);
+          showConfetti();
+          addStarJ('jugar');
+
+          setTimeout(() => {
+            pelotaEl.style.bottom = '16px';
+            pelotaEl.style.transform = 'translate(-50%,0) scale(1)';
+            animando = false;
+            if (encestarBtn) encestarBtn.disabled = false;
+          }, 700);
+        }, 600);
+      }
+
+      if (encestarBtn) encestarBtn.addEventListener('click', encestar);
+      if (pelotaEl)     pelotaEl.addEventListener('click', encestar);
+
+      window.__basquetStart = function(){
+        animando = false;
+        canastas = 0;
+        if (canastasEl) canastasEl.textContent = '0';
+        if (feedbackEl) feedbackEl.textContent = '';
+        pelotaEl.style.bottom = '16px';
+        pelotaEl.style.transform = 'translate(-50%,0) scale(1)';
+        speak('Básquet. Tocá la pelota o el botón para encestar.');
       };
     })();
   </script>
