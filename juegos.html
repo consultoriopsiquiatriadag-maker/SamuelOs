@@ -77,6 +77,7 @@
     .hub-sonidos{ --hub-color:#2563eb; }
     .hub-explotar{ --hub-color:#22c55e; }
     .hub-movimiento{ --hub-color:#f97316; }
+    .hub-instrumentos{ --hub-color:#a855f7; }
 
     .soon-card{ margin-top:18px; border:2px solid rgba(15,23,42,.14); border-radius:18px; background:var(--card); box-shadow:var(--shadow); padding:30px 22px; text-align:center; }
     .soon-emoji{ font-size:64px; margin-bottom:8px; }
@@ -204,6 +205,23 @@
       .ficha-swatch{ width:110px; height:110px; }
       .ficha-emoji,.ficha-number{ font-size:72px; }
     }
+
+    /* Pintar con el dedo (Fase 45) */
+    .pintar-wrap{ margin-top:14px; display:flex; flex-direction:column; align-items:center; gap:16px; }
+    .pintar-canvas{ width:100%; max-width:560px; height:380px; border-radius:22px; background:#fff; border:2px solid rgba(15,23,42,.14); box-shadow:var(--shadow); touch-action:none; cursor:crosshair; }
+    .pintar-colors{ display:flex; gap:12px; flex-wrap:wrap; justify-content:center; }
+    .pintar-color-btn{ width:54px; height:54px; border-radius:50%; border:3px solid rgba(255,255,255,.9); box-shadow:0 10px 18px rgba(2,6,23,.18); cursor:pointer; }
+    .pintar-color-btn.active{ border-color:#0f172a; }
+    @media (max-width:600px){ .pintar-canvas{ height:300px; } }
+
+    /* Lluvia y arcoíris (Fase 45) */
+    .lluvia-stage{ position:relative; margin-top:14px; height:420px; border-radius:22px; background:linear-gradient(180deg,#64748b,#94a3b8); border:2px solid rgba(15,23,42,.12); overflow:hidden; touch-action:manipulation; cursor:pointer; transition:background 1s ease; }
+    .lluvia-stage.sunny{ background:linear-gradient(180deg,#7dd3fc,#bae6fd); }
+    .gota{ position:absolute; top:-20px; width:8px; height:22px; border-radius:0 0 50% 50% / 0 0 70% 70%; background:rgba(255,255,255,.85); animation-name: gotaCaer; animation-timing-function: linear; animation-fill-mode: forwards; pointer-events:none; }
+    @keyframes gotaCaer{ from{ transform:translateY(0); opacity:.9; } to{ transform:translateY(440px); opacity:.3; } }
+    .lluvia-arcoiris{ position:absolute; left:50%; top:55%; transform:translate(-50%,-50%) scale(0); font-size:120px; transition:transform .5s ease; pointer-events:none; }
+    .lluvia-arcoiris.show{ transform:translate(-50%,-50%) scale(1); }
+    .lluvia-hint{ position:absolute; left:50%; bottom:16px; transform:translateX(-50%); color:#fff; font-weight:950; font-size:18px; text-shadow:0 2px 6px rgba(0,0,0,.4); pointer-events:none; }
 
     /* Memotest */
     .bar{margin-top:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
@@ -517,6 +535,11 @@
           <div class="gtitle"><span class="gicon">🚗</span>Movimiento</div>
           <div class="gdesc">Carrera, esquivar y luces de colores.</div>
         </button>
+
+        <button class="game hub-card hub-instrumentos" id="goInstrumentos">
+          <div class="gtitle"><span class="gicon">🥁</span>Instrumentos</div>
+          <div class="gdesc">Tambor, maracas, campana y trompeta.</div>
+        </button>
       </div>
     </section>
 
@@ -568,6 +591,11 @@
           <div class="gtitle">⭐ Estrellas mágicas</div>
           <div class="gdesc">Tocá la pantalla y aparecen estrellas.</div>
         </button>
+
+        <button class="game" id="goPintar">
+          <div class="gtitle">🎨 Pintar con el dedo</div>
+          <div class="gdesc">Arrastrá el dedo y dejá un trazo de color.</div>
+        </button>
       </div>
     </section>
 
@@ -591,7 +619,20 @@
           <div class="gtitle">🌈 Luces y colores</div>
           <div class="gdesc">Tocá un color, mirá y escuchá.</div>
         </button>
+
+        <button class="game" id="goLluvia">
+          <div class="gtitle">🌧️ Lluvia y arcoíris</div>
+          <div class="gdesc">Tocá para hacer llover. ¡Mirá el arcoíris!</div>
+        </button>
       </div>
+    </section>
+
+    <!-- INSTRUMENTOS MUSICALES (sub-hub de Juegos simples, Fase 45) -->
+    <section id="viewInstrumentos" class="view" aria-label="Instrumentos musicales">
+      <div class="top-actions" style="margin-bottom:6px;">
+        <button class="btn ghost" id="instrumentosHome">⬅️ Juegos simples</button>
+      </div>
+      <div id="instrumentosGrid" class="sound-grid" aria-label="Instrumentos musicales"></div>
     </section>
 
     <!-- JUEGOS DIDÁCTICOS -->
@@ -899,6 +940,18 @@
       <div class="stars-stage" id="starsStage" aria-label="Tocá para hacer aparecer estrellas"></div>
     </section>
 
+    <!-- PINTAR CON EL DEDO (Fase 45) -->
+    <section id="viewPintar" class="view" aria-label="Pintar con el dedo">
+      <div class="top-actions" style="margin-bottom:6px;">
+        <button class="btn ghost" id="pintarHome">⬅️ Para tocar</button>
+      </div>
+      <div class="pintar-wrap">
+        <canvas id="pintarCanvas" class="pintar-canvas" aria-label="Lienzo para pintar"></canvas>
+        <div class="pintar-colors" id="pintarColores"></div>
+        <button class="btn" id="pintarLimpiar">🧹 Borrar todo</button>
+      </div>
+    </section>
+
     <!-- LUCES Y COLORES (Fase 15) -->
     <section id="viewLuces" class="view" aria-label="Luces y colores">
       <div class="top-actions" style="margin-bottom:6px;">
@@ -906,6 +959,17 @@
       </div>
       <div class="luces-stage" id="lucesStage">
         <div class="luces-grid" id="lucesGrid"></div>
+      </div>
+    </section>
+
+    <!-- LLUVIA Y ARCOÍRIS (Fase 45) -->
+    <section id="viewLluvia" class="view" aria-label="Lluvia y arcoíris">
+      <div class="top-actions" style="margin-bottom:6px;">
+        <button class="btn ghost" id="lluviaHome">⬅️ Movimiento</button>
+      </div>
+      <div class="lluvia-stage" id="lluviaStage" aria-label="Tocá para hacer llover">
+        <div class="lluvia-arcoiris" id="lluviaArcoiris">🌈</div>
+        <div class="lluvia-hint">Tocá para hacer llover</div>
       </div>
     </section>
 
@@ -1200,6 +1264,9 @@
       sonidos: document.getElementById('viewSonidos'),
       explotar: document.getElementById('viewExplotar'),
       movimiento: document.getElementById('viewMovimiento'),
+      instrumentos: document.getElementById('viewInstrumentos'),
+      pintar: document.getElementById('viewPintar'),
+      lluvia: document.getElementById('viewLluvia'),
       didacticos: document.getElementById('viewDidacticos'),
       fichas: document.getElementById('viewFichas'),
       comunicacion: document.getElementById('viewComunicacion'),
@@ -1249,21 +1316,27 @@
     document.getElementById('goSonidos').addEventListener('click', () => { showView('sonidos'); speak('Sonidos.'); });
     document.getElementById('goExplotar').addEventListener('click', () => { showView('explotar'); speak('Para tocar.'); });
     document.getElementById('goMovimiento').addEventListener('click', () => { showView('movimiento'); speak('Movimiento.'); });
+    document.getElementById('goInstrumentos').addEventListener('click', () => { showView('instrumentos'); renderInstrumentos(); });
     document.getElementById('sonidosHome').addEventListener('click', () => showView('simples'));
     document.getElementById('explotarHome').addEventListener('click', () => showView('simples'));
     document.getElementById('movimientoHome').addEventListener('click', () => showView('simples'));
+    document.getElementById('instrumentosHome').addEventListener('click', () => showView('simples'));
 
     document.getElementById('goBurbujas').addEventListener('click', () => { showView('burbujas'); window.__burbujasStart && window.__burbujasStart(); });
     document.getElementById('goGlobos').addEventListener('click', () => { showView('globos'); window.__globosStart && window.__globosStart(); });
     document.getElementById('goEstrellas').addEventListener('click', () => { showView('estrellas'); window.__estrellasStart && window.__estrellasStart(); });
+    document.getElementById('goPintar').addEventListener('click', () => { showView('pintar'); window.__pintarStart && window.__pintarStart(); });
     document.getElementById('goLuces').addEventListener('click', () => { showView('luces'); window.__lucesStart && window.__lucesStart(); });
+    document.getElementById('goLluvia').addEventListener('click', () => { showView('lluvia'); window.__lluviaStart && window.__lluviaStart(); });
     document.getElementById('goPianoAnimales').addEventListener('click', () => { showView('pianoAnimales'); renderPianoAnimales(); });
     document.getElementById('goPianoVehiculos').addEventListener('click', () => { showView('pianoVehiculos'); renderPianoVehiculos(); });
 
     document.getElementById('burbujasHome').addEventListener('click', () => { window.__burbujasStop && window.__burbujasStop(); showView('explotar'); });
     document.getElementById('globosHome').addEventListener('click', () => { window.__globosStop && window.__globosStop(); showView('explotar'); });
     document.getElementById('estrellasHome').addEventListener('click', () => showView('explotar'));
+    document.getElementById('pintarHome').addEventListener('click', () => showView('explotar'));
     document.getElementById('lucesHome').addEventListener('click', () => showView('movimiento'));
+    document.getElementById('lluviaHome').addEventListener('click', () => showView('movimiento'));
     document.getElementById('pianoAnimalesHome').addEventListener('click', () => showView('sonidos'));
     document.getElementById('pianoVehiculosHome').addEventListener('click', () => showView('sonidos'));
 
@@ -2737,6 +2810,251 @@
       });
       speak('Sonidos de vehículos. Tocá para escuchar.');
     }
+
+    // --- Instrumentos musicales (Fase 45, sintetizados con Web Audio) ---
+    function playTambor(){
+      if (!audioCtx) return;
+      const t0 = audioCtx.currentTime + 0.02;
+      const out = audioCtx.createGain(); out.gain.value = 0.9; out.connect(audioCtx.destination);
+      currentNodes.push(out);
+      const o = audioCtx.createOscillator(); o.type = 'sine';
+      o.frequency.setValueAtTime(160, t0);
+      o.frequency.exponentialRampToValueAtTime(60, t0 + 0.18);
+      const g = audioCtx.createGain(); env(g, t0, 0.22);
+      o.connect(g); g.connect(out); o.start(t0); o.stop(t0 + 0.22);
+      const n = mkNoise(0.12);
+      const bp = audioCtx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 180; bp.Q.value = 1.4;
+      const ng = audioCtx.createGain(); env(ng, t0, 0.12);
+      n.connect(bp); bp.connect(ng); ng.connect(out);
+      n.start(t0); n.stop(t0 + 0.12);
+      currentNodes.push(o, g, n, bp, ng);
+    }
+    function playMaracas(){
+      if (!audioCtx) return;
+      const t0 = audioCtx.currentTime + 0.02;
+      const out = audioCtx.createGain(); out.gain.value = 0.7; out.connect(audioCtx.destination);
+      currentNodes.push(out);
+      [0, 0.14].forEach(off => {
+        const n = mkNoise(0.09);
+        const hp = audioCtx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 2200;
+        const g = audioCtx.createGain(); env(g, t0 + off, 0.09);
+        n.connect(hp); hp.connect(g); g.connect(out);
+        n.start(t0 + off); n.stop(t0 + off + 0.09);
+        currentNodes.push(n, hp, g);
+      });
+    }
+    function playCampana(){
+      if (!audioCtx) return;
+      const t0 = audioCtx.currentTime + 0.02;
+      const out = audioCtx.createGain(); out.gain.value = 0.6; out.connect(audioCtx.destination);
+      currentNodes.push(out);
+      [880, 1320].forEach((f, i) => {
+        const o = audioCtx.createOscillator(); o.type = 'sine'; o.frequency.value = f;
+        const g = audioCtx.createGain(); env(g, t0, 0.9 - i * 0.1);
+        o.connect(g); g.connect(out); o.start(t0); o.stop(t0 + 0.9);
+        currentNodes.push(o, g);
+      });
+    }
+    function playTrompeta(){
+      if (!audioCtx) return;
+      const t0 = audioCtx.currentTime + 0.02;
+      const out = audioCtx.createGain(); out.gain.value = 0.7; out.connect(audioCtx.destination);
+      currentNodes.push(out);
+      const o = audioCtx.createOscillator(); o.type = 'sawtooth';
+      o.frequency.setValueAtTime(392, t0);
+      o.frequency.exponentialRampToValueAtTime(523, t0 + 0.3);
+      const g = audioCtx.createGain(); env(g, t0, 0.45);
+      const lp = audioCtx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 1800;
+      o.connect(lp); lp.connect(g); g.connect(out); o.start(t0); o.stop(t0 + 0.45);
+      currentNodes.push(o, g, lp);
+    }
+    const INSTRUMENTOS = [
+      { name:'Tambor',   emoji:'🥁', play: playTambor },
+      { name:'Maracas',  emoji:'🪇', play: playMaracas },
+      { name:'Campana',  emoji:'🔔', play: playCampana },
+      { name:'Trompeta', emoji:'🎺', play: playTrompeta }
+    ];
+    function renderInstrumentos(){
+      const grid = document.getElementById('instrumentosGrid');
+      if (!grid) return;
+      stopAll();
+      ensureAudio();
+      grid.innerHTML = '';
+      const tick = makeStarTicker(6);
+      INSTRUMENTOS.forEach(ins => {
+        const b = document.createElement('button');
+        b.className = 'sound';
+        b.setAttribute('aria-label', ins.name);
+        b.innerHTML = `<div class="emoji">${ins.emoji}</div><div class="label">${ins.name}</div>`;
+        b.addEventListener('click', () => {
+          ensureAudio();
+          ins.play();
+          if (tick()) setTimeout(() => speak('¡Muy bien, Samuel!'), 900);
+        });
+        grid.appendChild(b);
+      });
+      speak('Instrumentos musicales. Tocá para escuchar.');
+    }
+
+    // --- Pintar con el dedo (Fase 45) ---
+    (function(){
+      const canvas = document.getElementById('pintarCanvas');
+      const colorsEl = document.getElementById('pintarColores');
+      const limpiarBtn = document.getElementById('pintarLimpiar');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const COLORES = ['#ef4444', '#3b82f6', '#f59e0b', '#22c55e', '#a855f7', '#0f172a'];
+      let color = COLORES[0];
+      let drawing = false;
+      let lastX = 0, lastY = 0;
+      const tick = makeStarTicker(8);
+
+      function fondoBlanco(){
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      }
+      function resize(){
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = Math.max(1, Math.floor(rect.width));
+        canvas.height = Math.max(1, Math.floor(rect.height));
+        fondoBlanco();
+      }
+      function renderColores(){
+        colorsEl.innerHTML = '';
+        COLORES.forEach(c => {
+          const b = document.createElement('button');
+          b.className = 'pintar-color-btn' + (c === color ? ' active' : '');
+          b.style.background = c;
+          b.setAttribute('aria-label', 'Color');
+          b.addEventListener('click', () => {
+            color = c;
+            colorsEl.querySelectorAll('.pintar-color-btn').forEach(x => x.classList.remove('active'));
+            b.classList.add('active');
+          });
+          colorsEl.appendChild(b);
+        });
+      }
+      function pos(e){
+        const rect = canvas.getBoundingClientRect();
+        const t = e.touches ? e.touches[0] : e;
+        return { x: t.clientX - rect.left, y: t.clientY - rect.top };
+      }
+      function start(e){
+        drawing = true;
+        const p = pos(e);
+        lastX = p.x; lastY = p.y;
+        ctx.fillStyle = color;
+        ctx.beginPath(); ctx.arc(p.x, p.y, 6, 0, Math.PI * 2); ctx.fill();
+        e.preventDefault();
+      }
+      function move(e){
+        if (!drawing) return;
+        const p = pos(e);
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 12;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.beginPath();
+        ctx.moveTo(lastX, lastY);
+        ctx.lineTo(p.x, p.y);
+        ctx.stroke();
+        lastX = p.x; lastY = p.y;
+        e.preventDefault();
+      }
+      function end(){
+        if (!drawing) return;
+        drawing = false;
+        if (tick()) setTimeout(() => speak('¡Qué lindo, Samuel!'), 300);
+      }
+      canvas.addEventListener('mousedown', start);
+      canvas.addEventListener('mousemove', move);
+      window.addEventListener('mouseup', end);
+      canvas.addEventListener('touchstart', start, { passive:false });
+      canvas.addEventListener('touchmove', move, { passive:false });
+      canvas.addEventListener('touchend', end);
+      limpiarBtn.addEventListener('click', () => { fondoBlanco(); speak('Lienzo limpio.'); });
+      window.__pintarStart = function(){
+        renderColores();
+        resize();
+        speak('Pintar con el dedo. Arrastrá para dibujar.');
+      };
+    })();
+
+    // --- Lluvia y arcoíris (Fase 45) ---
+    (function(){
+      const stage = document.getElementById('lluviaStage');
+      const arcoEl = document.getElementById('lluviaArcoiris');
+      if (!stage) return;
+      const tick = makeStarTicker(10);
+      let taps = 0;
+
+      function gota(x){
+        const g = document.createElement('div');
+        g.className = 'gota';
+        g.style.left = (x - 4) + 'px';
+        const dur = 0.7 + Math.random() * 0.4;
+        g.style.animationDuration = dur + 's';
+        stage.appendChild(g);
+        setTimeout(() => g.remove(), dur * 1000 + 50);
+      }
+      function trueno(){
+        if (!audioCtx) return;
+        const t0 = audioCtx.currentTime + 0.02;
+        const out = audioCtx.createGain(); out.gain.value = 0.5; out.connect(audioCtx.destination);
+        currentNodes.push(out);
+        const n = mkNoise(0.6);
+        const lp = audioCtx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 300;
+        const g = audioCtx.createGain(); env(g, t0, 0.6);
+        n.connect(lp); lp.connect(g); g.connect(out);
+        n.start(t0); n.stop(t0 + 0.6);
+        currentNodes.push(n, lp, g);
+      }
+      function gotaSonido(){
+        if (!audioCtx) return;
+        const t0 = audioCtx.currentTime + 0.02;
+        const out = audioCtx.createGain(); out.gain.value = 0.4; out.connect(audioCtx.destination);
+        currentNodes.push(out);
+        const n = mkNoise(0.08);
+        const bp = audioCtx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 2400; bp.Q.value = 3;
+        const g = audioCtx.createGain(); env(g, t0, 0.08);
+        n.connect(bp); bp.connect(g); g.connect(out);
+        n.start(t0); n.stop(t0 + 0.08);
+        currentNodes.push(n, bp, g);
+      }
+      function mostrarArcoiris(){
+        stage.classList.add('sunny');
+        arcoEl.classList.add('show');
+        speak('¡Qué lindo arcoíris!');
+        setTimeout(() => {
+          arcoEl.classList.remove('show');
+          stage.classList.remove('sunny');
+          taps = 0;
+        }, 3200);
+      }
+      function onTap(e){
+        ensureAudio();
+        const rect = stage.getBoundingClientRect();
+        const t = e.touches ? e.touches[0] : e;
+        const x = t.clientX - rect.left;
+        for (let i = 0; i < 3; i++) gota(x + (Math.random() * 40 - 20));
+        gotaSonido();
+        taps++;
+        if (taps === 6) trueno();
+        if (taps >= 10){
+          mostrarArcoiris();
+          if (tick()) setTimeout(() => speak('¡Muy bien, Samuel!'), 1500);
+        }
+        e.preventDefault();
+      }
+      stage.addEventListener('click', onTap);
+      stage.addEventListener('touchstart', onTap, { passive:false });
+      window.__lluviaStart = function(){
+        taps = 0;
+        arcoEl.classList.remove('show');
+        stage.classList.remove('sunny');
+        speak('Lluvia y arcoíris. Tocá para hacer llover.');
+      };
+    })();
 
     // ====== FASE 16: Juegos de asociación ======
 
