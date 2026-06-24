@@ -326,6 +326,8 @@
     .mundial-stage{ margin-top:14px; display:flex; flex-direction:column; align-items:center; gap:18px; }
     .mundial-card{ width:100%; max-width:380px; min-height:300px; border-radius:26px; background:var(--card); border:2px solid rgba(34,197,94,.30); box-shadow:var(--shadow); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; padding:28px; text-align:center; cursor:pointer; }
     .mundial-flag-big{ font-size:90px; line-height:1; }
+    .mundial-top-row{ display:flex; align-items:center; justify-content:center; gap:14px; }
+    .mundial-player-icon{ font-size:48px; line-height:1; }
     .mundial-name{ font-size:26px; font-weight:950; }
     .mundial-grupo-badge{ background:rgba(34,197,94,.14); color:#15803d; border-radius:999px; padding:6px 16px; font-weight:900; font-size:15px; }
     .mundial-host-badge{ background:rgba(245,158,11,.16); color:#b45309; border-radius:999px; padding:5px 14px; font-weight:900; font-size:13px; }
@@ -365,6 +367,7 @@
     @media (max-width:600px){
       .mundial-card{ min-height:260px; padding:22px; }
       .mundial-flag-big{ font-size:72px; }
+      .mundial-player-icon{ font-size:38px; }
       .mundial-name{ font-size:22px; }
     }
 
@@ -613,7 +616,10 @@
           <button class="btn ghost" id="mundialVolver">⬅️ Países</button>
         </div>
         <div class="mundial-card" id="mundialCard">
-          <div class="mundial-flag-big" id="mundialFlag"></div>
+          <div class="mundial-top-row">
+            <div class="mundial-flag-big" id="mundialFlag"></div>
+            <div class="mundial-player-icon" aria-hidden="true">👕⚽</div>
+          </div>
           <div class="mundial-name" id="mundialName"></div>
           <div id="mundialBadges"></div>
           <div class="mundial-dato" id="mundialDato"></div>

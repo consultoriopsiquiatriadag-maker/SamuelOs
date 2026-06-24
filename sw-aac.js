@@ -1,5 +1,5 @@
 /* Aplicación de Samuel - Service Worker */
-const CACHE_VERSION = 'samuel-app-v37-fase34';
+const CACHE_VERSION = 'samuel-app-v38-fase35';
 const CACHE_NAME = CACHE_VERSION;
 
 const ASSETS = [
