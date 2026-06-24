@@ -368,6 +368,7 @@
     /* Fase 36: Mini-juego Patear penales */
     .mundial-penales{ margin-top:14px; display:flex; flex-direction:column; align-items:center; gap:16px; width:100%; }
     .penales-marcador{ font-size:18px; font-weight:900; }
+    .penales-nivel{ font-size:15px; font-weight:800; color:#0f172a; margin-bottom:-4px; }
     .penales-cancha{ position:relative; width:100%; max-width:420px; height:240px; border-radius:18px; background:linear-gradient(180deg,#16a34a,#15803d); overflow:hidden; border:2px solid rgba(15,23,42,.14); }
     .penales-arco{ position:absolute; top:14px; left:50%; transform:translateX(-50%); width:220px; height:84px; border:6px solid #fff; border-bottom:none; border-radius:6px 6px 0 0; background:repeating-linear-gradient(0deg, rgba(255,255,255,.22) 0 4px, transparent 4px 10px), repeating-linear-gradient(90deg, rgba(255,255,255,.22) 0 4px, transparent 4px 10px); }
     .penales-pelota{ position:absolute; left:50%; bottom:16px; transform:translate(-50%,0) scale(1); font-size:50px; line-height:1; cursor:pointer; transition: left 0.55s ease, bottom 0.55s ease, transform 0.55s ease; user-select:none; }
@@ -714,7 +715,8 @@
 
       <div class="mundial-penales" id="mundialPenales" style="display:none;">
         <button class="btn ghost" id="mundialPenalesBack">⬅️ Países</button>
-        <div class="penales-marcador">⚽ Goles: <span id="penalesGoles">0</span></div>
+        <div class="penales-nivel">Nivel <span id="penalesNivelNum">1</span> · Rival: <span id="penalesRivalBadge">🏳️</span></div>
+        <div class="penales-marcador">⚽ Goles: <span id="penalesGoles">0</span>/<span id="penalesMeta">3</span></div>
         <div class="penales-cancha">
           <div class="penales-arco"></div>
           <div class="penales-pelota" id="penalesPelota">⚽</div>
@@ -3912,6 +3914,9 @@
       const penalesBackBtn  = document.getElementById('mundialPenalesBack');
       const penalesEl       = document.getElementById('mundialPenales');
       const penalesGolesEl  = document.getElementById('penalesGoles');
+      const penalesMetaEl   = document.getElementById('penalesMeta');
+      const penalesNivelNumEl = document.getElementById('penalesNivelNum');
+      const penalesRivalBadgeEl = document.getElementById('penalesRivalBadge');
       const penalesPelotaEl = document.getElementById('penalesPelota');
       const penalesPatearBtn= document.getElementById('penalesPatearBtn');
       const penalesFeedbackEl = document.getElementById('penalesFeedback');
@@ -4152,7 +4157,11 @@
       }
 
       // Fase 36: Mini-juego "Patear penales" — tocar para patear, siempre con resultado positivo (sin perder)
-      let penalesGoles = 0;
+      // Fase 41: niveles que escalan (más patadas por tanda + rival visual que cambia), sin agregar riesgo de fallar.
+      const NIVELES_PENALES = [3, 5, 7, 9, 11]; // patadas necesarias para subir de nivel; del último en adelante se repite
+      let penalesNivelIdx = 0;
+      let penalesGolesEnNivel = 0;
+      let penalesRival = null;
       let penalesAnimando = false;
       const FRASES_GOL = [
         '¡GOOOL! ¡Excelente tiro, Samuel!',
@@ -4160,6 +4169,21 @@
         '¡Gol! ¡Sos un crack!',
         '¡GOOOL! ¡Muy bien, Samuel!',
       ];
+
+      function metaNivelActual(){
+        return NIVELES_PENALES[Math.min(penalesNivelIdx, NIVELES_PENALES.length - 1)];
+      }
+
+      function elegirRival(){
+        penalesRival = mundial2026[Math.floor(Math.random() * mundial2026.length)];
+        if (penalesRivalBadgeEl) penalesRivalBadgeEl.textContent = penalesRival.bandera + ' ' + penalesRival.nombre;
+      }
+
+      function actualizarNivelUI(){
+        if (penalesNivelNumEl) penalesNivelNumEl.textContent = String(penalesNivelIdx + 1);
+        if (penalesMetaEl) penalesMetaEl.textContent = String(metaNivelActual());
+        if (penalesGolesEl) penalesGolesEl.textContent = String(penalesGolesEnNivel);
+      }
 
       function patear(){
         if (penalesAnimando || !penalesPelotaEl) return;
@@ -4177,13 +4201,23 @@
         playTone({ type:'sine', f0:300, f1:700, dur:0.22, gain:0.5 });
 
         setTimeout(() => {
-          penalesGoles++;
-          if (penalesGolesEl) penalesGolesEl.textContent = String(penalesGoles);
-          const frase = FRASES_GOL[Math.floor(Math.random() * FRASES_GOL.length)];
+          penalesGolesEnNivel++;
+          addStarJ('jugar');
+
+          const meta = metaNivelActual();
+          let frase;
+          if (penalesGolesEnNivel >= meta){
+            penalesNivelIdx++;
+            penalesGolesEnNivel = 0;
+            elegirRival();
+            frase = '¡Subiste de nivel! Ahora jugás contra ' + penalesRival.nombre + '.';
+          } else {
+            frase = FRASES_GOL[Math.floor(Math.random() * FRASES_GOL.length)];
+          }
+          actualizarNivelUI();
           if (penalesFeedbackEl) penalesFeedbackEl.textContent = '🎉 ' + frase;
           speak(frase);
           showConfetti();
-          addStarJ('jugar');
 
           setTimeout(() => {
             penalesPelotaEl.style.left = '50%';
@@ -4203,6 +4237,8 @@
         if (fixtureEl) fixtureEl.style.display = 'none';
         if (penalesEl) penalesEl.style.display = 'flex';
         if (penalesFeedbackEl) penalesFeedbackEl.textContent = '';
+        if (!penalesRival) elegirRival();
+        actualizarNivelUI();
         speak('Patear penales. Tocá la pelota o el botón para patear.');
       }
 
@@ -4226,6 +4262,8 @@
       renderSelector();
       renderInfo();
       renderFixtureDays();
+      elegirRival();
+      actualizarNivelUI();
 
       window.__mundialStart = function(){
         volverSelector();
