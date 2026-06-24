@@ -386,6 +386,18 @@
     .camion-caja.cargada{ transform:scale(0); opacity:0; pointer-events:none; }
     .camion-feedback{ font-size:22px; font-weight:950; text-align:center; min-height:30px; }
 
+    /* Fase 39: Minijuego Conectar animales (mamá/papá con su cría) */
+    .conectar-wrap{ margin-top:14px; display:flex; flex-direction:column; align-items:center; gap:14px; width:100%; }
+    .conectar-cols{ display:grid; grid-template-columns:1fr 1fr; gap:18px; width:100%; max-width:480px; }
+    .conectar-col{ display:flex; flex-direction:column; gap:10px; }
+    .conectar-item{ border:2px solid rgba(34,197,94,.30); border-radius:16px; background:var(--card); box-shadow:var(--shadow); padding:12px 8px; display:flex; flex-direction:column; align-items:center; gap:4px; cursor:pointer; font-weight:900; font-size:14px; color:inherit; font-family:inherit; }
+    .conectar-item .cemoji{ font-size:38px; line-height:1; }
+    .conectar-item.seleccionado{ border-color:#2563eb; box-shadow:0 0 0 4px rgba(37,99,235,.18); }
+    .conectar-item.resuelto{ opacity:.45; pointer-events:none; border-color:rgba(34,197,94,.6); }
+    .conectar-item.error{ animation: conectarShake 0.4s ease; }
+    @keyframes conectarShake{ 0%,100%{ transform:translateX(0); } 25%{ transform:translateX(-6px); } 75%{ transform:translateX(6px); } }
+    .conectar-feedback{ font-size:20px; font-weight:900; text-align:center; min-height:28px; }
+
     @media (max-width:600px){
       .mundial-card{ min-height:260px; padding:22px; }
       .mundial-flag-big{ font-size:72px; }
@@ -396,6 +408,8 @@
       .camion-cancha{ height:130px; }
       .camion-truck{ font-size:48px; }
       .camion-caja{ font-size:28px; padding:8px 0; }
+      .conectar-item .cemoji{ font-size:30px; }
+      .conectar-item{ font-size:12px; padding:10px 6px; }
     }
 
     /* Accessibility */
@@ -616,6 +630,11 @@
           <div class="gtitle">🚛 Camionero</div>
           <div class="gdesc">Cargá el camión con las cajas.</div>
         </button>
+
+        <button class="game" id="goConectar">
+          <div class="gtitle">🐾 Conectar animales</div>
+          <div class="gdesc">Uní cada animal con su cría.</div>
+        </button>
       </div>
     </section>
 
@@ -631,6 +650,20 @@
         </div>
         <div class="camion-cajas" id="camionCajas"></div>
         <div class="camion-feedback" id="camionFeedback"></div>
+      </div>
+    </section>
+
+    <!-- CONECTAR ANIMALES: unir mamá/papá con su cría (Fase 39) -->
+    <section id="viewConectar" class="view" aria-label="Conectar animales">
+      <div class="top-actions" style="margin-bottom:6px;">
+        <button class="btn ghost" id="conectarHome">⬅️ Juegos de aventura</button>
+      </div>
+      <div class="conectar-wrap">
+        <div class="conectar-cols">
+          <div class="conectar-col" id="conectarColAdultos"></div>
+          <div class="conectar-col" id="conectarColCrias"></div>
+        </div>
+        <div class="conectar-feedback" id="conectarFeedback"></div>
       </div>
     </section>
 
@@ -1135,6 +1168,7 @@
       mundial: document.getElementById('viewMundial'),
       aventura: document.getElementById('viewAventura'),
       camionero: document.getElementById('viewCamionero'),
+      conectar: document.getElementById('viewConectar'),
       sound: document.getElementById('viewSound'),
       cars: document.getElementById('viewCars'),
       race: document.getElementById('viewRace'),
@@ -1203,6 +1237,8 @@
     document.getElementById('aventuraHome').addEventListener('click', () => showView('didacticos'));
     document.getElementById('goCamionero').addEventListener('click', () => { showView('camionero'); window.__camioneroStart && window.__camioneroStart(); });
     document.getElementById('camioneroHome').addEventListener('click', () => showView('aventura'));
+    document.getElementById('goConectar').addEventListener('click', () => { showView('conectar'); window.__conectarStart && window.__conectarStart(); });
+    document.getElementById('conectarHome').addEventListener('click', () => showView('aventura'));
     document.getElementById('goSound').addEventListener('click', () => { showView('sound'); renderAnimals(); });
     document.getElementById('goCars').addEventListener('click', () => { showView('cars'); renderCars(); });
     document.getElementById('goRace').addEventListener('click', () => { showView('race'); resetRace(); speak('Semáforo. Verde: avanzar. Amarillo: cuidado. Rojo: parar.'); startSemaforo(); });
@@ -4231,6 +4267,112 @@
         cargando = false;
         renderCajas();
         speak('Camionero. Tocá las cajas para cargar el camión.');
+      };
+    })();
+
+    // --- Fase 39: Minijuego "Conectar animales" (unir cada animal con su cría) ---
+    // Tocar un adulto y luego su cría correcta los conecta. Errar nunca resta,
+    // solo invita a probar de nuevo (misma regla que "Encontrá la bandera").
+    (function(){
+      const colAdultosEl = document.getElementById('conectarColAdultos');
+      const colCriasEl   = document.getElementById('conectarColCrias');
+      const feedbackEl   = document.getElementById('conectarFeedback');
+      if (!colAdultosEl || !colCriasEl) return;
+
+      const PARES_ANIMALES = [
+        { adulto:{ emoji:'🐔', label:'Gallina' },  cria:{ emoji:'🐥', label:'Pollito' } },
+        { adulto:{ emoji:'🐕', label:'Perro' },    cria:{ emoji:'🐶', label:'Cachorro' } },
+        { adulto:{ emoji:'🐈', label:'Gato' },     cria:{ emoji:'🐱', label:'Gatito' } },
+        { adulto:{ emoji:'🐄', label:'Vaca' },     cria:{ emoji:'🐮', label:'Ternero' } },
+        { adulto:{ emoji:'🦆', label:'Pato' },     cria:{ emoji:'🐤', label:'Patito' } },
+        { adulto:{ emoji:'🐎', label:'Caballo' },  cria:{ emoji:'🐴', label:'Potrillo' } },
+      ];
+      const PARES_POR_RONDA = 4;
+      const tick = makeStarTicker(PARES_POR_RONDA, 'jugar');
+
+      const FRASES_RONDA = [
+        '¡Genial! Uniste a todas las familias.',
+        '¡Muy bien, Samuel! Todos los animales están con su cría.',
+        '¡Excelente trabajo conectando animales!',
+      ];
+
+      function shuffle(arr){
+        const a = arr.slice();
+        for (let i = a.length - 1; i > 0; i--){
+          const j = Math.floor(Math.random() * (i + 1));
+          [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
+      }
+
+      let rondaPares = [];
+      let resueltos = 0;
+      let seleccionado = null; // { btn, pairId }
+
+      function crearBoton(item, pairId, tipo){
+        const b = document.createElement('button');
+        b.className = 'conectar-item';
+        b.dataset.pairId = String(pairId);
+        b.innerHTML = '<span class="cemoji">' + item.emoji + '</span><span>' + item.label + '</span>';
+        b.addEventListener('click', () => {
+          if (tipo === 'adulto') onAdultoClick(b, pairId);
+          else onCriaClick(b, pairId);
+        });
+        return b;
+      }
+
+      function renderRonda(){
+        seleccionado = null;
+        resueltos = 0;
+        if (feedbackEl) feedbackEl.textContent = '';
+        rondaPares = shuffle(PARES_ANIMALES).slice(0, PARES_POR_RONDA);
+
+        colAdultosEl.innerHTML = '';
+        colCriasEl.innerHTML = '';
+        const ordenAdultos = shuffle(rondaPares.map((p, i) => i));
+        const ordenCrias   = shuffle(rondaPares.map((p, i) => i));
+        ordenAdultos.forEach(i => colAdultosEl.appendChild(crearBoton(rondaPares[i].adulto, i, 'adulto')));
+        ordenCrias.forEach(i => colCriasEl.appendChild(crearBoton(rondaPares[i].cria, i, 'cria')));
+      }
+
+      function onAdultoClick(btn, pairId){
+        if (btn.classList.contains('resuelto')) return;
+        if (seleccionado && seleccionado.btn) seleccionado.btn.classList.remove('seleccionado');
+        btn.classList.add('seleccionado');
+        seleccionado = { btn, pairId };
+      }
+
+      function onCriaClick(btn, pairId){
+        if (btn.classList.contains('resuelto') || !seleccionado) return;
+        ensureAudio();
+        if (pairId === seleccionado.pairId){
+          seleccionado.btn.classList.remove('seleccionado');
+          seleccionado.btn.classList.add('resuelto');
+          btn.classList.add('resuelto');
+          seleccionado = null;
+          resueltos++;
+          playTone({ type:'sine', f0:520, f1:780, dur:0.2, gain:0.5 });
+          const completo = tick();
+          if (resueltos >= PARES_POR_RONDA){
+            const frase = FRASES_RONDA[Math.floor(Math.random() * FRASES_RONDA.length)];
+            if (feedbackEl) feedbackEl.textContent = '🎉 ' + frase;
+            speak(frase);
+            showConfetti();
+            setTimeout(renderRonda, 1400);
+          } else if (completo){
+            speak('¡Muy bien!');
+          }
+        } else {
+          btn.classList.add('error');
+          if (feedbackEl) feedbackEl.textContent = 'Probemos de nuevo 🙂';
+          playTone({ type:'sine', f0:280, f1:220, dur:0.18, gain:0.4 });
+          setTimeout(() => btn.classList.remove('error'), 400);
+        }
+      }
+
+      window.__conectarStart = function(){
+        renderRonda();
+        speak('Conectar animales. Tocá un animal y después su cría.');
       };
     })();
   </script>
