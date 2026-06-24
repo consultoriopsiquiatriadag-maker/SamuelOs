@@ -80,6 +80,7 @@
     .hub-instrumentos{ --hub-color:#a855f7; }
     .hub-guitarra{ --hub-color:#b45309; }
     .hub-bateria{ --hub-color:#7c3aed; }
+    .hub-piano{ --hub-color:#0ea5e9; }
 
     .soon-card{ margin-top:18px; border:2px solid rgba(15,23,42,.14); border-radius:18px; background:var(--card); box-shadow:var(--shadow); padding:30px 22px; text-align:center; }
     .soon-emoji{ font-size:64px; margin-bottom:8px; }
@@ -253,6 +254,12 @@
     .bateria-stage{ position:relative; width:100%; max-width:380px; aspect-ratio:1/1; margin:14px auto 0; border-radius:50%; background:radial-gradient(circle at 50% 60%, #475569, #1e293b); box-shadow:var(--shadow); }
     .bateria-pieza{ position:absolute; border:none; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:950; font-size:13px; text-align:center; box-shadow:0 8px 16px rgba(0,0,0,.35); transform:translate(-50%,-50%); transition:transform .08s ease; }
     .bateria-pieza:active{ transform:translate(-50%,-50%) scale(.88); }
+
+    /* Teclado de piano (Fase 48) */
+    .piano-teclado{ display:flex; gap:4px; background:#0f172a; border-radius:14px; padding:14px; box-shadow:var(--shadow); max-width:520px; margin:0 auto; }
+    .piano-tecla{ flex:1; height:140px; border:none; border-radius:0 0 10px 10px; background:#fff; color:#1f2937; font-weight:950; font-size:14px; display:flex; align-items:flex-end; justify-content:center; padding-bottom:10px; cursor:pointer; box-shadow:0 6px 10px rgba(0,0,0,.25); transition:transform .08s ease; }
+    .piano-tecla:active{ transform:translateY(4px); background:#e5e7eb; }
+    @media (max-width:600px){ .piano-teclado{ padding:10px; gap:3px; } .piano-tecla{ height:110px; font-size:12px; } }
 
     /* Memotest */
     .bar{margin-top:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
@@ -569,7 +576,7 @@
 
         <button class="game hub-card hub-instrumentos" id="goInstrumentos">
           <div class="gtitle"><span class="gicon">🥁</span>Instrumentos</div>
-          <div class="gdesc">Instrumentos, guitarra y batería.</div>
+          <div class="gdesc">Instrumentos, guitarra, batería y piano.</div>
         </button>
       </div>
     </section>
@@ -678,6 +685,11 @@
           <div class="gtitle"><span class="gicon">🥁</span>Tocar batería</div>
           <div class="gdesc">Bombo, tambor y platillos, vistos desde arriba.</div>
         </button>
+
+        <button class="game hub-card hub-piano" id="goPianoTutorial">
+          <div class="gtitle"><span class="gicon">🎹</span>Aprender piano</div>
+          <div class="gdesc">Conocé el piano y probá tocar sus teclas.</div>
+        </button>
       </div>
     </section>
 
@@ -731,6 +743,42 @@
         <button class="btn ghost" id="bateriaHome">⬅️ Instrumentos</button>
       </div>
       <div class="bateria-stage" id="bateriaStage" aria-label="Batería vista desde arriba"></div>
+    </section>
+
+    <!-- APRENDER PIANO (Fase 48) -->
+    <section id="viewPiano" class="view" aria-label="Aprender piano">
+      <div class="top-actions" style="margin-bottom:6px;">
+        <button class="btn ghost" id="pianoHome">⬅️ Instrumentos</button>
+      </div>
+      <div class="guitarra-wrap" id="pianoWrap">
+        <div class="guitarra-stage" id="pianoIntroStage">
+          <div class="guitarra-emoji" id="pianoIntroEmoji">🎹</div>
+          <div class="guitarra-intro-text" id="pianoIntroText"></div>
+          <button class="historia-btn-nav" id="pianoIntroNext">Siguiente ➡️</button>
+        </div>
+
+        <div class="grid" id="pianoModoSelector" style="display:none;">
+          <button class="game hub-card hub-instrumentos" id="goPianoLibre">
+            <div class="gtitle"><span class="gicon">🎹</span>Tocar libre</div>
+            <div class="gdesc">Las 8 teclas de una octava completa.</div>
+          </button>
+          <button class="game hub-card hub-piano" id="goPianoCancion">
+            <div class="gtitle"><span class="gicon">🎵</span>Tocar una canción</div>
+            <div class="gdesc">Seguí la nota que brilla y armá una melodía.</div>
+          </button>
+        </div>
+
+        <div id="pianoLibreWrap" style="display:none;">
+          <button class="btn ghost" id="pianoLibreBack">⬅️ Modo</button>
+          <div class="piano-teclado" id="pianoTeclado"></div>
+        </div>
+
+        <div id="pianoCancionWrap" style="display:none;">
+          <button class="btn ghost" id="pianoCancionBack">⬅️ Modo</button>
+          <div class="guitarra-cancion-hint">Tocá la nota que brilla</div>
+          <div class="guitarra-notas-row" id="pianoNotas"></div>
+        </div>
+      </div>
     </section>
 
     <!-- JUEGOS DIDÁCTICOS -->
@@ -1366,6 +1414,7 @@
       instrumentosTocar: document.getElementById('viewInstrumentosTocar'),
       guitarra: document.getElementById('viewGuitarra'),
       bateria: document.getElementById('viewBateria'),
+      piano: document.getElementById('viewPiano'),
       pintar: document.getElementById('viewPintar'),
       lluvia: document.getElementById('viewLluvia'),
       didacticos: document.getElementById('viewDidacticos'),
@@ -1429,6 +1478,8 @@
     document.getElementById('guitarraHome').addEventListener('click', () => showView('instrumentos'));
     document.getElementById('goBateriaTutorial').addEventListener('click', () => { showView('bateria'); window.__renderBateria && window.__renderBateria(); });
     document.getElementById('bateriaHome').addEventListener('click', () => showView('instrumentos'));
+    document.getElementById('goPianoTutorial').addEventListener('click', () => { showView('piano'); window.__pianoStart && window.__pianoStart(); });
+    document.getElementById('pianoHome').addEventListener('click', () => showView('instrumentos'));
 
     document.getElementById('goBurbujas').addEventListener('click', () => { showView('burbujas'); window.__burbujasStart && window.__burbujasStart(); });
     document.getElementById('goGlobos').addEventListener('click', () => { showView('globos'); window.__globosStart && window.__globosStart(); });
@@ -2976,19 +3027,23 @@
       o.connect(lp); lp.connect(g); g.connect(out); o.start(t0); o.stop(t0 + 0.45);
       currentNodes.push(o, g, lp);
     }
-    function playPiano(){
+    // Tono de piano (triangular + armónico a la octava). Reutilizado por el sonido
+    // suelto de "Piano" en Tocar instrumentos y por el teclado del tutorial (Fase 48).
+    function pianoTone(freq, dur){
       if (!audioCtx) return;
+      dur = dur || 0.5;
       const t0 = audioCtx.currentTime + 0.02;
       const out = audioCtx.createGain(); out.gain.value = 0.7; out.connect(audioCtx.destination);
       currentNodes.push(out);
-      const o = audioCtx.createOscillator(); o.type = 'triangle'; o.frequency.value = 523;
-      const g = audioCtx.createGain(); env(g, t0, 0.5);
-      o.connect(g); g.connect(out); o.start(t0); o.stop(t0 + 0.5);
-      const o2 = audioCtx.createOscillator(); o2.type = 'sine'; o2.frequency.value = 1046;
-      const g2 = audioCtx.createGain(); env(g2, t0, 0.3);
-      o2.connect(g2); g2.connect(out); o2.start(t0); o2.stop(t0 + 0.3);
+      const o = audioCtx.createOscillator(); o.type = 'triangle'; o.frequency.value = freq;
+      const g = audioCtx.createGain(); env(g, t0, dur);
+      o.connect(g); g.connect(out); o.start(t0); o.stop(t0 + dur);
+      const o2 = audioCtx.createOscillator(); o2.type = 'sine'; o2.frequency.value = freq * 2;
+      const g2 = audioCtx.createGain(); env(g2, t0, dur * 0.6);
+      o2.connect(g2); g2.connect(out); o2.start(t0); o2.stop(t0 + dur * 0.6);
       currentNodes.push(o, g, o2, g2);
     }
+    function playPiano(){ pianoTone(523, 0.5); }
     // Pulsada de cuerda (estilo guitarra): ruido filtrado en banda + tono triangular, con decaimiento.
     // Reutilizada por el instrumento "Guitarra" y por el tutorial de guitarra (cuerdas EADGBE).
     function pluckString(freq, dur){
@@ -3206,6 +3261,170 @@
       });
 
       window.__guitarraStart = function(){
+        step = 0;
+        ocultarTodo();
+        introStage.style.display = 'flex';
+        ensureAudio();
+        renderIntroStep();
+      };
+    })();
+
+    // --- Tutorial de piano (Fase 48) ---
+    (function(){
+      const introStage = document.getElementById('pianoIntroStage');
+      const introEmoji = document.getElementById('pianoIntroEmoji');
+      const introText = document.getElementById('pianoIntroText');
+      const introNext = document.getElementById('pianoIntroNext');
+      const modoSelector = document.getElementById('pianoModoSelector');
+      const libreWrap = document.getElementById('pianoLibreWrap');
+      const cancionWrap = document.getElementById('pianoCancionWrap');
+      const teclasEl = document.getElementById('pianoTeclado');
+      const notasEl = document.getElementById('pianoNotas');
+      const libreBack = document.getElementById('pianoLibreBack');
+      const cancionBack = document.getElementById('pianoCancionBack');
+      const goLibre = document.getElementById('goPianoLibre');
+      const goCancion = document.getElementById('goPianoCancion');
+      if (!introStage) return;
+
+      const PIANO_INTRO = [
+        { emoji:'🎹', texto:'Este es un piano.' },
+        { emoji:'🎼', texto:'Tiene teclas blancas.' },
+        { emoji:'👆', texto:'Las tocamos con los dedos.' },
+        { emoji:'🎵', texto:'Cada tecla suena distinto.' }
+      ];
+      let step = 0;
+
+      function ocultarTodo(){
+        introStage.style.display = 'none';
+        modoSelector.style.display = 'none';
+        libreWrap.style.display = 'none';
+        cancionWrap.style.display = 'none';
+      }
+      function renderIntroStep(){
+        const s = PIANO_INTRO[step];
+        introEmoji.textContent = s.emoji;
+        introText.textContent = s.texto;
+        introNext.textContent = (step === PIANO_INTRO.length - 1) ? '¡A tocar! 🎹' : 'Siguiente ➡️';
+        speak(s.texto);
+      }
+      introNext.addEventListener('click', () => {
+        step++;
+        if (step >= PIANO_INTRO.length){
+          ocultarTodo();
+          modoSelector.style.display = 'grid';
+          speak('Elegí: tocar libre o tocar una canción.');
+          return;
+        }
+        renderIntroStep();
+      });
+
+      // --- Modo libre: una octava completa (8 teclas blancas) ---
+      const tickLibre = makeStarTicker(8);
+      const TECLAS = [
+        { label:'Do',  freq:262 },
+        { label:'Re',  freq:294 },
+        { label:'Mi',  freq:330 },
+        { label:'Fa',  freq:349 },
+        { label:'Sol', freq:392 },
+        { label:'La',  freq:440 },
+        { label:'Si',  freq:494 },
+        { label:'Do',  freq:523 }
+      ];
+      function renderTeclado(){
+        teclasEl.innerHTML = '';
+        TECLAS.forEach(t => {
+          const b = document.createElement('button');
+          b.className = 'piano-tecla';
+          b.textContent = t.label;
+          b.setAttribute('aria-label', t.label);
+          b.addEventListener('click', () => {
+            ensureAudio();
+            pianoTone(t.freq, 0.5);
+            if (tickLibre()) setTimeout(() => speak('¡Muy bien, Samuel!'), 500);
+          });
+          teclasEl.appendChild(b);
+        });
+      }
+      goLibre.addEventListener('click', () => {
+        ocultarTodo();
+        libreWrap.style.display = 'flex';
+        ensureAudio();
+        renderTeclado();
+        speak('Tocá las teclas para escuchar.');
+      });
+      libreBack.addEventListener('click', () => {
+        ocultarTodo();
+        modoSelector.style.display = 'grid';
+      });
+
+      // --- Modo canción: misma melodía que en guitarra ("Estrellita dónde estás") ---
+      const tickCancion = makeStarTicker(1, 'aprender');
+      const NOTAS = [
+        { label:'Do',  freq:262, color:'#ef4444' },
+        { label:'Re',  freq:294, color:'#f97316' },
+        { label:'Mi',  freq:330, color:'#eab308' },
+        { label:'Fa',  freq:349, color:'#22c55e' },
+        { label:'Sol', freq:392, color:'#3b82f6' },
+        { label:'La',  freq:440, color:'#a855f7' }
+      ];
+      const CANCION = [
+        1,1,5,5,6,6,5, 4,4,3,3,2,2,1,
+        5,5,4,4,3,3,2, 5,5,4,4,3,3,2,
+        1,1,5,5,6,6,5, 4,4,3,3,2,2,1
+      ];
+      let cancionPos = 0;
+      let notaBtns = [];
+
+      function resaltarNota(){
+        notaBtns.forEach(b => b.classList.remove('highlight'));
+        if (cancionPos < CANCION.length){
+          notaBtns[CANCION[cancionPos] - 1].classList.add('highlight');
+        }
+      }
+      function onNotaTap(idx, freq){
+        ensureAudio();
+        pianoTone(freq, 0.45);
+        if (idx === CANCION[cancionPos]){
+          cancionPos++;
+          if (cancionPos >= CANCION.length){
+            notaBtns.forEach(b => b.classList.remove('highlight'));
+            setTimeout(() => speak('¡Lo lograste, Samuel! Muy bien.'), 150);
+            tickCancion();
+            setTimeout(() => { cancionPos = 0; resaltarNota(); }, 2600);
+          } else {
+            resaltarNota();
+          }
+        }
+      }
+      function renderNotasCancion(){
+        notasEl.innerHTML = '';
+        notaBtns = [];
+        NOTAS.forEach((n, i) => {
+          const b = document.createElement('button');
+          b.className = 'guitarra-nota';
+          b.style.background = n.color;
+          b.textContent = n.label;
+          b.setAttribute('aria-label', n.label);
+          b.addEventListener('click', () => onNotaTap(i + 1, n.freq));
+          notasEl.appendChild(b);
+          notaBtns.push(b);
+        });
+        cancionPos = 0;
+        resaltarNota();
+      }
+      goCancion.addEventListener('click', () => {
+        ocultarTodo();
+        cancionWrap.style.display = 'flex';
+        ensureAudio();
+        renderNotasCancion();
+        speak('Tocá la nota que brilla para armar la canción.');
+      });
+      cancionBack.addEventListener('click', () => {
+        ocultarTodo();
+        modoSelector.style.display = 'grid';
+      });
+
+      window.__pianoStart = function(){
         step = 0;
         ocultarTodo();
         introStage.style.display = 'flex';
