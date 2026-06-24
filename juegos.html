@@ -338,6 +338,15 @@
     .mundial-info-card .micon{ font-size:38px; line-height:1; }
     .mundial-info-card.tapped{ animation:mundialInfoTap .45s ease; }
     @keyframes mundialInfoTap{ 0%{ transform:scale(1); } 35%{ transform:scale(1.08); background:rgba(34,197,94,.16); } 100%{ transform:scale(1); } }
+    .mundial-juego{ margin-top:14px; display:flex; flex-direction:column; align-items:center; gap:18px; }
+    .mundial-juego-pregunta{ font-size:22px; font-weight:950; text-align:center; max-width:480px; }
+    .mundial-juego-opciones{ display:flex; gap:16px; flex-wrap:wrap; justify-content:center; }
+    .mundial-juego-opt{ font-size:64px; line-height:1; border:3px solid rgba(34,197,94,.30); border-radius:24px; background:var(--card); box-shadow:var(--shadow); padding:18px 22px; cursor:pointer; }
+    .mundial-juego-opt.correcta{ border-color:#16a34a; background:rgba(34,197,94,.18); animation:mundialOk .5s ease; }
+    .mundial-juego-opt.incorrecta{ border-color:#ef4444; animation:mundialShake .4s ease; }
+    @keyframes mundialOk{ 0%{transform:scale(1);} 40%{transform:scale(1.15);} 100%{transform:scale(1);} }
+    @keyframes mundialShake{ 0%{transform:translateX(0);} 25%{transform:translateX(-8px);} 50%{transform:translateX(8px);} 75%{transform:translateX(-6px);} 100%{transform:translateX(0);} }
+    .mundial-juego-feedback{ font-size:20px; font-weight:900; min-height:28px; text-align:center; }
     @media (max-width:600px){
       .mundial-card{ min-height:260px; padding:22px; }
       .mundial-flag-big{ font-size:72px; }
@@ -552,6 +561,7 @@
       <div class="top-actions" style="margin-bottom:6px; gap:10px; flex-wrap:wrap;">
         <button class="btn ghost" id="mundialHome">⬅️ Juegos didácticos</button>
         <button class="btn ghost" id="mundialInfoBtn">❓ ¿Qué es el Mundial?</button>
+        <button class="btn ghost" id="mundialJuegoBtn">🚩 Encontrá la bandera</button>
       </div>
 
       <div class="mundial-grid" id="mundialSelector"></div>
@@ -560,6 +570,13 @@
         <button class="btn ghost" id="mundialInfoBack">⬅️ Países</button>
         <p class="mundial-info-intro" id="mundialInfoIntro"></p>
         <div class="mundial-info-grid" id="mundialInfoGrid"></div>
+      </div>
+
+      <div class="mundial-juego" id="mundialJuego" style="display:none;">
+        <button class="btn ghost" id="mundialJuegoBack">⬅️ Países</button>
+        <div class="mundial-juego-pregunta" id="mundialJuegoPregunta"></div>
+        <div class="mundial-juego-opciones" id="mundialJuegoOpciones"></div>
+        <div class="mundial-juego-feedback" id="mundialJuegoFeedback"></div>
       </div>
 
       <div class="mundial-stage" id="mundialStage" style="display:none;">
@@ -3585,6 +3602,12 @@
       const infoEl       = document.getElementById('mundialInfo');
       const infoIntroEl  = document.getElementById('mundialInfoIntro');
       const infoGridEl   = document.getElementById('mundialInfoGrid');
+      const juegoBtn        = document.getElementById('mundialJuegoBtn');
+      const juegoBackBtn    = document.getElementById('mundialJuegoBack');
+      const juegoEl         = document.getElementById('mundialJuego');
+      const juegoPreguntaEl = document.getElementById('mundialJuegoPregunta');
+      const juegoOpcionesEl = document.getElementById('mundialJuegoOpciones');
+      const juegoFeedbackEl = document.getElementById('mundialJuegoFeedback');
       if (!selector || !stage) return;
 
       let currentIdx = 0;
@@ -3641,6 +3664,7 @@
       function volverSelector(){
         stage.style.display = 'none';
         if (infoEl) infoEl.style.display = 'none';
+        if (juegoEl) juegoEl.style.display = 'none';
         selector.style.display = 'grid';
       }
 
@@ -3665,8 +3689,76 @@
       function abrirInfo(){
         selector.style.display = 'none';
         stage.style.display = 'none';
+        if (juegoEl) juegoEl.style.display = 'none';
         if (infoEl) infoEl.style.display = 'flex';
         speak('¿Qué es el Mundial? Tocá una tarjeta para escuchar.');
+      }
+
+      // Fase 31: minijuego "Encontrá la bandera"
+      let juegoTarget = null;
+      let juegoLocked = false;
+
+      function nuevoRound(){
+        if (!juegoEl || juegoEl.style.display === 'none') return;
+        juegoLocked = false;
+        if (juegoFeedbackEl) juegoFeedbackEl.textContent = '';
+        const idx = Math.floor(Math.random() * mundial2026.length);
+        juegoTarget = mundial2026[idx];
+        if (juegoPreguntaEl) juegoPreguntaEl.textContent = '¿Cuál es la bandera de ' + juegoTarget.nombre + '?';
+
+        const usedFlags = new Set([juegoTarget.bandera]);
+        const opciones = [juegoTarget];
+        let intentos = 0;
+        while (opciones.length < 3 && intentos < 300){
+          intentos++;
+          const cand = mundial2026[Math.floor(Math.random() * mundial2026.length)];
+          if (usedFlags.has(cand.bandera)) continue;
+          usedFlags.add(cand.bandera);
+          opciones.push(cand);
+        }
+        for (let i = opciones.length - 1; i > 0; i--){
+          const j = Math.floor(Math.random() * (i + 1));
+          const tmp = opciones[i]; opciones[i] = opciones[j]; opciones[j] = tmp;
+        }
+
+        if (juegoOpcionesEl){
+          juegoOpcionesEl.innerHTML = '';
+          opciones.forEach(pais => {
+            const b = document.createElement('button');
+            b.className = 'mundial-juego-opt';
+            b.textContent = pais.bandera;
+            b.setAttribute('aria-label', pais.nombre);
+            b.addEventListener('click', () => onElegirBandera(b, pais));
+            juegoOpcionesEl.appendChild(b);
+          });
+        }
+        speak('¿Cuál es la bandera de ' + juegoTarget.nombre + '?');
+      }
+
+      function onElegirBandera(btn, pais){
+        if (juegoLocked || !juegoTarget) return;
+        if (pais.nombre === juegoTarget.nombre){
+          juegoLocked = true;
+          btn.classList.add('correcta');
+          if (juegoFeedbackEl) juegoFeedbackEl.textContent = '¡Muy bien, Samuel! ⭐⭐';
+          speak('¡Muy bien, Samuel!');
+          addStarJ('aprender');
+          addStarJ('aprender'); // acertar bandera: +2 estrellas
+          setTimeout(nuevoRound, 1700);
+        } else {
+          btn.classList.add('incorrecta');
+          setTimeout(() => btn.classList.remove('incorrecta'), 450);
+          if (juegoFeedbackEl) juegoFeedbackEl.textContent = 'Probemos otra vez';
+          speak('Probemos otra vez');
+        }
+      }
+
+      function abrirJuego(){
+        selector.style.display = 'none';
+        stage.style.display = 'none';
+        if (infoEl) infoEl.style.display = 'none';
+        if (juegoEl) juegoEl.style.display = 'flex';
+        nuevoRound();
       }
 
       if (cardEl)    cardEl.addEventListener('click', sayCurrent);
@@ -3676,6 +3768,8 @@
       if (volverBtn) volverBtn.addEventListener('click', volverSelector);
       if (infoBtn)     infoBtn.addEventListener('click', abrirInfo);
       if (infoBackBtn) infoBackBtn.addEventListener('click', volverSelector);
+      if (juegoBtn)     juegoBtn.addEventListener('click', abrirJuego);
+      if (juegoBackBtn) juegoBackBtn.addEventListener('click', volverSelector);
 
       renderSelector();
       renderInfo();
