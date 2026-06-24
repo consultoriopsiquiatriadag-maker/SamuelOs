@@ -73,6 +73,7 @@
     .hub-fichas{ --hub-color:#f59e0b; }
     .hub-comunicacion{ --hub-color:#0ea5a4; }
     .hub-historias{ --hub-color:#ec4899; }
+    .hub-cuentos{ --hub-color:#06b6d4; }
     .hub-aprender{ --hub-color:#f59e0b; }
     .hub-sonidos{ --hub-color:#2563eb; }
     .hub-explotar{ --hub-color:#22c55e; }
@@ -214,6 +215,18 @@
     .historia-btn-nav{ border:none; border-radius:18px; min-height:64px; padding:0 26px; font-size:20px; font-weight:950; cursor:pointer; background:#ec4899; color:#fff; box-shadow:0 14px 26px rgba(2,6,23,.18); }
     .historia-btn-back{ border:none; border-radius:18px; min-height:64px; padding:0 22px; font-size:18px; font-weight:900; cursor:pointer; background:#fff; box-shadow:0 14px 26px rgba(2,6,23,.18); }
     @media (max-width:600px){ .historia-card{ min-height:260px; padding:22px; } .historia-emoji{ font-size:76px; } .historia-text{ font-size:20px; } }
+
+    /* CUENTOS INTERACTIVOS (Fase 54): mismo patrón que Historias, con acento celeste y figuras para tocar */
+    .cuento-btn{ border-color: rgba(6,182,212,.35); }
+    .cuento-card{ border-color: rgba(6,182,212,.30); }
+    .cuento-btn-nav{ background:#06b6d4; }
+    .cuento-figuras{ display:flex; gap:14px; flex-wrap:wrap; justify-content:center; }
+    .cuento-fig-btn{ border:2px solid rgba(6,182,212,.35); border-radius:18px; background:var(--card); box-shadow:var(--shadow); width:78px; height:78px; font-size:38px; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:transform .15s; padding:0; }
+    .cuento-fig-btn:active{ transform:scale(.9); }
+    .cuento-fig-btn.bump{ animation:cuentoBump .35s ease; }
+    @keyframes cuentoBump{ 0%{transform:scale(1);} 45%{transform:scale(1.28);} 100%{transform:scale(1);} }
+    .cuento-ayuda{ font-size:14px; font-weight:800; color:var(--muted); text-align:center; }
+    @media (max-width:600px){ .cuento-fig-btn{ width:64px; height:64px; font-size:30px; } }
 
     /* Fichas visuales didácticas (Fase 19) */
     .ficha-grid{ margin-top:16px; display:grid; gap:14px; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); }
@@ -580,6 +593,11 @@
         <button class="game hub-card hub-historias" id="goHistorias">
           <div class="gtitle"><span class="gicon">📖</span>Historias sociales</div>
           <div class="gdesc">Para entender los momentos del día.</div>
+        </button>
+
+        <button class="game hub-card hub-cuentos" id="goCuentos">
+          <div class="gtitle"><span class="gicon">🎬</span>Cuentos interactivos</div>
+          <div class="gdesc">Escuchá un cuento y tocá los personajes.</div>
         </button>
       </div>
     </section>
@@ -1162,6 +1180,36 @@
       </div>
     </section>
 
+    <!-- CUENTOS INTERACTIVOS (Fase 54): cuentos narrados con figuras para tocar -->
+    <section id="viewCuentos" class="view" aria-label="Cuentos interactivos">
+      <div class="top-actions" style="margin-bottom:6px;">
+        <button class="btn ghost" id="cuentosHome">⬅️ Centro de juegos</button>
+      </div>
+
+      <div class="historia-grid" id="cuentosSelector">
+        <button class="historia-btn cuento-btn" data-cuento="lavarAuto"><span class="hemoji">🚗</span>Ayudando a lavar el auto</button>
+        <button class="historia-btn cuento-btn" data-cuento="escuela"><span class="hemoji">🏫</span>Un día en la escuela</button>
+        <button class="historia-btn cuento-btn" data-cuento="parque"><span class="hemoji">🌳</span>Paseo al parque en familia</button>
+        <button class="historia-btn cuento-btn" data-cuento="cine"><span class="hemoji">🎬</span>Al cine con Larita</button>
+        <button class="historia-btn cuento-btn" data-cuento="plaza"><span class="hemoji">🛝</span>Paseo a la plaza con los abuelos</button>
+        <button class="historia-btn cuento-btn" data-cuento="camioneta"><span class="hemoji">🚙</span>Paseo en la camioneta del Padrino Peter</button>
+      </div>
+
+      <div class="historia-stage" id="cuentoStage" style="display:none;">
+        <div class="historia-progress" id="cuentoProgress">Paso 1 de 5</div>
+        <div class="historia-card cuento-card" id="cuentoCard">
+          <div class="historia-emoji" id="cuentoEmoji"></div>
+          <div class="historia-text" id="cuentoText"></div>
+          <div class="cuento-figuras" id="cuentoFiguras"></div>
+        </div>
+        <div class="cuento-ayuda">Tocá los dibujos para escucharlos.</div>
+        <div class="historia-actions">
+          <button class="historia-btn-back" id="cuentoVolver">⬅️ Cuentos</button>
+          <button class="historia-btn-nav cuento-btn-nav" id="cuentoSiguiente">Siguiente ➡️</button>
+        </div>
+      </div>
+    </section>
+
     <!-- BURBUJAS (Fase 15) -->
     <section id="viewBurbujas" class="view" aria-label="Tocar burbujas">
       <div class="top-actions" style="margin-bottom:6px;">
@@ -1521,6 +1569,7 @@
       fichas: document.getElementById('viewFichas'),
       comunicacion: document.getElementById('viewComunicacion'),
       historias: document.getElementById('viewHistorias'),
+      cuentos: document.getElementById('viewCuentos'),
       burbujas: document.getElementById('viewBurbujas'),
       globos: document.getElementById('viewGlobos'),
       estrellas: document.getElementById('viewEstrellas'),
@@ -1565,6 +1614,7 @@
 
     document.getElementById('goFichas').addEventListener('click', () => { showView('fichas'); window.__fichasStart && window.__fichasStart(); });
     document.getElementById('goHistorias').addEventListener('click', () => { showView('historias'); window.__historiasStart && window.__historiasStart(); });
+    document.getElementById('goCuentos').addEventListener('click', () => { showView('cuentos'); window.__cuentosStart && window.__cuentosStart(); });
 
     document.getElementById('goSonidos').addEventListener('click', () => { showView('sonidos'); speak('Sonidos.'); });
     document.getElementById('goExplotar').addEventListener('click', () => { showView('explotar'); speak('Para tocar.'); });
@@ -1607,6 +1657,7 @@
     document.getElementById('fichasHome').addEventListener('click', () => showView('aprender'));
     document.getElementById('comunicacionHome').addEventListener('click', () => showView('home'));
     document.getElementById('historiasHome').addEventListener('click', () => showView('aprender'));
+    document.getElementById('cuentosHome').addEventListener('click', () => showView('aprender'));
 
     document.getElementById('goMemo').addEventListener('click', () => { showView('memo'); startMemo(currentPairs); });
     document.getElementById('goClasificar').addEventListener('click', () => { showView('clasificar'); window.__clasificarStart && window.__clasificarStart(); });
@@ -5120,6 +5171,165 @@
 
       window.__historiasStart = function(){
         volverSelector();
+      };
+    })();
+
+    // --- Cuentos interactivos (Fase 54) ---
+    // Cuentos narrados en voz alta (con speak, igual que Historias sociales) pero con
+    // figuras de animales/vehículos/emociones que Samuel puede tocar mientras escucha.
+    // Tocar una figura SOLO reacciona (sonido/voz) y NO cambia el avance del cuento.
+    (function(){
+      // Figuras reutilizables: mismas rutas de audio que ya usa "Sonidos" (cacheadas offline).
+      const F = {
+        perro:      { emoji:'🐶', label:'Perro',      audioUrl:'./audio/animales/perro.mp3' },
+        gato:       { emoji:'🐱', label:'Gato',       audioUrl:'./audio/animales/gato.mp3' },
+        pajaro:     { emoji:'🐦', label:'Pájaro',     audioUrl:'./audio/animales/pajaro.mp3' },
+        auto:       { emoji:'🚗', label:'Auto',       audioUrl:'./audio/vehiculos/auto.mp3' },
+        camion:     { emoji:'🚚', label:'Camioneta',  audioUrl:'./audio/vehiculos/camion.mp3' },
+        contento:   { emoji:'☺️', label:'Contento' },
+        riendo:     { emoji:'😂', label:'Riendo' },
+        tranquilo:  { emoji:'😌', label:'Tranquilo' },
+        sorprendido:{ emoji:'😲', label:'Sorprendido' },
+        cansado:    { emoji:'😪', label:'Cansado' }
+      };
+
+      const CUENTOS = {
+        lavarAuto: { titulo:'Ayudando a lavar el auto', pasos:[
+          { emoji:'🚗', texto:'Hoy Samuel ayuda a Papá Omer a lavar el auto.', figuras:[F.auto, F.contento] },
+          { emoji:'🧽', texto:'Samuel agarra la esponja con jabón.', figuras:[F.auto] },
+          { emoji:'💦', texto:'Papá pasa la manguera y el agua moja las ruedas.', figuras:[F.auto] },
+          { emoji:'✨', texto:'El auto quedó brillante y limpio.', figuras:[F.auto, F.riendo] },
+          { emoji:'🙌', texto:'Papá le dice: gracias por ayudarme, Samuel.', figuras:[F.contento] }
+        ]},
+        escuela: { titulo:'Un día en la escuela', pasos:[
+          { emoji:'🏫', texto:'Samuel llega a la escuela con su mochila.', figuras:[F.contento] },
+          { emoji:'🙋', texto:'Samuel saluda a la maestra y a sus compañeros.', figuras:[F.contento] },
+          { emoji:'✏️', texto:'Escucha un cuento y dibuja en su cuaderno.', figuras:[F.tranquilo] },
+          { emoji:'⚽', texto:'En el recreo, Samuel juega un poquito afuera.', figuras:[F.pajaro, F.riendo] },
+          { emoji:'🎒', texto:'A la salida, Samuel está contento porque aprendió cosas nuevas.', figuras:[F.contento] }
+        ]},
+        parque: { titulo:'Paseo al parque en familia', pasos:[
+          { emoji:'🚗', texto:'Samuel sube al auto con Mamá Margarita, Papá Omer y su hermana Larita.', figuras:[F.auto, F.contento] },
+          { emoji:'🌳', texto:'Llegan al parque y ven pajaritos volando.', figuras:[F.pajaro] },
+          { emoji:'🛝', texto:'Samuel juega en el tobogán con Larita.', figuras:[F.riendo] },
+          { emoji:'🐶', texto:'Pasa un perrito caminando con su dueño.', figuras:[F.perro] },
+          { emoji:'🏡', texto:'Vuelven a casa todos contentos.', figuras:[F.contento] }
+        ]},
+        cine: { titulo:'Al cine con Larita', pasos:[
+          { emoji:'🚗', texto:'Samuel va con su hermana Larita en auto al cine.', figuras:[F.auto, F.contento] },
+          { emoji:'🍿', texto:'Compran pochoclo antes de entrar a la sala.', figuras:[F.contento] },
+          { emoji:'🎬', texto:'Se sientan a ver la película. La sala está oscura y tranquila.', figuras:[F.tranquilo] },
+          { emoji:'😂', texto:'Samuel se ríe con una parte muy graciosa.', figuras:[F.riendo, F.sorprendido] },
+          { emoji:'🏡', texto:'Cuando termina, vuelven contentos a casa.', figuras:[F.contento] }
+        ]},
+        plaza: { titulo:'Paseo a la plaza con los abuelos', pasos:[
+          { emoji:'🚗', texto:'Los abuelos pasan a buscar a Samuel para ir a la plaza.', figuras:[F.auto, F.contento] },
+          { emoji:'🐦', texto:'En la plaza hay palomas caminando.', figuras:[F.pajaro] },
+          { emoji:'🛝', texto:'Samuel se columpia y se sube al tobogán.', figuras:[F.riendo] },
+          { emoji:'🍪', texto:'Toman una merienda rica todos juntos.', figuras:[F.tranquilo] },
+          { emoji:'🤗', texto:'El abuelo y la abuela le dan un abrazo a Samuel.', figuras:[F.contento] }
+        ]},
+        camioneta: { titulo:'Paseo en la camioneta del Padrino Peter', pasos:[
+          { emoji:'🚙', texto:'El Padrino Peter llega con su camioneta a buscar a Samuel.', figuras:[F.camion, F.contento] },
+          { emoji:'🔒', texto:'Samuel sube y se pone el cinturón de seguridad.', figuras:[F.camion] },
+          { emoji:'🌄', texto:'Samuel mira el paisaje por la ventana.', figuras:[F.tranquilo] },
+          { emoji:'🎶', texto:'Escuchan música y cantan juntos en el camino.', figuras:[F.riendo] },
+          { emoji:'😊', texto:'Llegan y Samuel está feliz por el paseo con su padrino.', figuras:[F.contento] }
+        ]}
+      };
+
+      const selectorC  = document.getElementById('cuentosSelector');
+      const stageC     = document.getElementById('cuentoStage');
+      const progressC  = document.getElementById('cuentoProgress');
+      const emojiC     = document.getElementById('cuentoEmoji');
+      const textC      = document.getElementById('cuentoText');
+      const figurasC   = document.getElementById('cuentoFiguras');
+      const nextBtnC   = document.getElementById('cuentoSiguiente');
+      const backBtnC   = document.getElementById('cuentoVolver');
+      if (!selectorC || !stageC) return;
+
+      let currentCuento = null;
+      let stepIdxC = 0;
+      let finishedC = false;
+      const tickC = makeStarTicker(1, 'aprender');
+
+      function tapFigura(fig){
+        stopAll();
+        ensureAudio();
+        speak(fig.label);
+        if (fig.audioUrl) playMp3Clip(fig.audioUrl);
+      }
+
+      function renderFiguras(lista){
+        figurasC.innerHTML = '';
+        (lista || []).forEach(fig => {
+          const b = document.createElement('button');
+          b.className = 'cuento-fig-btn';
+          b.setAttribute('aria-label', fig.label);
+          b.textContent = fig.emoji;
+          b.addEventListener('click', () => {
+            b.classList.remove('bump');
+            // reiniciar la animación aunque se toque varias veces seguidas
+            void b.offsetWidth;
+            b.classList.add('bump');
+            tapFigura(fig);
+          });
+          figurasC.appendChild(b);
+        });
+      }
+
+      function renderStepC(){
+        const c = CUENTOS[currentCuento];
+        if (!c) return;
+        if (stepIdxC < c.pasos.length){
+          finishedC = false;
+          const paso = c.pasos[stepIdxC];
+          progressC.textContent = 'Paso ' + (stepIdxC + 1) + ' de ' + c.pasos.length;
+          emojiC.textContent = paso.emoji;
+          textC.textContent = paso.texto;
+          renderFiguras(paso.figuras);
+          nextBtnC.textContent = (stepIdxC === c.pasos.length - 1) ? 'Terminar ➡️' : 'Siguiente ➡️';
+          speak(paso.texto);
+        } else if (!finishedC){
+          finishedC = true;
+          progressC.textContent = '¡Cuento completo!';
+          emojiC.textContent = '🎉';
+          textC.textContent = 'Muy bien, Samuel';
+          figurasC.innerHTML = '';
+          nextBtnC.textContent = '⬅️ Cuentos';
+          tickC();
+          speak('Muy bien, Samuel');
+        }
+      }
+
+      function startCuento(key){
+        currentCuento = key;
+        stepIdxC = 0;
+        finishedC = false;
+        selectorC.style.display = 'none';
+        stageC.style.display = 'flex';
+        renderStepC();
+      }
+
+      function volverSelectorC(){
+        currentCuento = null;
+        stageC.style.display = 'none';
+        selectorC.style.display = 'grid';
+      }
+
+      selectorC.querySelectorAll('.historia-btn').forEach(btn => {
+        btn.addEventListener('click', () => startCuento(btn.dataset.cuento));
+      });
+
+      nextBtnC.addEventListener('click', () => {
+        if (finishedC){ volverSelectorC(); return; }
+        stepIdxC++;
+        renderStepC();
+      });
+      backBtnC.addEventListener('click', volverSelectorC);
+
+      window.__cuentosStart = function(){
+        volverSelectorC();
       };
     })();
 
