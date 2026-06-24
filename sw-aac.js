@@ -1,5 +1,5 @@
 /* Aplicación de Samuel - Service Worker */
-const CACHE_VERSION = 'samuel-app-v62-fase54-cuentos';
+const CACHE_VERSION = 'samuel-app-v63-foto-samuel';
 const CACHE_NAME = CACHE_VERSION;
 
 const ASSETS = [
@@ -14,9 +14,7 @@ const ASSETS = [
   './app.js',
   './flags-data.js',
   './manifest.webmanifest',
-  './samuel-avatar.png',
-  './icons/icon-192.png',
-  './icons/icon-512.png',
+  './Perfil-Samuel.png',
   './audio/animales/burro.mp3',
   './audio/animales/caballo.mp3',
   './audio/animales/cabra.mp3',
