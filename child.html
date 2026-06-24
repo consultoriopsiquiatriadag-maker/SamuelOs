@@ -64,6 +64,30 @@
             align-items: center;
             justify-content: center;
             font-size: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .avatar .avatar-emoji {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, .92);
+            opacity: 0;
+            transition: opacity .15s ease;
+        }
+
+        .avatar .avatar-emoji.show {
+            opacity: 1;
         }
 
         h1 {
@@ -506,7 +530,7 @@
 
     <header>
         <div class="user-profile">
-            <div class="avatar">👦</div>
+            <div class="avatar"><img src="./Perfil-Samuel.png" alt="Samuel"><span class="avatar-emoji"></span></div>
             <h1>Hola, Samuel</h1>
         </div>
         <button onclick="toggleFullscreen()" class="btn-parents">📺 Pantalla Completa</button>
@@ -789,9 +813,13 @@
             window.speechSynthesis.speak(utterance);
 
             if (emoji) {
-                // Flash visual al hablar
-                document.querySelector('.avatar').innerText = emoji;
-                setTimeout(() => document.querySelector('.avatar').innerText = '👦', 2000);
+                // Flash visual al hablar (sobre la foto, sin tapar la imagen)
+                const flash = document.querySelector('.avatar-emoji');
+                if (flash) {
+                    flash.innerText = emoji;
+                    flash.classList.add('show');
+                    setTimeout(() => flash.classList.remove('show'), 2000);
+                }
             }
         }
 
