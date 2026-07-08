@@ -457,6 +457,53 @@
     }
     .iframe-error.show { display: block; }
 
+    /* ===== REPRODUCTOR SEGURO — controles propios (Fase 2) ===== */
+    .player-controls {
+      display: flex;
+      gap: 14px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .player-ctrl-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 26px;
+      border-radius: 20px;
+      border: none;
+      font-size: 19px;
+      font-weight: 900;
+      cursor: pointer;
+      min-height: 58px;
+      transition: transform .12s ease, box-shadow .12s ease;
+    }
+    .player-ctrl-btn:active { transform: scale(.95); }
+    .btn-fullscreen { background: #2563eb; color: #fff; box-shadow: 0 8px 22px rgba(37,99,235,.35); }
+    .btn-fullscreen:hover { box-shadow: 0 12px 28px rgba(37,99,235,.50); }
+    .btn-salir-video { background: #f97316; color: #fff; box-shadow: 0 8px 22px rgba(249,115,22,.40); }
+    .btn-salir-video:hover { box-shadow: 0 12px 28px rgba(249,115,22,.50); }
+
+    /* Overlay bloqueo de navegación externa */
+    #navBlockMsg {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(15,23,42,.90);
+      z-index: 9999;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      color: #fff;
+      text-align: center;
+      padding: 40px;
+    }
+    #navBlockMsg.show { display: flex; }
+    #navBlockMsg .nav-block-icon { font-size: 60px; }
+    #navBlockMsg p { font-size: 24px; font-weight: 900; margin: 0; max-width: 480px; line-height: 1.4; }
+    #navBlockMsg .nav-block-sub { font-size: 17px; font-weight: 700; color: #94a3b8; margin: 0; }
+    #navBlockMsg button { background: #f97316; color: #fff; border: none; padding: 18px 36px; font-size: 20px; font-weight: 900; border-radius: 22px; cursor: pointer; margin-top: 8px; }
+
     /* ====== Botón primario ====== */
     .btn-primary {
       display: inline-flex;
@@ -581,14 +628,32 @@
       <span class="player-title-text" id="playerTitle"></span>
     </div>
 
-    <div class="player-wrap">
+    <div class="player-wrap" id="playerWrap">
+      <!-- iframe seguro (Fase 2):
+           - youtube-nocookie.com: menos rastreo, sin cookies de seguimiento
+           - fs=0: deshabilita botón nativo de pantalla completa (usamos el nuestro)
+           - disablekb=1: deshabilita atajos de teclado del reproductor
+           - iv_load_policy=3: oculta anotaciones/links sobre el video
+           - rel=0: limita videos relacionados al mismo canal
+           - Sin allowfullscreen: fullscreen lo maneja Samuel OS
+           - Sin allow-popups ni allow-top-navigation en sandbox: bloquea salida -->
       <iframe
         id="playerIframe"
         src=""
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowfullscreen
+        allow="autoplay; encrypted-media"
+        sandbox="allow-scripts allow-same-origin"
         title="Video para Samuel"
       ></iframe>
+    </div>
+
+    <!-- Controles propios del reproductor (Fase 2) -->
+    <div class="player-controls">
+      <button class="player-ctrl-btn btn-fullscreen" id="btnFullscreen" onclick="toggleFullscreen()">
+        🔍 Pantalla grande
+      </button>
+      <button class="player-ctrl-btn btn-salir-video" onclick="backToCategory()">
+        ◀ Salir del video
+      </button>
     </div>
 
     <div class="iframe-error" id="iframeError">
@@ -601,6 +666,14 @@
   </div>
 
 </div><!-- /shell -->
+
+<!-- Overlay bloqueo navegación externa (Fase 2) -->
+<div id="navBlockMsg">
+  <div class="nav-block-icon">🔒</div>
+  <p>Este contenido necesita ayuda de un adulto</p>
+  <p class="nav-block-sub">No podés salir de los videos de Samuel desde acá</p>
+  <button onclick="document.getElementById('navBlockMsg').classList.remove('show')">◀ Volver a los videos</button>
+</div>
 
 <script>
   // ============================================================
@@ -980,14 +1053,18 @@
     videoActual = video;
     document.getElementById('playerTitle').textContent = video.titulo;
 
-    // Embed con parámetros seguros:
-    // rel=0     → solo relacionados del mismo canal
+    // Embed seguro (Fase 2):
+    // nocookie  → dominio sin cookies de seguimiento de YouTube
+    // rel=0     → limita videos relacionados al mismo canal
+    // fs=0      → deshabilita pantalla completa nativa (la maneja Samuel OS)
+    // disablekb=1 → deshabilita atajos de teclado del reproductor
+    // iv_load_policy=3 → oculta anotaciones y links sobre el video
     // modestbranding=1 → mínimo branding YouTube
-    // playsinline=1    → en línea en iOS
-    // autoplay=1       → reproduce automáticamente
+    // playsinline=1    → reproduce en línea (sin forzar fullscreen nativo en móvil)
+    // autoplay=1       → reproduce al abrir
     const embedUrl =
-      `https://www.youtube.com/embed/${video.id}` +
-      `?rel=0&modestbranding=1&playsinline=1&autoplay=1`;
+      `https://www.youtube-nocookie.com/embed/${video.id}` +
+      `?rel=0&fs=0&disablekb=1&iv_load_policy=3&modestbranding=1&playsinline=1&autoplay=1`;
 
     const iframe = document.getElementById('playerIframe');
     iframe.src = embedUrl;
@@ -1010,7 +1087,59 @@
     const iframe = document.getElementById('playerIframe');
     // Vaciar src para detener el video
     iframe.src = '';
+    // Salir de pantalla completa si está activa
+    if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
   }
+
+  // ===== PANTALLA COMPLETA PROPIA (Fase 2) =====
+  // Samuel OS maneja su propio fullscreen — el del iframe está deshabilitado (fs=0)
+  function toggleFullscreen() {
+    const wrap = document.getElementById('playerWrap');
+    const btn  = document.getElementById('btnFullscreen');
+    if (!document.fullscreenElement) {
+      wrap.requestFullscreen().then(() => {
+        btn.textContent = '🔙 Pantalla normal';
+      }).catch(() => {
+        // Fallback: no soportado — informar
+        btn.textContent = '🔍 Pantalla grande';
+      });
+    } else {
+      document.exitFullscreen().then(() => {
+        btn.textContent = '🔍 Pantalla grande';
+      }).catch(() => {});
+    }
+  }
+
+  // Restaurar botón si el usuario sale de fullscreen con Escape
+  document.addEventListener('fullscreenchange', () => {
+    const btn = document.getElementById('btnFullscreen');
+    if (btn) {
+      btn.textContent = document.fullscreenElement ? '🔙 Pantalla normal' : '🔍 Pantalla grande';
+    }
+  });
+
+  // ===== BLOQUEO DE NAVEGACIÓN EXTERNA (Fase 2) =====
+  // Capa 1: interceptar clicks en links que intenten salir de la app
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest('a[href]');
+    if (!a) return;
+    const href = a.getAttribute('href');
+    // Permitir navegación interna (relativa o # o dentro de Samuel OS)
+    if (!href || href.startsWith('#') || href.startsWith('./') || href.startsWith('/') && !href.startsWith('//')) return;
+    // Bloquear links externos
+    if (/^https?:\/\//i.test(href) || href.startsWith('//')) {
+      e.preventDefault();
+      e.stopPropagation();
+      document.getElementById('navBlockMsg').classList.add('show');
+    }
+  }, true);
+
+  // Capa 2: si la página intenta navegar (beforeunload en kiosko), mostrar overlay
+  window.addEventListener('beforeunload', (e) => {
+    document.getElementById('navBlockMsg').classList.add('show');
+    e.preventDefault();
+    e.returnValue = '';
+  });
 
   // ============================================================
   // Voz generada (Fase 28) — mismo patrón que juegos.html/child.html
