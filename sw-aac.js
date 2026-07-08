@@ -1,5 +1,5 @@
 /* Aplicación de Samuel - Service Worker */
-const CACHE_VERSION = 'samuel-app-v67-reproductor-seguro';
+const CACHE_VERSION = 'samuel-app-v68-videos-tricicleta';
 const CACHE_NAME = CACHE_VERSION;
 
 const ASSETS = [
