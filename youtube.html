@@ -85,23 +85,26 @@
       margin-top: 2px;
     }
 
+    /* ===== BOTÓN VOLVER INFANTIL (Fase 1) ===== */
     .btn-back {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      padding: 11px 18px;
-      border-radius: 99px;
-      border: 2px solid rgba(15,23,42,.10);
-      background: rgba(255,255,255,.90);
+      gap: 12px;
+      padding: 16px 28px;
+      border-radius: 22px;
+      border: none;
+      background: #f97316;
       font-weight: 900;
-      font-size: 15px;
+      font-size: 20px;
+      min-height: 60px;
       cursor: pointer;
       text-decoration: none;
-      color: var(--text);
-      box-shadow: 0 4px 14px rgba(0,0,0,.07);
-      transition: transform .10s ease;
+      color: #fff;
+      box-shadow: 0 8px 22px rgba(249,115,22,.40);
+      transition: transform .12s ease, box-shadow .12s ease;
     }
-    .btn-back:active { transform: scale(.96) translateY(1px); }
+    .btn-back:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(249,115,22,.50); }
+    .btn-back:active { transform: scale(.95); }
 
     /* ====== Banner offline ====== */
     .offline-banner {
@@ -491,7 +494,7 @@
       </div>
     </div>
     <button class="btn-back" onclick="goHome()" id="btnBack" aria-label="Volver a la app">
-      ⬅️ Volver a la app
+      ◀ Volver
     </button>
   </header>
 
@@ -843,7 +846,7 @@
   function updateBackBtn(ctx) {
     const btn = document.getElementById('btnBack');
     if (ctx === 'home') {
-      btn.textContent = '⬅️ Volver a la app';
+      btn.textContent = '◀ Volver';
       btn.onclick = goHome;
     }
   }

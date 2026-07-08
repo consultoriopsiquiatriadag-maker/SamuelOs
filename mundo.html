@@ -36,6 +36,20 @@
     .btn{border:2px solid rgba(15,23,42,.12); background:#fff; padding:14px 18px; border-radius:16px; font-weight:900; cursor:pointer; text-decoration:none; color:var(--text); display:inline-flex; align-items:center; gap:10px; box-shadow:0 14px 28px rgba(2,6,23,.10); font-size:17px;}
     .btn.primary{background:var(--blue); color:#fff; border-color:transparent;}
     .btn.big{padding:18px 26px;border-radius:20px;font-size:20px;}
+
+    /* ===== BOTÓN VOLVER INFANTIL (Fase 1) ===== */
+    .btn-volver{
+      display:inline-flex; align-items:center; gap:12px;
+      background:#f97316; color:#fff; border:none;
+      padding:16px 28px; border-radius:22px;
+      font-size:20px; font-weight:900;
+      min-height:60px;
+      box-shadow:0 8px 22px rgba(249,115,22,.40);
+      cursor:pointer; text-decoration:none;
+      transition:transform .12s ease, box-shadow .12s ease;
+    }
+    .btn-volver:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(249,115,22,.50);}
+    .btn-volver:active{transform:scale(.95);}
     .pill{display:inline-flex;align-items:center;gap:8px;border:2px solid rgba(15,23,42,.12);background:#fff;padding:10px 12px;border-radius:999px;font-weight:900;}
 
     /* Escenario del Mundo de Samuel (Fase 36: esqueleto, sin motor 3D todavía) */
@@ -115,7 +129,7 @@
     </div>
 
     <div class="mundo-footer">
-      <a class="btn primary big" href="./juegos.html">⬅️ Volver</a>
+      <a class="btn-volver" href="./juegos.html">◀ Volver</a>
       <button class="btn big" id="btnAyuda">🔊 Escuchar ayuda</button>
     </div>
   </div>
