@@ -411,6 +411,281 @@ body {
     .subhub-grid        { gap: 10px; padding: 12px 12px 14px; }
 }
 
+/* ============================================================
+   SUB-HUB 2 OPCIONES (Voy a la Escuela)
+   ============================================================ */
+.subhub-2-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 22px;
+    padding: 28px 36px 32px;
+    align-items: stretch;
+}
+.subhub-2-grid .hub-card { min-height: 180px; }
+
+/* ============================================================
+   AGENDA VISUAL
+   ============================================================ */
+.agenda-scroll {
+    flex: 1;
+    overflow-y: auto;
+    padding: 14px 24px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.agenda-step {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: #fff;
+    border-radius: 20px;
+    padding: 14px 18px;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.07);
+    border-left: 6px solid #e2e8f0;
+    transition: opacity .2s, transform .2s;
+}
+.agenda-step.current {
+    border-left-color: #10b981;
+    box-shadow: 0 6px 22px rgba(16,185,129,0.22);
+    transform: scale(1.01);
+}
+.agenda-step.done {
+    opacity: .45;
+    border-left-color: #94a3b8;
+}
+
+.step-emoji { font-size: 2.2rem; flex-shrink: 0; line-height: 1; }
+.step-info  { flex: 1; }
+.step-text  {
+    font-size: clamp(1rem, 2.5vw, 1.3rem);
+    font-weight: 800;
+    color: var(--text);
+}
+.step-done-badge {
+    font-size: 1.4rem;
+    flex-shrink: 0;
+}
+
+.btn-terminado {
+    background: #10b981;
+    color: #fff;
+    border: none;
+    border-radius: 16px;
+    padding: 10px 20px;
+    font-family: var(--font);
+    font-size: 1rem;
+    font-weight: 900;
+    cursor: pointer;
+    flex-shrink: 0;
+    box-shadow: 0 4px 14px rgba(16,185,129,0.35);
+    transition: transform .12s;
+}
+.btn-terminado:active { transform: scale(.94); }
+
+.agenda-footer {
+    display: flex;
+    gap: 12px;
+    padding: 12px 24px 20px;
+    flex-shrink: 0;
+}
+.agenda-footer-btn {
+    flex: 1;
+    padding: 14px;
+    border: none;
+    border-radius: 18px;
+    font-family: var(--font);
+    font-size: 1rem;
+    font-weight: 900;
+    cursor: pointer;
+    transition: transform .12s;
+}
+.agenda-footer-btn:active { transform: scale(.94); }
+.btn-agenda-escuchar { background: #10b981; color: #fff; box-shadow: 0 4px 14px rgba(16,185,129,0.35); }
+.btn-agenda-reset    { background: #e2e8f0; color: #475569; }
+
+.agenda-completa {
+    text-align: center;
+    padding: 20px;
+    font-size: 1.3rem;
+    font-weight: 900;
+    color: #10b981;
+    display: none;
+}
+
+/* ============================================================
+   PRIMERO Y DESPUÉS
+   ============================================================ */
+.pd-layout {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px 24px 12px;
+    overflow: hidden;
+}
+
+.pd-cards-row {
+    flex: 1;
+    display: flex;
+    gap: 16px;
+    align-items: stretch;
+    min-height: 0;
+}
+
+.pd-card {
+    flex: 1;
+    background: #fff;
+    border-radius: 28px;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 20px 14px;
+    cursor: pointer;
+    border: 4px solid transparent;
+    transition: border-color .15s, box-shadow .15s;
+    min-width: 0;
+}
+.pd-card:hover  { box-shadow: var(--shadow-hover); }
+.pd-card:active { transform: scale(.97); }
+.pd-card.primero-card { border-color: #10b981; }
+.pd-card.despues-card { border-color: #3b82f6; }
+
+.pd-label {
+    font-size: clamp(0.85rem, 2vw, 1.1rem);
+    font-weight: 900;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 4px 16px;
+    border-radius: 20px;
+}
+.primero-card .pd-label { background: #d1fae5; color: #065f46; }
+.despues-card  .pd-label { background: #dbeafe; color: #1e40af; }
+
+.pd-card-emoji { font-size: clamp(3rem, 8vw, 5rem); line-height: 1.1; }
+.pd-card-text  {
+    font-size: clamp(0.95rem, 2.5vw, 1.3rem);
+    font-weight: 800;
+    text-align: center;
+    color: var(--text);
+}
+.pd-card-hint  {
+    font-size: 0.8rem;
+    color: var(--text-soft);
+    font-weight: 600;
+}
+
+.pd-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    color: var(--text-soft);
+    flex-shrink: 0;
+}
+
+.pd-actions {
+    display: flex;
+    gap: 12px;
+    flex-shrink: 0;
+}
+.pd-actions .btn-pd {
+    flex: 1;
+    padding: 15px;
+    border: none;
+    border-radius: 18px;
+    font-family: var(--font);
+    font-size: 1.05rem;
+    font-weight: 900;
+    cursor: pointer;
+    transition: transform .12s;
+}
+.pd-actions .btn-pd:active { transform: scale(.94); }
+.btn-pd-escuchar { background: #3b82f6; color: #fff; box-shadow: 0 4px 14px rgba(59,130,246,0.35); }
+
+/* Selector overlay */
+.pd-selector-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15,23,42,0.55);
+    z-index: 200;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+.pd-selector-box {
+    background: #fff;
+    border-radius: 28px;
+    width: 100%;
+    max-width: 560px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+}
+.pd-selector-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 24px;
+    border-bottom: 2px solid #f1f5f9;
+    font-size: 1.1rem;
+    font-weight: 900;
+}
+.pd-selector-close {
+    background: #f1f5f9;
+    border: none;
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    font-size: 1.1rem;
+    font-weight: 900;
+    cursor: pointer;
+    color: var(--text);
+}
+.pd-selector-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    padding: 16px;
+    overflow-y: auto;
+}
+.pd-selector-item {
+    background: #f8fafc;
+    border: 3px solid #e2e8f0;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 12px 8px;
+    cursor: pointer;
+    font-family: var(--font);
+    transition: border-color .12s, background .12s;
+}
+.pd-selector-item:hover  { border-color: #3b82f6; background: #eff6ff; }
+.pd-selector-item:active { transform: scale(.94); }
+.pd-selector-emoji { font-size: 2rem; line-height: 1; }
+.pd-selector-text  { font-size: 0.75rem; font-weight: 800; text-align: center; color: var(--text); }
+
+@media (max-width: 600px) {
+    .subhub-2-grid    { grid-template-columns: 1fr; padding: 16px; gap: 14px; }
+    .pd-cards-row     { flex-direction: column; }
+    .pd-arrow         { transform: rotate(90deg); font-size: 1.8rem; }
+    .pd-selector-grid { grid-template-columns: repeat(3, 1fr); }
+    .agenda-footer    { padding: 10px 16px 16px; }
+    .agenda-scroll    { padding: 10px 16px 8px; }
+    .pd-layout        { padding: 12px 16px 10px; }
+    .pd-actions       { padding: 0 0 4px; }
+}
+
 /* Reducción de movimiento */
 @media (prefers-reduced-motion: reduce) {
     .hub-card, .cat-card, .btn-volver, .fc-btn { transition: none; }
@@ -466,12 +741,11 @@ body {
         </button>
 
         <button class="hub-card escuela"
-                onclick="navTo('view-placeholder', '🏫 Voy a la Escuela', 'escuela')"
+                onclick="navTo('view-voy-escuela', '🏫 Voy a la Escuela', 'escuela')"
                 aria-label="Voy a la escuela: agenda y rutinas">
             <span class="hub-card-icon" aria-hidden="true">🏫</span>
             <span class="hub-card-label">Voy a la Escuela</span>
             <span class="hub-card-sub">Agenda y rutinas</span>
-            <span class="hub-card-badge">Próximamente</span>
         </button>
 
         <button class="hub-card comunico"
@@ -575,6 +849,82 @@ body {
 </div>
 
 <!-- ============================================================
+     VISTA: VOY A LA ESCUELA — sub-hub
+     ============================================================ -->
+<div class="view" id="view-voy-escuela" hidden>
+    <div class="subhub-2-grid">
+        <button class="hub-card escuela"
+                onclick="navTo('view-agenda', '📅 Agenda del Día', 'agenda'); initAgenda()"
+                aria-label="Agenda del día">
+            <span class="hub-card-icon" aria-hidden="true">📅</span>
+            <span class="hub-card-label">Agenda</span>
+            <span class="hub-card-sub">Pasos del día</span>
+        </button>
+        <button class="hub-card organizo"
+                onclick="navTo('view-pd', '↔️ Primero y Después', 'pd'); initPD()"
+                aria-label="Primero y después">
+            <span class="hub-card-icon" aria-hidden="true">↔️</span>
+            <span class="hub-card-label">Primero y Después</span>
+            <span class="hub-card-sub">Qué hacemos ahora</span>
+        </button>
+    </div>
+</div>
+
+<!-- ============================================================
+     VISTA: AGENDA VISUAL
+     ============================================================ -->
+<div class="view" id="view-agenda" hidden>
+    <div class="agenda-scroll" id="agendaList" role="list"></div>
+    <div class="agenda-completa" id="agendaCompleta">🎉 ¡Terminaste todos los pasos!</div>
+    <div class="agenda-footer">
+        <button class="agenda-footer-btn btn-agenda-escuchar" onclick="speakCurrentStep()">🔊 Escuchar</button>
+        <button class="agenda-footer-btn btn-agenda-reset"    onclick="resetAgenda()">🔁 Empezar</button>
+    </div>
+</div>
+
+<!-- ============================================================
+     VISTA: PRIMERO Y DESPUÉS
+     ============================================================ -->
+<div class="view" id="view-pd" hidden>
+    <div class="pd-layout">
+        <div class="pd-cards-row">
+            <button class="pd-card primero-card" onclick="openPDSelector('primero')"
+                    aria-label="Primero: tocar para elegir actividad">
+                <div class="pd-label">Primero</div>
+                <div class="pd-card-emoji" id="pd-primero-emoji">❓</div>
+                <div class="pd-card-text"  id="pd-primero-text">Tocar para elegir</div>
+                <div class="pd-card-hint">Tocá para cambiar</div>
+            </button>
+
+            <div class="pd-arrow" aria-hidden="true">→</div>
+
+            <button class="pd-card despues-card" onclick="openPDSelector('despues')"
+                    aria-label="Después: tocar para elegir actividad">
+                <div class="pd-label">Después</div>
+                <div class="pd-card-emoji" id="pd-despues-emoji">❓</div>
+                <div class="pd-card-text"  id="pd-despues-text">Tocar para elegir</div>
+                <div class="pd-card-hint">Tocá para cambiar</div>
+            </button>
+        </div>
+
+        <div class="pd-actions">
+            <button class="btn-pd btn-pd-escuchar" onclick="speakPD()">🔊 Escuchar</button>
+        </div>
+    </div>
+
+    <!-- Selector de actividad -->
+    <div class="pd-selector-overlay" id="pdSelectorOverlay" hidden role="dialog" aria-label="Elegir actividad">
+        <div class="pd-selector-box">
+            <div class="pd-selector-header">
+                <span id="pdSelectorTitle">Elegir actividad</span>
+                <button class="pd-selector-close" onclick="closePDSelector()" aria-label="Cerrar">✕</button>
+            </div>
+            <div class="pd-selector-grid" id="pdSelectorGrid"></div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================
      CELEBRACIÓN
      ============================================================ -->
 <div id="celebration" role="dialog" aria-label="¡Muy bien, Samuel!">
@@ -632,9 +982,12 @@ function updateHeader(viewId) {
         backBtn.onclick = navBack;
         // Título según vista
         const titles = {
-            'view-aprendo':     '📖 Aprendo',
-            'view-cards':       document.getElementById('fcCatTitle')?.textContent || '📖 Fichas',
-            'view-placeholder': '🚧 Próximamente',
+            'view-aprendo':      '📖 Aprendo',
+            'view-cards':        document.getElementById('fcCatTitle')?.textContent || '📖 Fichas',
+            'view-placeholder':  '🚧 Próximamente',
+            'view-voy-escuela':  '🏫 Voy a la Escuela',
+            'view-agenda':       '📅 Agenda del Día',
+            'view-pd':           '↔️ Primero y Después',
         };
         title.textContent = titles[viewId] || '📚 Escuela de Samuel';
     }
@@ -850,6 +1203,183 @@ function sayText(text) {
 function cancelSpeak() {
     if (speakTimer) { clearTimeout(speakTimer); speakTimer = null; }
     speechSynthesis.cancel();
+}
+
+/* ============================================================
+   AGENDA VISUAL
+   ============================================================ */
+const AGENDA_STEPS = [
+    { emoji:'⏰', texto:'Despertarse',         speak:'Despertarse' },
+    { emoji:'👕', texto:'Vestirse',             speak:'Vestirse' },
+    { emoji:'🍳', texto:'Desayunar',            speak:'Desayunar' },
+    { emoji:'🎒', texto:'Preparar la mochila',  speak:'Preparar la mochila' },
+    { emoji:'🚌', texto:'Viajar a la escuela',  speak:'Viajar a la escuela' },
+    { emoji:'🏫', texto:'Entrar a la escuela',  speak:'Entrar a la escuela' },
+    { emoji:'📝', texto:'Trabajar en el aula',  speak:'Trabajar en el aula' },
+    { emoji:'⚽', texto:'Recreo',               speak:'Recreo' },
+    { emoji:'📖', texto:'Volver a clase',       speak:'Volver a clase' },
+    { emoji:'🏃', texto:'Salir de la escuela',  speak:'Salir de la escuela' },
+    { emoji:'🏠', texto:'Regresar a casa',      speak:'Regresar a casa' },
+];
+
+let agendaDone = new Set();
+
+function initAgenda() {
+    agendaDone = new Set();
+    renderAgenda();
+}
+
+function renderAgenda() {
+    const list   = document.getElementById('agendaList');
+    const compl  = document.getElementById('agendaCompleta');
+    const allDone = agendaDone.size === AGENDA_STEPS.length;
+
+    list.innerHTML  = '';
+    compl.style.display = allDone ? 'block' : 'none';
+
+    AGENDA_STEPS.forEach((step, i) => {
+        const done    = agendaDone.has(i);
+        const current = !done && i === firstUndone();
+
+        const div = document.createElement('div');
+        div.className = 'agenda-step' + (done ? ' done' : current ? ' current' : '');
+        div.setAttribute('role', 'listitem');
+
+        div.innerHTML = `
+            <span class="step-emoji" aria-hidden="true">${step.emoji}</span>
+            <span class="step-info">
+                <span class="step-text">${step.texto}</span>
+            </span>
+            ${done
+                ? '<span class="step-done-badge" aria-label="Completado">✅</span>'
+                : current
+                    ? `<button class="btn-terminado" onclick="markStepDone(${i})">✔ Terminado</button>`
+                    : ''}
+        `;
+        list.appendChild(div);
+    });
+
+    if (!allDone) {
+        const ci = firstUndone();
+        if (ci !== -1) {
+            setTimeout(() => sayText(AGENDA_STEPS[ci].speak), 350);
+            // Scroll al step actual
+            const items = list.querySelectorAll('.agenda-step');
+            if (items[ci]) items[ci].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    } else {
+        setTimeout(() => sayText('¡Muy bien, Samuel! Terminaste todos los pasos del día.'), 350);
+    }
+}
+
+function firstUndone() {
+    for (let i = 0; i < AGENDA_STEPS.length; i++) {
+        if (!agendaDone.has(i)) return i;
+    }
+    return -1;
+}
+
+function markStepDone(i) {
+    agendaDone.add(i);
+    renderAgenda();
+}
+
+function resetAgenda() {
+    agendaDone = new Set();
+    renderAgenda();
+}
+
+function speakCurrentStep() {
+    const ci = firstUndone();
+    if (ci !== -1) sayText(AGENDA_STEPS[ci].speak);
+    else sayText('¡Terminaste todos los pasos del día!');
+}
+
+/* ============================================================
+   PRIMERO Y DESPUÉS
+   ============================================================ */
+const ACTIVITIES = [
+    { key:'despertarse', emoji:'⏰', texto:'Despertarse' },
+    { key:'vestirse',    emoji:'👕', texto:'Vestirse' },
+    { key:'desayunar',   emoji:'🍳', texto:'Desayunar' },
+    { key:'mochila',     emoji:'🎒', texto:'Preparar mochila' },
+    { key:'viajar',      emoji:'🚌', texto:'Viajar' },
+    { key:'escuela',     emoji:'🏫', texto:'Ir a la escuela' },
+    { key:'trabajar',    emoji:'📝', texto:'Trabajar' },
+    { key:'recreo',      emoji:'⚽', texto:'Recreo' },
+    { key:'salir',       emoji:'🏃', texto:'Salir' },
+    { key:'casa',        emoji:'🏠', texto:'Ir a casa' },
+    { key:'merendar',    emoji:'🥐', texto:'Merendar' },
+    { key:'banarse',     emoji:'🛁', texto:'Bañarse' },
+    { key:'dormir',      emoji:'😴', texto:'Dormir' },
+    { key:'jugar',       emoji:'🎮', texto:'Jugar' },
+    { key:'leer',        emoji:'📚', texto:'Leer' },
+    { key:'tarea',       emoji:'✏️', texto:'Hacer tarea' },
+    { key:'comer',       emoji:'🍽️', texto:'Comer' },
+    { key:'descansar',   emoji:'🛌', texto:'Descansar' },
+];
+
+const LS_PD_P = 'samuel_pd_primero';
+const LS_PD_D = 'samuel_pd_despues';
+let pdSlotTarget = null; // 'primero' | 'despues'
+
+function initPD() {
+    try {
+        const p = localStorage.getItem(LS_PD_P);
+        const d = localStorage.getItem(LS_PD_D);
+        if (p) setPDSlot('primero', p);
+        if (d) setPDSlot('despues', d);
+    } catch (e) { /* ignore */ }
+}
+
+function setPDSlot(slot, key) {
+    const act = ACTIVITIES.find(a => a.key === key);
+    if (!act) return;
+    document.getElementById(`pd-${slot}-emoji`).textContent = act.emoji;
+    document.getElementById(`pd-${slot}-text`).textContent  = act.texto;
+    try { localStorage.setItem(slot === 'primero' ? LS_PD_P : LS_PD_D, key); } catch (e) { /* ignore */ }
+}
+
+function openPDSelector(slot) {
+    pdSlotTarget = slot;
+    document.getElementById('pdSelectorTitle').textContent =
+        slot === 'primero' ? 'Elegir PRIMERO' : 'Elegir DESPUÉS';
+
+    const grid = document.getElementById('pdSelectorGrid');
+    grid.innerHTML = '';
+    ACTIVITIES.forEach(act => {
+        const btn = document.createElement('button');
+        btn.className = 'pd-selector-item';
+        btn.setAttribute('aria-label', act.texto);
+        btn.innerHTML = `<span class="pd-selector-emoji" aria-hidden="true">${act.emoji}</span>
+                         <span class="pd-selector-text">${act.texto}</span>`;
+        btn.onclick = () => {
+            setPDSlot(pdSlotTarget, act.key);
+            closePDSelector();
+            speakPD();
+        };
+        grid.appendChild(btn);
+    });
+
+    document.getElementById('pdSelectorOverlay').hidden = false;
+}
+
+function closePDSelector() {
+    document.getElementById('pdSelectorOverlay').hidden = true;
+    pdSlotTarget = null;
+}
+
+function speakPD() {
+    const ptxt = document.getElementById('pd-primero-text').textContent;
+    const dtxt = document.getElementById('pd-despues-text').textContent;
+    if (ptxt === 'Tocar para elegir' && dtxt === 'Tocar para elegir') {
+        sayText('Elegí las actividades tocando las tarjetas.');
+        return;
+    }
+    const parts = [];
+    if (ptxt !== 'Tocar para elegir') parts.push(`Primero: ${ptxt}`);
+    if (dtxt !== 'Tocar para elegir') parts.push(`Después: ${dtxt}`);
+    sayText(parts.join('. '));
 }
 
 /* ============================================================
