@@ -1,5 +1,5 @@
 /* Aplicación de Samuel - Service Worker */
-const CACHE_VERSION = 'samuel-app-v73-escuela-mochila-consignas';
+const CACHE_VERSION = 'samuel-app-v74-escuela-adulto';
 const CACHE_NAME = CACHE_VERSION;
 
 const ASSETS = [
