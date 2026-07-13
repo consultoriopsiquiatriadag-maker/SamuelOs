@@ -101,9 +101,9 @@
             flex: 1;
             display: grid;
             grid-template-columns: 1fr 1fr;
-            grid-template-rows: 1fr 1fr;
-            gap: 25px;
-            padding: 10px 40px 30px 40px;
+            grid-template-rows: 1fr auto;
+            gap: 20px;
+            padding: 10px 40px 10px 40px;
             max-width: 1200px;
             margin: 0 auto;
             width: 100%;
@@ -156,6 +156,55 @@
         .card-videos { border-bottom: 12px solid var(--color-videos); color: var(--color-videos); }
         .card-hablar { border-bottom: 12px solid var(--color-hablar); color: var(--color-hablar); }
         .card-ayuda { border-bottom: 12px solid var(--color-ayuda); color: var(--color-ayuda); }
+
+        /* --- Hablar: carta ancha en portada --- */
+        .card-hablar-wide {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
+            color: #fff;
+            border-bottom: none;
+            min-height: 150px;
+            box-shadow: 0 12px 38px rgba(124,58,237,0.45);
+            animation: cardIn 0.6s ease-out backwards 0.32s, hablarGlow 3s ease-in-out infinite 2s;
+        }
+        .card-hablar-wide .card-icon { font-size: 60px; margin-bottom: 4px; }
+        .card-hablar-wide .card-label { font-size: 2.4rem; }
+        .card-hablar-sub {
+            display: block;
+            font-size: 1rem;
+            font-weight: 600;
+            opacity: 0.85;
+            margin-top: 4px;
+            letter-spacing: 0;
+            text-transform: none;
+        }
+        @keyframes hablarGlow {
+            0%, 100% { box-shadow: 0 12px 38px rgba(124,58,237,0.45); }
+            50% { box-shadow: 0 18px 55px rgba(124,58,237,0.75); transform: translateY(-3px) scale(1.01); }
+        }
+
+        /* --- Ayuda: botón de emergencia bajo el grid --- */
+        .ayuda-strip {
+            padding: 0 40px 18px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .ayuda-strip-btn {
+            width: 100%;
+            background: #fff5f5;
+            border: 3px solid #ff4757;
+            color: #ff4757;
+            border-radius: 22px;
+            font-size: 1.15rem;
+            font-weight: 900;
+            padding: 14px 20px;
+            cursor: pointer;
+            transition: background .15s, transform .12s;
+        }
+        .ayuda-strip-btn:hover { background: #ffe0e3; transform: translateY(-2px); }
+        .ayuda-strip-btn:active { transform: scale(.95); }
 
         /* --- Footer --- */
         footer {
@@ -318,44 +367,90 @@
         #speakModal {
             position: fixed;
             inset: 0;
-            background: rgba(255,255,255,0.95);
+            background: rgba(245,243,255,0.97);
             display: none;
-            grid-template-columns: repeat(2, 1fr);
-            grid-auto-rows: min-content;
-            align-content: start;
-            gap: 16px;
-            padding: 90px 30px 30px;
+            flex-direction: column;
             z-index: 100;
             overflow-y: auto;
             animation: zoomIn 0.3s ease-out;
         }
+        .speak-modal-header {
+            position: sticky;
+            top: 0;
+            background: linear-gradient(135deg, #7c3aed, #5b21b6);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 24px;
+            z-index: 10;
+            box-shadow: 0 4px 18px rgba(124,58,237,0.35);
+        }
+        .speak-modal-title {
+            font-size: 1.5rem;
+            font-weight: 900;
+        }
+        .speak-close-btn {
+            background: rgba(255,255,255,0.2);
+            color: #fff;
+            border: 2px solid rgba(255,255,255,0.5);
+            border-radius: 18px;
+            font-size: 1.1rem;
+            font-weight: 900;
+            padding: 10px 22px;
+            cursor: pointer;
+            transition: background .15s;
+        }
+        .speak-close-btn:hover { background: rgba(255,255,255,0.35); }
+        .speak-phrases-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            padding: 20px 24px 10px;
+        }
+        .btn-repetir-wrap {
+            padding: 0 24px 24px;
+        }
+        .btn-repetir {
+            width: 100%;
+            background: #ede9fe;
+            border: 3px solid #7c3aed;
+            color: #5b21b6;
+            border-radius: 22px;
+            font-size: 1.1rem;
+            font-weight: 900;
+            padding: 16px;
+            cursor: pointer;
+            transition: background .15s, transform .12s;
+        }
+        .btn-repetir:hover { background: #ddd6fe; transform: translateY(-2px); }
+        .btn-repetir:active { transform: scale(.95); }
 
         .phrase-btn {
             background: white;
             border: 4px solid var(--color-hablar);
-            border-radius: 30px;
-            font-size: 1.2rem;
+            border-radius: 28px;
+            font-size: 1.35rem;
             font-weight: 800;
             cursor: pointer;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 12px;
-            padding: 14px 10px;
-            min-height: 90px;
+            gap: 8px;
+            padding: 18px 12px;
+            min-height: 120px;
             box-shadow: var(--shadow-soft);
+            transition: transform .12s, box-shadow .12s;
+            line-height: 1.3;
+            text-align: center;
         }
+        .phrase-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 28px rgba(139,92,246,0.25); }
+        .phrase-btn:active { transform: scale(.93); }
+        .phrase-emoji { font-size: 2.2rem; line-height: 1; }
 
         .close-modal {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: #ff4757;
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            border-radius: 50px;
-            font-weight: 900;
+            display: none; /* replaced by speak-modal-header */
         }
 
         /* --- Modal Gate (Zona de Papás) --- */
@@ -558,16 +653,16 @@
             <span class="card-label">Videos</span>
         </button>
 
-        <button class="card card-hablar" onclick="openHablar()">
+        <button class="card card-hablar card-hablar-wide" onclick="openHablar()">
             <span class="card-icon">🗣️</span>
             <span class="card-label">Hablar</span>
-        </button>
-
-        <button class="card card-ayuda" onclick="handleAyuda()">
-            <span class="card-icon">❤️</span>
-            <span class="card-label">Ayuda</span>
+            <span class="card-hablar-sub">Decí lo que necesitás</span>
         </button>
     </main>
+
+    <div class="ayuda-strip">
+        <button class="ayuda-strip-btn" onclick="handleAyuda()">❤️ Pedir Ayuda a Mamá o Papá</button>
+    </div>
 
     <footer>
         <div class="last-phrase" id="status-bar">
@@ -581,18 +676,27 @@
     </div>
 
     <div id="speakModal">
-        <button class="close-modal" onclick="closeHablar()">X CERRAR</button>
-        <button class="phrase-btn" onclick="say('Quiero agua', '💧')">💧 Quiero agua</button>
-        <button class="phrase-btn" onclick="say('Tengo hambre', '🍽️')">🍽️ Tengo hambre</button>
-        <button class="phrase-btn" onclick="say('Tengo sueño', '😴')">😴 Tengo sueño</button>
-        <button class="phrase-btn" onclick="say('Quiero jugar', '🧸')">🧸 Quiero jugar</button>
-        <button class="phrase-btn" onclick="say('Necesito ayuda', '🆘')">🆘 Necesito ayuda</button>
-        <button class="phrase-btn" onclick="say('Quiero descansar', '🛌')">🛌 Quiero descansar</button>
-        <button class="phrase-btn" onclick="say('Estoy contento', '😊')">😊 Estoy contento</button>
-        <button class="phrase-btn" onclick="say('Estoy enojado', '😠')">😠 Estoy enojado</button>
-        <button class="phrase-btn" onclick="say('Me duele', '🤕')">🤕 Me duele</button>
-        <button class="phrase-btn" onclick="say('Quiero ir al baño', '🚽')">🚽 Quiero ir al baño</button>
-        <button class="phrase-btn" onclick="say('Te quiero mucho', '💖')">💖 Te quiero</button>
+        <div class="speak-modal-header">
+            <span class="speak-modal-title">🗣️ ¿Qué necesitás decir?</span>
+            <button class="speak-close-btn" onclick="closeHablar()">◀ Volver</button>
+        </div>
+        <div class="speak-phrases-grid">
+            <button class="phrase-btn" onclick="say('Tengo hambre', '🍽️')"><span class="phrase-emoji">🍽️</span>Tengo hambre</button>
+            <button class="phrase-btn" onclick="say('Tengo sed', '💧')"><span class="phrase-emoji">💧</span>Tengo sed</button>
+            <button class="phrase-btn" onclick="say('Quiero ir al baño', '🚽')"><span class="phrase-emoji">🚽</span>Quiero ir al baño</button>
+            <button class="phrase-btn" onclick="say('Quiero descansar', '🛌')"><span class="phrase-emoji">🛌</span>Quiero descansar</button>
+            <button class="phrase-btn" onclick="say('Me duele', '🤕')"><span class="phrase-emoji">🤕</span>Me duele</button>
+            <button class="phrase-btn" onclick="say('Necesito ayuda', '🆘')"><span class="phrase-emoji">🆘</span>Necesito ayuda</button>
+            <button class="phrase-btn" onclick="say('Quiero jugar', '🧸')"><span class="phrase-emoji">🧸</span>Quiero jugar</button>
+            <button class="phrase-btn" onclick="say('Estoy cansado', '😴')"><span class="phrase-emoji">😴</span>Estoy cansado</button>
+            <button class="phrase-btn" onclick="say('Estoy contento', '😊')"><span class="phrase-emoji">😊</span>Estoy contento</button>
+            <button class="phrase-btn" onclick="say('Estoy enojado', '😠')"><span class="phrase-emoji">😠</span>Estoy enojado</button>
+            <button class="phrase-btn" onclick="say('Quiero agua', '💧')"><span class="phrase-emoji">🥤</span>Quiero agua</button>
+            <button class="phrase-btn" onclick="say('Te quiero mucho', '💖')"><span class="phrase-emoji">💖</span>Te quiero</button>
+        </div>
+        <div class="btn-repetir-wrap">
+            <button class="btn-repetir" id="btnRepetir" onclick="repeatLastSaid()" style="display:none">🔁 Repetir lo último</button>
+        </div>
     </div>
 
     <div id="gateModal">
@@ -823,13 +927,29 @@
             }
         }
 
+        // --- Última frase dicha (para repetir) ---
+        let _lastSaidText = null;
+        let _lastSaidEmoji = null;
+
         // --- Frase elegida por Samuel (suma estrella + registra actividad) ---
         function say(text, emoji) {
             playTapSound();
             registerActivity('hablar');
             addStars(1, 'hablar');
+            _lastSaidText = text;
+            _lastSaidEmoji = emoji;
             try { localStorage.setItem('samuel_last_phrase', text); } catch (e) { /* ignore */ }
             speak(text, emoji);
+            // mostrar botón Repetir
+            const btn = document.getElementById('btnRepetir');
+            if (btn) { btn.style.display = ''; btn.textContent = '🔁 Repetir: ' + text; }
+        }
+
+        // --- Repetir la última frase ---
+        function repeatLastSaid() {
+            if (!_lastSaidText) return;
+            playTapSound();
+            speak(_lastSaidText, _lastSaidEmoji);
         }
 
         // --- Audios Parentales Grabados ---
