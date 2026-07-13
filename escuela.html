@@ -1,521 +1,800 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Escuela de Samuel</title>
-    <style>
-        :root {
-            --color-numeros: #f59e0b;
-            --color-letras: #3b82f6;
-            --color-colores: #8b5cf6;
-            --color-palabras: #10b981;
-            --bg: #f8fafc;
-            --card-bg: #ffffff;
-            --text: #1e293b;
-            --shadow: 0 8px 30px rgba(0,0,0,0.10);
-            --radius: 32px;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Escuela de Samuel</title>
+<style>
+/* ============================================================
+   VARIABLES Y RESET
+   ============================================================ */
+:root {
+    --color-aprendo:  #3b82f6;
+    --color-practico: #f97316;
+    --color-escuela:  #10b981;
+    --color-comunico: #8b5cf6;
+    --color-organizo: #0891b2;
+    --color-calmo:    #ec4899;
+    --color-volver:   #f97316;
+    --bg:             #f0f4f8;
+    --card-bg:        #ffffff;
+    --text:           #1e293b;
+    --text-soft:      #64748b;
+    --shadow:         0 6px 24px rgba(0,0,0,0.10);
+    --shadow-hover:   0 12px 36px rgba(0,0,0,0.16);
+    --radius-card:    28px;
+    --radius-btn:     20px;
+    --font:           'Segoe UI', system-ui, -apple-system, sans-serif;
+}
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        body {
-            font-family: 'Segoe UI', system-ui, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
+html, body {
+    height: 100%;
+    overflow: hidden;
+}
 
-        /* --- Header --- */
-        header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 14px 28px;
-            background: #ffffff;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.07);
-            flex-shrink: 0;
-        }
+body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+}
 
-        .btn-volver {
-            display: inline-flex; align-items: center; gap: 10px;
-            background: #f97316; color: #fff; border: none;
-            padding: 14px 24px; border-radius: 22px;
-            font-size: 18px; font-weight: 900; min-height: 56px;
-            box-shadow: 0 6px 18px rgba(249,115,22,.35);
-            cursor: pointer; text-decoration: none;
-            transition: transform .12s, box-shadow .12s;
-        }
-        .btn-volver:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(249,115,22,.45); }
-        .btn-volver:active { transform: scale(.95); }
+/* ============================================================
+   HEADER COMPARTIDO
+   ============================================================ */
+.esc-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 24px;
+    background: #fff;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+    flex-shrink: 0;
+    min-height: 64px;
+    gap: 12px;
+}
 
-        .header-center {
-            font-size: 1.4rem;
-            font-weight: 900;
-            color: #10b981;
-            text-align: center;
-        }
+.esc-header-title {
+    font-size: clamp(1rem, 2.5vw, 1.35rem);
+    font-weight: 900;
+    color: #10b981;
+    text-align: center;
+    flex: 1;
+}
 
-        .header-avatar {
-            width: 52px; height: 52px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid #10b981;
-        }
+.header-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #10b981;
+    flex-shrink: 0;
+}
 
-        /* --- HUB --- */
-        #view-hub {
-            flex: 1;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            grid-template-rows: 1fr 1fr;
-            gap: 24px;
-            padding: 28px 40px 36px;
-            max-width: 900px;
-            margin: 0 auto;
-            width: 100%;
-        }
+/* ============================================================
+   BOTÓN VOLVER (naranja, consistente con el resto de Samuel OS)
+   ============================================================ */
+.btn-volver {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--color-volver);
+    color: #fff;
+    border: none;
+    padding: 12px 22px;
+    border-radius: var(--radius-btn);
+    font-family: var(--font);
+    font-size: clamp(14px, 2vw, 18px);
+    font-weight: 900;
+    min-height: 52px;
+    min-width: 110px;
+    cursor: pointer;
+    text-decoration: none;
+    box-shadow: 0 6px 18px rgba(249,115,22,.35);
+    transition: transform .12s ease, box-shadow .12s ease;
+    flex-shrink: 0;
+}
+.btn-volver:hover  { box-shadow: 0 10px 26px rgba(249,115,22,.45); transform: translateY(-2px); }
+.btn-volver:active { transform: scale(.95); }
+.btn-volver:focus-visible {
+    outline: 4px solid #fb923c;
+    outline-offset: 3px;
+}
 
-        .cat-card {
-            background: var(--card-bg);
-            border-radius: var(--radius);
-            border: none;
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            box-shadow: var(--shadow);
-            transition: transform .15s, box-shadow .15s;
-            border-bottom: 12px solid #ddd;
-        }
-        .cat-card:hover { transform: translateY(-5px) scale(1.02); }
-        .cat-card:active { transform: scale(.95); }
+/* ============================================================
+   VISTAS (sistema show/hide)
+   ============================================================ */
+.view {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+.view[hidden] { display: none !important; }
 
-        .cat-card.numeros { border-bottom-color: var(--color-numeros); color: var(--color-numeros); }
-        .cat-card.letras  { border-bottom-color: var(--color-letras);  color: var(--color-letras); }
-        .cat-card.colores { border-bottom-color: var(--color-colores); color: var(--color-colores); }
-        .cat-card.palabras{ border-bottom-color: var(--color-palabras);color: var(--color-palabras); }
+/* ============================================================
+   HUB PRINCIPAL — 6 categorías
+   ============================================================ */
+#view-hub .hub-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 18px;
+    padding: 20px 28px 24px;
+    overflow: hidden;
+}
 
-        .cat-icon  { font-size: 72px; filter: drop-shadow(0 6px 8px rgba(0,0,0,0.10)); }
-        .cat-label { font-size: 1.7rem; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; }
-        .cat-sub   { font-size: 0.9rem; font-weight: 600; opacity: 0.7; text-transform: none; }
+.hub-card {
+    background: var(--card-bg);
+    border: none;
+    border-radius: var(--radius-card);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    border-bottom: 10px solid #e2e8f0;
+    transition: transform .15s ease, box-shadow .15s ease;
+    padding: 16px 12px;
+    font-family: var(--font);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+.hub-card:hover  { transform: translateY(-4px); box-shadow: var(--shadow-hover); }
+.hub-card:active { transform: scale(.95); }
+.hub-card:focus-visible {
+    outline: 4px solid currentColor;
+    outline-offset: 3px;
+}
 
-        /* --- FLASHCARD VIEW --- */
-        #view-cards {
-            flex: 1;
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px 28px 28px;
-            gap: 18px;
-        }
+.hub-card-icon  {
+    font-size: clamp(40px, 6vw, 64px);
+    line-height: 1;
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.10));
+}
+.hub-card-label {
+    font-size: clamp(0.95rem, 2vw, 1.4rem);
+    font-weight: 900;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+}
+.hub-card-sub {
+    font-size: clamp(0.7rem, 1.3vw, 0.85rem);
+    font-weight: 600;
+    opacity: .70;
+    text-transform: none;
+    letter-spacing: 0;
+}
+.hub-card-badge {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    background: #fef3c7;
+    color: #92400e;
+    font-size: 0.65rem;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 20px;
+}
 
-        .fc-topbar {
-            width: 100%;
-            max-width: 680px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-        }
+.hub-card.aprendo  { border-bottom-color: var(--color-aprendo);  color: var(--color-aprendo); }
+.hub-card.practico { border-bottom-color: var(--color-practico); color: var(--color-practico); }
+.hub-card.escuela  { border-bottom-color: var(--color-escuela);  color: var(--color-escuela); }
+.hub-card.comunico { border-bottom-color: var(--color-comunico); color: var(--color-comunico); }
+.hub-card.organizo { border-bottom-color: var(--color-organizo); color: var(--color-organizo); }
+.hub-card.calmo    { border-bottom-color: var(--color-calmo);    color: var(--color-calmo); }
 
-        .btn-volver-cat {
-            display: inline-flex; align-items: center; gap: 8px;
-            background: #f97316; color: #fff; border: none;
-            padding: 12px 20px; border-radius: 18px;
-            font-size: 16px; font-weight: 900;
-            cursor: pointer; transition: transform .12s;
-        }
-        .btn-volver-cat:active { transform: scale(.95); }
+/* ============================================================
+   SUB-HUB: APRENDO (4 categorías de fichas)
+   ============================================================ */
+.subhub-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 18px;
+    padding: 20px 28px 24px;
+    overflow: hidden;
+}
 
-        .fc-cat-title {
-            font-size: 1.2rem;
-            font-weight: 900;
-            flex: 1;
-            text-align: center;
-        }
+.cat-card {
+    background: var(--card-bg);
+    border-radius: var(--radius-card);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    box-shadow: var(--shadow);
+    transition: transform .15s, box-shadow .15s;
+    border-bottom: 10px solid #ddd;
+    font-family: var(--font);
+}
+.cat-card:hover  { transform: translateY(-4px); box-shadow: var(--shadow-hover); }
+.cat-card:active { transform: scale(.95); }
+.cat-card:focus-visible { outline: 4px solid currentColor; outline-offset: 3px; }
 
-        .fc-progress {
-            font-size: 1rem;
-            font-weight: 700;
-            color: #64748b;
-            white-space: nowrap;
-        }
+.cat-card.numeros { border-bottom-color: #f59e0b; color: #f59e0b; }
+.cat-card.letras  { border-bottom-color: #3b82f6; color: #3b82f6; }
+.cat-card.colores { border-bottom-color: #8b5cf6; color: #8b5cf6; }
+.cat-card.palabras{ border-bottom-color: #10b981; color: #10b981; }
 
-        /* La ficha grande */
-        .flashcard {
-            flex: 1;
-            width: 100%;
-            max-width: 560px;
-            background: #fff;
-            border-radius: 40px;
-            box-shadow: 0 12px 40px rgba(0,0,0,0.12);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 30px 24px;
-            gap: 10px;
-            transition: transform .2s;
-            position: relative;
-            overflow: hidden;
-        }
+.cat-icon  { font-size: clamp(48px, 7vw, 72px); filter: drop-shadow(0 4px 6px rgba(0,0,0,0.10)); }
+.cat-label { font-size: clamp(1rem, 2.5vw, 1.7rem); font-weight: 900; letter-spacing: 1px; text-transform: uppercase; }
+.cat-sub   { font-size: clamp(0.7rem, 1.2vw, 0.9rem); font-weight: 600; opacity: .7; text-transform: none; }
 
-        .fc-stripe {
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 10px;
-            border-radius: 40px 40px 0 0;
-        }
+/* ============================================================
+   VISOR DE FICHAS
+   ============================================================ */
+.fc-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 24px;
+    gap: 12px;
+    flex-shrink: 0;
+}
 
-        .fc-visual {
-            font-size: 100px;
-            line-height: 1.1;
-            filter: drop-shadow(0 8px 12px rgba(0,0,0,0.12));
-        }
+.fc-cat-title {
+    font-size: clamp(1rem, 2.5vw, 1.3rem);
+    font-weight: 900;
+    flex: 1;
+    text-align: center;
+}
 
-        .fc-text {
-            font-size: 5rem;
-            font-weight: 900;
-            line-height: 1;
-            text-align: center;
-        }
+.fc-progress {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-soft);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
 
-        .fc-sub {
-            font-size: 1.6rem;
-            font-weight: 700;
-            color: #475569;
-            text-align: center;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
+.flashcard {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin: 0 24px;
+    background: #fff;
+    border-radius: 36px;
+    box-shadow: 0 10px 36px rgba(0,0,0,0.11);
+    padding: 28px 20px;
+    position: relative;
+    overflow: hidden;
+}
 
-        /* Controles */
-        .fc-controls {
-            width: 100%;
-            max-width: 560px;
-            display: flex;
-            gap: 14px;
-            justify-content: center;
-        }
+.fc-stripe {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 8px;
+    border-radius: 36px 36px 0 0;
+}
 
-        .fc-btn {
-            flex: 1;
-            padding: 16px 10px;
-            border: none;
-            border-radius: 22px;
-            font-size: 1.15rem;
-            font-weight: 900;
-            cursor: pointer;
-            transition: transform .12s, box-shadow .12s;
-            box-shadow: 0 6px 18px rgba(0,0,0,0.10);
-        }
-        .fc-btn:active { transform: scale(.93); }
+.fc-visual {
+    font-size: clamp(64px, 12vw, 100px);
+    line-height: 1.1;
+    filter: drop-shadow(0 6px 10px rgba(0,0,0,0.12));
+}
 
-        .fc-btn-prev { background: #e2e8f0; color: #475569; }
-        .fc-btn-prev:hover { background: #cbd5e1; }
+.fc-text {
+    font-size: clamp(3rem, 8vw, 5rem);
+    font-weight: 900;
+    line-height: 1;
+    text-align: center;
+}
 
-        .fc-btn-listen {
-            background: #10b981; color: #fff; flex: 2;
-            box-shadow: 0 6px 20px rgba(16,185,129,0.35);
-        }
-        .fc-btn-listen:hover { background: #059669; box-shadow: 0 10px 28px rgba(16,185,129,0.45); }
+.fc-sub {
+    font-size: clamp(1rem, 2.5vw, 1.6rem);
+    font-weight: 700;
+    color: var(--text-soft);
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
 
-        .fc-btn-next { background: #e2e8f0; color: #475569; }
-        .fc-btn-next:hover { background: #cbd5e1; }
+.fc-controls {
+    display: flex;
+    gap: 12px;
+    padding: 14px 24px 20px;
+    flex-shrink: 0;
+}
 
-        /* Celebración */
-        #celebration {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(255,255,255,0.97);
-            z-index: 200;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 20px;
-            font-size: 1.4rem;
-            font-weight: 900;
-            text-align: center;
-            animation: zoomIn .3s ease-out;
-        }
-        .celeb-emoji { font-size: 5rem; }
-        .celeb-text { font-size: 2rem; color: #10b981; }
-        .celeb-sub  { font-size: 1.1rem; color: #64748b; font-weight: 600; }
-        .celeb-btn  {
-            background: #10b981; color: #fff; border: none;
-            padding: 18px 40px; border-radius: 28px;
-            font-size: 1.2rem; font-weight: 900; cursor: pointer;
-            box-shadow: 0 8px 24px rgba(16,185,129,0.4);
-            margin-top: 10px;
-        }
+.fc-btn {
+    flex: 1;
+    padding: 15px 10px;
+    border: none;
+    border-radius: 20px;
+    font-family: var(--font);
+    font-size: clamp(0.9rem, 2vw, 1.1rem);
+    font-weight: 900;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.10);
+    transition: transform .12s, box-shadow .12s;
+    min-height: 52px;
+}
+.fc-btn:active { transform: scale(.93); }
+.fc-btn:focus-visible { outline: 4px solid currentColor; outline-offset: 3px; }
 
-        @keyframes zoomIn {
-            from { opacity: 0; transform: scale(.88); }
-            to   { opacity: 1; transform: scale(1); }
-        }
-        @keyframes cardFlip {
-            0%   { transform: scale(1); }
-            50%  { transform: scale(.92); }
-            100% { transform: scale(1); }
-        }
-        .card-animate { animation: cardFlip .18s ease-out; }
+.fc-btn-prev   { background: #e2e8f0; color: #475569; }
+.fc-btn-prev:hover  { background: #cbd5e1; }
+.fc-btn-listen { background: #10b981; color: #fff; flex: 2; box-shadow: 0 5px 18px rgba(16,185,129,0.35); }
+.fc-btn-listen:hover { background: #059669; }
+.fc-btn-next   { background: #e2e8f0; color: #475569; }
+.fc-btn-next:hover  { background: #cbd5e1; }
 
-        @media (max-width: 600px) {
-            #view-hub { padding: 16px 20px 24px; gap: 16px; }
-            .cat-icon { font-size: 52px; }
-            .cat-label { font-size: 1.3rem; }
-            .fc-text { font-size: 3.5rem; }
-            .fc-visual { font-size: 70px; }
-        }
-    </style>
+/* ============================================================
+   PLACEHOLDER "PRÓXIMAMENTE"
+   ============================================================ */
+.placeholder-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    padding: 32px;
+    text-align: center;
+}
+.placeholder-icon  { font-size: 80px; opacity: .6; }
+.placeholder-title { font-size: 1.8rem; font-weight: 900; color: var(--text-soft); }
+.placeholder-sub   { font-size: 1rem; color: var(--text-soft); max-width: 340px; }
+
+/* ============================================================
+   CELEBRACIÓN
+   ============================================================ */
+#celebration {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(255,255,255,0.97);
+    z-index: 300;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    text-align: center;
+    padding: 32px;
+}
+
+.celeb-emoji { font-size: 5rem; }
+.celeb-text  { font-size: clamp(1.5rem, 4vw, 2rem); color: #10b981; font-weight: 900; }
+.celeb-sub   { font-size: 1rem; color: var(--text-soft); font-weight: 600; }
+
+.celeb-btn {
+    padding: 18px 36px;
+    border: none;
+    border-radius: 26px;
+    font-family: var(--font);
+    font-size: 1.1rem;
+    font-weight: 900;
+    cursor: pointer;
+    margin-top: 6px;
+}
+.celeb-btn-repasar { background: #10b981; color: #fff; box-shadow: 0 6px 20px rgba(16,185,129,0.4); }
+.celeb-btn-elegir  { background: var(--color-volver); color: #fff; box-shadow: 0 6px 20px rgba(249,115,22,0.4); }
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 600px) {
+    #view-hub .hub-grid {
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: repeat(3, 1fr);
+        padding: 14px 16px 18px;
+        gap: 13px;
+    }
+    .hub-card-badge { font-size: 0.55rem; padding: 2px 6px; }
+    .subhub-grid  { padding: 14px 16px 18px; gap: 13px; }
+    .fc-topbar    { padding: 10px 16px; }
+    .flashcard    { margin: 0 16px; }
+    .fc-controls  { padding: 10px 16px 16px; gap: 8px; }
+    .esc-header   { padding: 10px 16px; }
+    .btn-volver   { padding: 10px 16px; font-size: 14px; min-width: 90px; }
+}
+
+@media (max-width: 430px) {
+    #view-hub .hub-grid { gap: 10px; padding: 12px 12px 14px; }
+    .subhub-grid        { gap: 10px; padding: 12px 12px 14px; }
+}
+
+/* Reducción de movimiento */
+@media (prefers-reduced-motion: reduce) {
+    .hub-card, .cat-card, .btn-volver, .fc-btn { transition: none; }
+    .hub-card:hover, .cat-card:hover            { transform: none; }
+}
+
+/* Animación suave de entrada de ficha */
+@keyframes cardPop {
+    from { opacity: .4; transform: scale(.93); }
+    to   { opacity: 1;  transform: scale(1); }
+}
+.card-anim {
+    animation: cardPop .18s ease-out forwards;
+}
+@media (prefers-reduced-motion: reduce) {
+    .card-anim { animation: none; }
+}
+</style>
 </head>
 <body>
 
-<header>
-    <a class="btn-volver" href="./child.html">◀ Volver</a>
-    <div class="header-center">📚 Escuela de Samuel</div>
+<!-- ============================================================
+     HEADER
+     ============================================================ -->
+<header class="esc-header" id="appHeader">
+    <!-- El botón de volver se inyecta por JS según la vista -->
+    <button class="btn-volver" id="headerBack" onclick="navBack()">◀ Volver</button>
+    <div class="esc-header-title" id="headerTitle">📚 Escuela de Samuel</div>
     <img class="header-avatar" src="./Perfil-Samuel.png" alt="Samuel">
 </header>
 
-<!-- HUB: elegir categoría -->
-<div id="view-hub">
-    <button class="cat-card numeros" onclick="openCategory('numeros')">
-        <span class="cat-icon">🔢</span>
-        <span class="cat-label">Números</span>
-        <span class="cat-sub">Del 1 al 10</span>
-    </button>
-    <button class="cat-card letras" onclick="openCategory('letras')">
-        <span class="cat-icon">🔤</span>
-        <span class="cat-label">Letras</span>
-        <span class="cat-sub">El abecedario</span>
-    </button>
-    <button class="cat-card colores" onclick="openCategory('colores')">
-        <span class="cat-icon">🎨</span>
-        <span class="cat-label">Colores</span>
-        <span class="cat-sub">y Formas</span>
-    </button>
-    <button class="cat-card palabras" onclick="openCategory('palabras')">
-        <span class="cat-icon">🖼️</span>
-        <span class="cat-label">Palabras</span>
-        <span class="cat-sub">Con imagen</span>
-    </button>
+<!-- ============================================================
+     VISTA: HUB PRINCIPAL
+     ============================================================ -->
+<div class="view" id="view-hub">
+    <div class="hub-grid">
+
+        <button class="hub-card aprendo"
+                onclick="navTo('view-aprendo', '📖 Aprendo', 'aprendo')"
+                aria-label="Aprendo: letras, números, colores y palabras">
+            <span class="hub-card-icon" aria-hidden="true">📖</span>
+            <span class="hub-card-label">Aprendo</span>
+            <span class="hub-card-sub">Letras, números y más</span>
+        </button>
+
+        <button class="hub-card practico"
+                onclick="navTo('view-placeholder', '✏️ Practico', 'practico')"
+                aria-label="Practico: juegos y ejercicios">
+            <span class="hub-card-icon" aria-hidden="true">✏️</span>
+            <span class="hub-card-label">Practico</span>
+            <span class="hub-card-sub">Juegos y ejercicios</span>
+            <span class="hub-card-badge">Próximamente</span>
+        </button>
+
+        <button class="hub-card escuela"
+                onclick="navTo('view-placeholder', '🏫 Voy a la Escuela', 'escuela')"
+                aria-label="Voy a la escuela: agenda y rutinas">
+            <span class="hub-card-icon" aria-hidden="true">🏫</span>
+            <span class="hub-card-label">Voy a la Escuela</span>
+            <span class="hub-card-sub">Agenda y rutinas</span>
+            <span class="hub-card-badge">Próximamente</span>
+        </button>
+
+        <button class="hub-card comunico"
+                onclick="navTo('view-placeholder', '💬 Me Comunico', 'comunico')"
+                aria-label="Me comunico: frases y expresiones">
+            <span class="hub-card-icon" aria-hidden="true">💬</span>
+            <span class="hub-card-label">Me Comunico</span>
+            <span class="hub-card-sub">Frases y expresiones</span>
+            <span class="hub-card-badge">Próximamente</span>
+        </button>
+
+        <button class="hub-card organizo"
+                onclick="navTo('view-placeholder', '📋 Me Organizo', 'organizo')"
+                aria-label="Me organizo: mi agenda y horarios">
+            <span class="hub-card-icon" aria-hidden="true">📋</span>
+            <span class="hub-card-label">Me Organizo</span>
+            <span class="hub-card-sub">Mi agenda y horarios</span>
+            <span class="hub-card-badge">Próximamente</span>
+        </button>
+
+        <button class="hub-card calmo"
+                onclick="navTo('view-placeholder', '🌬️ Me Calmo', 'calmo')"
+                aria-label="Me calmo: respiro y me tranquilizo">
+            <span class="hub-card-icon" aria-hidden="true">🌬️</span>
+            <span class="hub-card-label">Me Calmo</span>
+            <span class="hub-card-sub">Respiro y me tranquilizo</span>
+            <span class="hub-card-badge">Próximamente</span>
+        </button>
+
+    </div>
 </div>
 
-<!-- VISTA FICHAS -->
-<div id="view-cards">
+<!-- ============================================================
+     VISTA: APRENDO — sub-hub de fichas
+     ============================================================ -->
+<div class="view" id="view-aprendo" hidden>
+    <div class="subhub-grid">
+        <button class="cat-card numeros"
+                onclick="openCategory('numeros')"
+                aria-label="Números, del 1 al 10">
+            <span class="cat-icon" aria-hidden="true">🔢</span>
+            <span class="cat-label">Números</span>
+            <span class="cat-sub">Del 1 al 10</span>
+        </button>
+        <button class="cat-card letras"
+                onclick="openCategory('letras')"
+                aria-label="Letras, el abecedario">
+            <span class="cat-icon" aria-hidden="true">🔤</span>
+            <span class="cat-label">Letras</span>
+            <span class="cat-sub">El abecedario</span>
+        </button>
+        <button class="cat-card colores"
+                onclick="openCategory('colores')"
+                aria-label="Colores y formas">
+            <span class="cat-icon" aria-hidden="true">🎨</span>
+            <span class="cat-label">Colores</span>
+            <span class="cat-sub">y Formas</span>
+        </button>
+        <button class="cat-card palabras"
+                onclick="openCategory('palabras')"
+                aria-label="Palabras con imagen">
+            <span class="cat-icon" aria-hidden="true">🖼️</span>
+            <span class="cat-label">Palabras</span>
+            <span class="cat-sub">Con imagen</span>
+        </button>
+    </div>
+</div>
+
+<!-- ============================================================
+     VISTA: VISOR DE FICHAS
+     ============================================================ -->
+<div class="view" id="view-cards" hidden>
     <div class="fc-topbar">
-        <button class="btn-volver-cat" onclick="backToHub()">◀ Volver</button>
         <div class="fc-cat-title" id="fcCatTitle"></div>
-        <div class="fc-progress" id="fcProgress"></div>
+        <div class="fc-progress"  id="fcProgress"></div>
     </div>
 
     <div class="flashcard" id="flashcard">
-        <div class="fc-stripe" id="fcStripe"></div>
-        <div class="fc-visual" id="fcVisual"></div>
-        <div class="fc-text"   id="fcText"></div>
-        <div class="fc-sub"    id="fcSub"></div>
+        <div class="fc-stripe"  id="fcStripe"></div>
+        <div class="fc-visual"  id="fcVisual"  aria-hidden="true"></div>
+        <div class="fc-text"    id="fcText"    role="text"></div>
+        <div class="fc-sub"     id="fcSub"></div>
     </div>
 
     <div class="fc-controls">
-        <button class="fc-btn fc-btn-prev" id="btnPrev" onclick="prevCard()">◀ Anterior</button>
-        <button class="fc-btn fc-btn-listen" onclick="speakCard()">🔊 Escuchar</button>
-        <button class="fc-btn fc-btn-next"  id="btnNext" onclick="nextCard()">Siguiente ▶</button>
+        <button class="fc-btn fc-btn-prev"   id="btnPrev"   onclick="prevCard()"   aria-label="Ficha anterior">◀ Anterior</button>
+        <button class="fc-btn fc-btn-listen"               onclick="speakCard()"  aria-label="Escuchar">🔊 Escuchar</button>
+        <button class="fc-btn fc-btn-next"   id="btnNext"   onclick="nextCard()"   aria-label="Ficha siguiente">Siguiente ▶</button>
     </div>
 </div>
 
-<!-- Celebración al completar -->
-<div id="celebration">
-    <div class="celeb-emoji">🌟</div>
+<!-- ============================================================
+     VISTA: PLACEHOLDER (secciones próximamente)
+     ============================================================ -->
+<div class="view" id="view-placeholder" hidden>
+    <div class="placeholder-body">
+        <div class="placeholder-icon" aria-hidden="true">🚧</div>
+        <div class="placeholder-title" id="placeholderTitle">Próximamente</div>
+        <div class="placeholder-sub">Esta sección está siendo preparada para Samuel. ¡Volvé pronto!</div>
+    </div>
+</div>
+
+<!-- ============================================================
+     CELEBRACIÓN
+     ============================================================ -->
+<div id="celebration" role="dialog" aria-label="¡Muy bien, Samuel!">
+    <div class="celeb-emoji" aria-hidden="true">🌟</div>
     <div class="celeb-text">¡Muy bien, Samuel!</div>
     <div class="celeb-sub" id="celebSub">Terminaste todas las fichas</div>
-    <button class="celeb-btn" onclick="restartCategory()">🔁 Repasar de nuevo</button>
-    <button class="celeb-btn" style="background:#f97316;box-shadow:0 8px 24px rgba(249,115,22,.4);" onclick="backToHub()">📚 Elegir otra</button>
+    <button class="celeb-btn celeb-btn-repasar" onclick="restartCategory()">🔁 Repasar de nuevo</button>
+    <button class="celeb-btn celeb-btn-elegir"  onclick="navBack(); navBack()">📚 Elegir otra</button>
 </div>
 
 <script>
-// ============================================================
-//  DATOS DE CADA CATEGORÍA
-// ============================================================
-const CATEGORIAS = {
+/* ============================================================
+   NAVEGACIÓN (stack-based)
+   ============================================================ */
+const navStack = [];
 
+function currentViewId() {
+    const v = document.querySelector('.view:not([hidden])');
+    return v ? v.id : 'view-hub';
+}
+
+function showView(id) {
+    document.querySelectorAll('.view').forEach(v => { v.hidden = true; });
+    const target = document.getElementById(id);
+    if (target) target.hidden = false;
+    updateHeader(id);
+}
+
+function navTo(viewId, voiceText, colorKey) {
+    navStack.push(currentViewId());
+    showView(viewId);
+    if (voiceText) sayText(voiceText);
+    // Para placeholder, actualizar el título visible
+    if (viewId === 'view-placeholder') {
+        const el = document.getElementById('placeholderTitle');
+        if (el) el.textContent = voiceText || 'Próximamente';
+    }
+}
+
+function navBack() {
+    cancelSpeak();
+    const prev = navStack.pop();
+    showView(prev || 'view-hub');
+}
+
+function updateHeader(viewId) {
+    const backBtn = document.getElementById('headerBack');
+    const title   = document.getElementById('headerTitle');
+
+    if (viewId === 'view-hub') {
+        // En el hub principal, Volver va a child.html
+        backBtn.onclick = () => { window.location.href = './child.html'; };
+        title.textContent = '📚 Escuela de Samuel';
+    } else {
+        backBtn.onclick = navBack;
+        // Título según vista
+        const titles = {
+            'view-aprendo':     '📖 Aprendo',
+            'view-cards':       document.getElementById('fcCatTitle')?.textContent || '📖 Fichas',
+            'view-placeholder': '🚧 Próximamente',
+        };
+        title.textContent = titles[viewId] || '📚 Escuela de Samuel';
+    }
+}
+
+/* ============================================================
+   DATOS DE FICHAS
+   ============================================================ */
+const CATEGORIAS = {
     numeros: {
         titulo: '🔢 Números',
-        color: '#f59e0b',
+        color:  '#f59e0b',
         fichas: [
-            { visual: '1️⃣', texto: '1', sub: 'uno',   speak: 'uno, el número uno' },
-            { visual: '2️⃣', texto: '2', sub: 'dos',   speak: 'dos, el número dos' },
-            { visual: '3️⃣', texto: '3', sub: 'tres',  speak: 'tres, el número tres' },
-            { visual: '4️⃣', texto: '4', sub: 'cuatro',speak: 'cuatro, el número cuatro' },
-            { visual: '5️⃣', texto: '5', sub: 'cinco', speak: 'cinco, el número cinco' },
-            { visual: '6️⃣', texto: '6', sub: 'seis',  speak: 'seis, el número seis' },
-            { visual: '7️⃣', texto: '7', sub: 'siete', speak: 'siete, el número siete' },
-            { visual: '8️⃣', texto: '8', sub: 'ocho',  speak: 'ocho, el número ocho' },
-            { visual: '9️⃣', texto: '9', sub: 'nueve', speak: 'nueve, el número nueve' },
-            { visual: '🔟', texto: '10', sub: 'diez', speak: 'diez, el número diez' },
+            { visual:'1️⃣', texto:'1',  sub:'uno',    speak:'uno, el número uno' },
+            { visual:'2️⃣', texto:'2',  sub:'dos',    speak:'dos, el número dos' },
+            { visual:'3️⃣', texto:'3',  sub:'tres',   speak:'tres, el número tres' },
+            { visual:'4️⃣', texto:'4',  sub:'cuatro', speak:'cuatro, el número cuatro' },
+            { visual:'5️⃣', texto:'5',  sub:'cinco',  speak:'cinco, el número cinco' },
+            { visual:'6️⃣', texto:'6',  sub:'seis',   speak:'seis, el número seis' },
+            { visual:'7️⃣', texto:'7',  sub:'siete',  speak:'siete, el número siete' },
+            { visual:'8️⃣', texto:'8',  sub:'ocho',   speak:'ocho, el número ocho' },
+            { visual:'9️⃣', texto:'9',  sub:'nueve',  speak:'nueve, el número nueve' },
+            { visual:'🔟',  texto:'10', sub:'diez',   speak:'diez, el número diez' },
         ]
     },
-
     letras: {
         titulo: '🔤 Letras',
-        color: '#3b82f6',
+        color:  '#3b82f6',
         fichas: [
-            { visual: '✈️',  texto: 'A', sub: 'de avión',    speak: 'A, a de avión' },
-            { visual: '⚽',  texto: 'B', sub: 'de pelota',   speak: 'B, be de pelota' },
-            { visual: '🏠',  texto: 'C', sub: 'de casa',     speak: 'C, ce de casa' },
-            { visual: '🍬',  texto: 'D', sub: 'de dulce',    speak: 'D, de de dulce' },
-            { visual: '⭐',  texto: 'E', sub: 'de estrella', speak: 'E, e de estrella' },
-            { visual: '🌸',  texto: 'F', sub: 'de flor',     speak: 'F, efe de flor' },
-            { visual: '🐱',  texto: 'G', sub: 'de gato',     speak: 'G, ge de gato' },
-            { visual: '🍦',  texto: 'H', sub: 'de helado',   speak: 'H, ache de helado' },
-            { visual: '🏝️',  texto: 'I', sub: 'de isla',     speak: 'I, i de isla' },
-            { visual: '🦒',  texto: 'J', sub: 'de jirafa',   speak: 'J, jota de jirafa' },
-            { visual: '🐨',  texto: 'K', sub: 'de koala',    speak: 'K, ka de koala' },
-            { visual: '🌙',  texto: 'L', sub: 'de luna',     speak: 'L, ele de luna' },
-            { visual: '👩',  texto: 'M', sub: 'de mamá',     speak: 'M, eme de mamá' },
-            { visual: '☁️',  texto: 'N', sub: 'de nube',     speak: 'N, ene de nube' },
-            { visual: '🦃',  texto: 'Ñ', sub: 'de ñandú',   speak: 'Ñe, ñe de ñandú' },
-            { visual: '🐻',  texto: 'O', sub: 'de oso',      speak: 'O, o de oso' },
-            { visual: '🐕',  texto: 'P', sub: 'de perro',    speak: 'P, pe de perro' },
-            { visual: '🧀',  texto: 'Q', sub: 'de queso',    speak: 'Q, cu de queso' },
-            { visual: '🐭',  texto: 'R', sub: 'de ratón',    speak: 'R, erre de ratón' },
-            { visual: '☀️',  texto: 'S', sub: 'de sol',      speak: 'S, ese de sol' },
-            { visual: '🚂',  texto: 'T', sub: 'de tren',     speak: 'T, te de tren' },
-            { visual: '🍇',  texto: 'U', sub: 'de uva',      speak: 'U, u de uva' },
-            { visual: '🐄',  texto: 'V', sub: 'de vaca',     speak: 'V, ve de vaca' },
-            { visual: '🧇',  texto: 'W', sub: 'de waffle',   speak: 'W, doble ve de waffle' },
-            { visual: '🎶',  texto: 'X', sub: 'de xilófono', speak: 'X, equis de xilófono' },
-            { visual: '⛵',  texto: 'Y', sub: 'de yate',     speak: 'Y, ye de yate' },
-            { visual: '👟',  texto: 'Z', sub: 'de zapato',   speak: 'Z, zeta de zapato' },
+            { visual:'✈️', texto:'A', sub:'de avión',    speak:'A, a de avión' },
+            { visual:'⚽', texto:'B', sub:'de pelota',   speak:'B, be de pelota' },
+            { visual:'🏠', texto:'C', sub:'de casa',     speak:'C, ce de casa' },
+            { visual:'🍬', texto:'D', sub:'de dulce',    speak:'D, de de dulce' },
+            { visual:'⭐', texto:'E', sub:'de estrella', speak:'E, e de estrella' },
+            { visual:'🌸', texto:'F', sub:'de flor',     speak:'F, efe de flor' },
+            { visual:'🐱', texto:'G', sub:'de gato',     speak:'G, ge de gato' },
+            { visual:'🍦', texto:'H', sub:'de helado',   speak:'H, ache de helado' },
+            { visual:'🏝️', texto:'I', sub:'de isla',     speak:'I, i de isla' },
+            { visual:'🦒', texto:'J', sub:'de jirafa',   speak:'J, jota de jirafa' },
+            { visual:'🐨', texto:'K', sub:'de koala',    speak:'K, ka de koala' },
+            { visual:'🌙', texto:'L', sub:'de luna',     speak:'L, ele de luna' },
+            { visual:'👩', texto:'M', sub:'de mamá',     speak:'M, eme de mamá' },
+            { visual:'☁️', texto:'N', sub:'de nube',     speak:'N, ene de nube' },
+            { visual:'🦃', texto:'Ñ', sub:'de ñandú',   speak:'Ñe, ñe de ñandú' },
+            { visual:'🐻', texto:'O', sub:'de oso',      speak:'O, o de oso' },
+            { visual:'🐕', texto:'P', sub:'de perro',    speak:'P, pe de perro' },
+            { visual:'🧀', texto:'Q', sub:'de queso',    speak:'Q, cu de queso' },
+            { visual:'🐭', texto:'R', sub:'de ratón',    speak:'R, erre de ratón' },
+            { visual:'☀️', texto:'S', sub:'de sol',      speak:'S, ese de sol' },
+            { visual:'🚂', texto:'T', sub:'de tren',     speak:'T, te de tren' },
+            { visual:'🍇', texto:'U', sub:'de uva',      speak:'U, u de uva' },
+            { visual:'🐄', texto:'V', sub:'de vaca',     speak:'V, ve de vaca' },
+            { visual:'🧇', texto:'W', sub:'de waffle',   speak:'W, doble ve de waffle' },
+            { visual:'🎶', texto:'X', sub:'de xilófono', speak:'X, equis de xilófono' },
+            { visual:'⛵', texto:'Y', sub:'de yate',     speak:'Y, ye de yate' },
+            { visual:'👟', texto:'Z', sub:'de zapato',   speak:'Z, zeta de zapato' },
         ]
     },
-
     colores: {
         titulo: '🎨 Colores y Formas',
-        color: '#8b5cf6',
+        color:  '#8b5cf6',
         fichas: [
-            { visual: '🔴', texto: 'Rojo',      sub: 'color',   speak: 'rojo, el color rojo' },
-            { visual: '🔵', texto: 'Azul',       sub: 'color',   speak: 'azul, el color azul' },
-            { visual: '🟢', texto: 'Verde',      sub: 'color',   speak: 'verde, el color verde' },
-            { visual: '🟡', texto: 'Amarillo',   sub: 'color',   speak: 'amarillo, el color amarillo' },
-            { visual: '🟠', texto: 'Naranja',    sub: 'color',   speak: 'naranja, el color naranja' },
-            { visual: '🟣', texto: 'Violeta',    sub: 'color',   speak: 'violeta, el color violeta' },
-            { visual: '⚫', texto: 'Negro',      sub: 'color',   speak: 'negro, el color negro' },
-            { visual: '⚪', texto: 'Blanco',     sub: 'color',   speak: 'blanco, el color blanco' },
-            { visual: '🩷', texto: 'Rosa',       sub: 'color',   speak: 'rosa, el color rosa' },
-            { visual: '🩵', texto: 'Celeste',    sub: 'color',   speak: 'celeste, el color celeste' },
-            { visual: '⭕', texto: 'Círculo',    sub: 'forma',   speak: 'círculo, la forma círculo' },
-            { visual: '🟦', texto: 'Cuadrado',   sub: 'forma',   speak: 'cuadrado, la forma cuadrado' },
-            { visual: '🔺', texto: 'Triángulo',  sub: 'forma',   speak: 'triángulo, la forma triángulo' },
-            { visual: '🟥', texto: 'Rectángulo', sub: 'forma',   speak: 'rectángulo, la forma rectángulo' },
-            { visual: '⭐', texto: 'Estrella',   sub: 'forma',   speak: 'estrella, la forma estrella' },
-            { visual: '❤️', texto: 'Corazón',   sub: 'forma',   speak: 'corazón, la forma corazón' },
+            { visual:'🔴', texto:'Rojo',       sub:'color', speak:'rojo, el color rojo' },
+            { visual:'🔵', texto:'Azul',        sub:'color', speak:'azul, el color azul' },
+            { visual:'🟢', texto:'Verde',       sub:'color', speak:'verde, el color verde' },
+            { visual:'🟡', texto:'Amarillo',    sub:'color', speak:'amarillo, el color amarillo' },
+            { visual:'🟠', texto:'Naranja',     sub:'color', speak:'naranja, el color naranja' },
+            { visual:'🟣', texto:'Violeta',     sub:'color', speak:'violeta, el color violeta' },
+            { visual:'⚫', texto:'Negro',       sub:'color', speak:'negro, el color negro' },
+            { visual:'⚪', texto:'Blanco',      sub:'color', speak:'blanco, el color blanco' },
+            { visual:'🩷', texto:'Rosa',        sub:'color', speak:'rosa, el color rosa' },
+            { visual:'🩵', texto:'Celeste',     sub:'color', speak:'celeste, el color celeste' },
+            { visual:'⭕', texto:'Círculo',     sub:'forma', speak:'círculo, la forma círculo' },
+            { visual:'🟦', texto:'Cuadrado',    sub:'forma', speak:'cuadrado, la forma cuadrado' },
+            { visual:'🔺', texto:'Triángulo',   sub:'forma', speak:'triángulo, la forma triángulo' },
+            { visual:'🟥', texto:'Rectángulo',  sub:'forma', speak:'rectángulo, la forma rectángulo' },
+            { visual:'⭐', texto:'Estrella',    sub:'forma', speak:'estrella, la forma estrella' },
+            { visual:'❤️', texto:'Corazón',    sub:'forma', speak:'corazón, la forma corazón' },
         ]
     },
-
     palabras: {
         titulo: '🖼️ Palabras',
-        color: '#10b981',
+        color:  '#10b981',
         fichas: [
-            { visual: '🏠', texto: 'CASA',     sub: 'casa',     speak: 'casa' },
-            { visual: '🐕', texto: 'PERRO',    sub: 'perro',    speak: 'perro' },
-            { visual: '🐱', texto: 'GATO',     sub: 'gato',     speak: 'gato' },
-            { visual: '☀️', texto: 'SOL',      sub: 'sol',      speak: 'sol' },
-            { visual: '💧', texto: 'AGUA',     sub: 'agua',     speak: 'agua' },
-            { visual: '🍞', texto: 'PAN',      sub: 'pan',      speak: 'pan' },
-            { visual: '🥛', texto: 'LECHE',    sub: 'leche',    speak: 'leche' },
-            { visual: '🍎', texto: 'MANZANA',  sub: 'manzana',  speak: 'manzana' },
-            { visual: '🚗', texto: 'AUTO',     sub: 'auto',     speak: 'auto' },
-            { visual: '⚽', texto: 'PELOTA',   sub: 'pelota',   speak: 'pelota' },
-            { visual: '🌳', texto: 'ÁRBOL',    sub: 'árbol',    speak: 'árbol' },
-            { visual: '📚', texto: 'LIBRO',    sub: 'libro',    speak: 'libro' },
-            { visual: '🛏️', texto: 'CAMA',     sub: 'cama',     speak: 'cama' },
-            { visual: '👩', texto: 'MAMÁ',     sub: 'mamá',     speak: 'mamá' },
-            { visual: '👨', texto: 'PAPÁ',     sub: 'papá',     speak: 'papá' },
-            { visual: '🎈', texto: 'GLOBO',    sub: 'globo',    speak: 'globo' },
-            { visual: '🌙', texto: 'LUNA',     sub: 'luna',     speak: 'luna' },
-            { visual: '👟', texto: 'ZAPATO',   sub: 'zapato',   speak: 'zapato' },
+            { visual:'🏠', texto:'CASA',    sub:'casa',    speak:'casa' },
+            { visual:'🐕', texto:'PERRO',   sub:'perro',   speak:'perro' },
+            { visual:'🐱', texto:'GATO',    sub:'gato',    speak:'gato' },
+            { visual:'☀️', texto:'SOL',     sub:'sol',     speak:'sol' },
+            { visual:'💧', texto:'AGUA',    sub:'agua',    speak:'agua' },
+            { visual:'🍞', texto:'PAN',     sub:'pan',     speak:'pan' },
+            { visual:'🥛', texto:'LECHE',   sub:'leche',   speak:'leche' },
+            { visual:'🍎', texto:'MANZANA', sub:'manzana', speak:'manzana' },
+            { visual:'🚗', texto:'AUTO',    sub:'auto',    speak:'auto' },
+            { visual:'⚽', texto:'PELOTA',  sub:'pelota',  speak:'pelota' },
+            { visual:'🌳', texto:'ÁRBOL',   sub:'árbol',   speak:'árbol' },
+            { visual:'📚', texto:'LIBRO',   sub:'libro',   speak:'libro' },
+            { visual:'🛏️', texto:'CAMA',    sub:'cama',    speak:'cama' },
+            { visual:'👩', texto:'MAMÁ',    sub:'mamá',    speak:'mamá' },
+            { visual:'👨', texto:'PAPÁ',    sub:'papá',    speak:'papá' },
+            { visual:'🎈', texto:'GLOBO',   sub:'globo',   speak:'globo' },
+            { visual:'🌙', texto:'LUNA',    sub:'luna',    speak:'luna' },
+            { visual:'👟', texto:'ZAPATO',  sub:'zapato',  speak:'zapato' },
         ]
     }
 };
 
-// ============================================================
-//  ESTADO
-// ============================================================
+/* ============================================================
+   VISOR DE FICHAS
+   ============================================================ */
 let currentCatKey = null;
 let currentIndex  = 0;
 let speakTimer    = null;
 
-// ============================================================
-//  NAVEGACIÓN
-// ============================================================
 function openCategory(catKey) {
     currentCatKey = catKey;
     currentIndex  = 0;
-    document.getElementById('view-hub').style.display   = 'none';
-    document.getElementById('view-cards').style.display = 'flex';
+    navStack.push(currentViewId());
+    showView('view-cards');
+
     const cat = CATEGORIAS[catKey];
-    document.getElementById('fcCatTitle').textContent   = cat.titulo;
-    document.getElementById('fcCatTitle').style.color   = cat.color;
+    const titleEl = document.getElementById('fcCatTitle');
+    titleEl.textContent = cat.titulo;
+    titleEl.style.color = cat.color;
     document.getElementById('fcStripe').style.background = cat.color;
+    document.getElementById('headerTitle').textContent = cat.titulo;
+
     renderCard(true);
 }
 
-function backToHub() {
-    cancelSpeak();
-    document.getElementById('celebration').style.display = 'none';
-    document.getElementById('view-cards').style.display  = 'none';
-    document.getElementById('view-hub').style.display    = 'grid';
-    currentCatKey = null;
-}
-
-function restartCategory() {
-    document.getElementById('celebration').style.display = 'none';
-    currentIndex = 0;
-    renderCard(true);
-}
-
-// ============================================================
-//  RENDERIZAR FICHA
-// ============================================================
 function renderCard(autoSpeak) {
     if (!currentCatKey) return;
     const fichas = CATEGORIAS[currentCatKey].fichas;
     const f = fichas[currentIndex];
 
-    // Animación de transición
     const card = document.getElementById('flashcard');
-    card.classList.remove('card-animate');
-    void card.offsetWidth; // reflow
-    card.classList.add('card-animate');
+    card.classList.remove('card-anim');
+    void card.offsetWidth;
+    card.classList.add('card-anim');
 
-    document.getElementById('fcVisual').textContent  = f.visual;
-    document.getElementById('fcText').textContent    = f.texto;
-    document.getElementById('fcSub').textContent     = f.sub;
+    document.getElementById('fcVisual').textContent   = f.visual;
+    document.getElementById('fcText').textContent     = f.texto;
+    document.getElementById('fcSub').textContent      = f.sub;
     document.getElementById('fcProgress').textContent = `${currentIndex + 1} / ${fichas.length}`;
 
-    // prev/next disable
-    document.getElementById('btnPrev').disabled = currentIndex === 0;
-    document.getElementById('btnNext').disabled = currentIndex === fichas.length - 1;
+    const prevBtn = document.getElementById('btnPrev');
+    const nextBtn = document.getElementById('btnNext');
+    prevBtn.disabled = currentIndex === 0;
+    prevBtn.style.opacity = currentIndex === 0 ? '.4' : '1';
+    nextBtn.disabled = currentIndex === fichas.length - 1;
+    nextBtn.style.opacity = currentIndex === fichas.length - 1 ? '.4' : '1';
 
     if (autoSpeak) {
         cancelSpeak();
-        speakTimer = setTimeout(speakCard, 400);
+        speakTimer = setTimeout(speakCard, 450);
     }
 }
 
-// ============================================================
-//  NAVEGACIÓN FICHAS
-// ============================================================
 function nextCard() {
-    const fichas = CATEGORIAS[currentCatKey].fichas;
-    if (currentIndex < fichas.length - 1) {
+    const total = CATEGORIAS[currentCatKey].fichas.length;
+    if (currentIndex < total - 1) {
         currentIndex++;
         renderCard(true);
     } else {
@@ -530,22 +809,38 @@ function prevCard() {
     }
 }
 
-// ============================================================
-//  AUDIO (speechSynthesis)
-// ============================================================
 function speakCard() {
     if (!currentCatKey) return;
     const f = CATEGORIAS[currentCatKey].fichas[currentIndex];
     sayText(f.speak);
 }
 
+function restartCategory() {
+    document.getElementById('celebration').style.display = 'none';
+    currentIndex = 0;
+    showView('view-cards');
+    renderCard(true);
+}
+
+function showCelebration() {
+    cancelSpeak();
+    const cat = CATEGORIAS[currentCatKey];
+    document.getElementById('celebSub').textContent =
+        `Repasaste ${cat.fichas.length} fichas de ${cat.titulo}`;
+    const cel = document.getElementById('celebration');
+    cel.style.display = 'flex';
+    setTimeout(() => sayText('¡Muy bien, Samuel! ¡Lo hiciste genial!'), 350);
+}
+
+/* ============================================================
+   AUDIO
+   ============================================================ */
 function sayText(text) {
     cancelSpeak();
     const u = new SpeechSynthesisUtterance(text);
     u.lang  = 'es-AR';
     u.rate  = 0.85;
     u.pitch = 1.1;
-    // Preferir voz en español si está disponible
     const voices = speechSynthesis.getVoices();
     const esp = voices.find(v => v.lang.startsWith('es'));
     if (esp) u.voice = esp;
@@ -557,21 +852,34 @@ function cancelSpeak() {
     speechSynthesis.cancel();
 }
 
-// ============================================================
-//  CELEBRACIÓN
-// ============================================================
-function showCelebration() {
-    cancelSpeak();
-    const cat = CATEGORIAS[currentCatKey];
-    const n   = cat.fichas.length;
-    document.getElementById('celebSub').textContent = `Repasaste ${n} fichas de ${cat.titulo}`;
-    document.getElementById('celebration').style.display = 'flex';
-    setTimeout(() => sayText('¡Muy bien, Samuel! ¡Lo hiciste genial!'), 300);
-}
+/* ============================================================
+   PROTECCIONES KIOSKO
+   ============================================================ */
+document.addEventListener('contextmenu', e => e.preventDefault());
 
-// Cargar voces al arrancar (Chrome necesita esto)
+document.addEventListener('keydown', e => {
+    // Bloquear Escape para evitar salir del modo kiosko
+    if (e.key === 'Escape') {
+        e.preventDefault();
+        return;
+    }
+    // Navegación con teclado: Backspace = volver (si no está en input)
+    if (e.key === 'Backspace' && e.target.tagName !== 'INPUT') {
+        e.preventDefault();
+        const id = currentViewId();
+        if (id !== 'view-hub') navBack();
+    }
+});
+
+/* ============================================================
+   INIT
+   ============================================================ */
 speechSynthesis.onvoiceschanged = () => { speechSynthesis.getVoices(); };
-window.onload = () => { speechSynthesis.getVoices(); };
+
+window.addEventListener('load', () => {
+    speechSynthesis.getVoices();
+    showView('view-hub');
+});
 </script>
 </body>
 </html>
