@@ -686,6 +686,199 @@ body {
     .pd-actions       { padding: 0 0 4px; }
 }
 
+/* ============================================================
+   PREPARO MI MOCHILA
+   ============================================================ */
+.mochila-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 14px 24px 16px;
+    overflow: hidden;
+}
+.mochila-nivel {
+    text-align: center;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-soft);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+.mochila-instruccion {
+    text-align: center;
+    font-size: clamp(1rem, 2.5vw, 1.25rem);
+    font-weight: 800;
+    color: var(--text);
+    background: #fff;
+    border-radius: 18px;
+    padding: 12px 18px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.06);
+}
+.mochila-grid {
+    flex: 1;
+    display: grid;
+    gap: 14px;
+    align-content: center;
+}
+.mochila-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+.mochila-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+.mochila-grid.cols-4 { grid-template-columns: repeat(2, 1fr); }
+
+.mochila-item {
+    background: #fff;
+    border: 4px solid #e2e8f0;
+    border-radius: 22px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 18px 10px;
+    cursor: pointer;
+    font-family: var(--font);
+    transition: border-color .15s, background .15s, transform .12s;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.07);
+    min-height: 110px;
+}
+.mochila-item:hover  { border-color: #94a3b8; transform: translateY(-2px); }
+.mochila-item:active { transform: scale(.94); }
+.mochila-item.correcto   { border-color: #10b981; background: #f0fdf4; animation: itemPop .25s ease-out; }
+.mochila-item.incorrecto { border-color: #ef4444; background: #fef2f2; animation: itemShake .3s ease-out; }
+.mochila-item:disabled   { cursor: default; pointer-events: none; }
+
+.mochila-item-emoji { font-size: clamp(2rem, 5vw, 3rem); line-height: 1; }
+.mochila-item-name  { font-size: clamp(0.85rem, 2vw, 1.05rem); font-weight: 800; text-align: center; color: var(--text); }
+.mochila-item-check { font-size: 1.3rem; }
+
+.mochila-feedback {
+    min-height: 40px;
+    text-align: center;
+    font-size: 1.1rem;
+    font-weight: 800;
+    border-radius: 14px;
+    padding: 8px 16px;
+    transition: opacity .2s;
+}
+.mochila-feedback.ok  { color: #065f46; background: #d1fae5; }
+.mochila-feedback.err { color: #991b1b; background: #fee2e2; }
+.mochila-feedback.hidden { opacity: 0; }
+
+@keyframes itemPop   { 0%{transform:scale(.9)} 60%{transform:scale(1.06)} 100%{transform:scale(1)} }
+@keyframes itemShake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-8px)} 75%{transform:translateX(8px)} }
+
+/* ============================================================
+   COMPRENSIÓN DE CONSIGNAS
+   ============================================================ */
+.consigna-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 14px 24px 16px;
+    overflow: hidden;
+}
+.consigna-progreso {
+    text-align: center;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-soft);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+.consigna-box {
+    background: #fff;
+    border-radius: 20px;
+    padding: 16px 20px;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.07);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+.consigna-texto {
+    flex: 1;
+    font-size: clamp(1rem, 2.5vw, 1.3rem);
+    font-weight: 800;
+    color: var(--text);
+    line-height: 1.35;
+}
+.btn-escuchar-consigna {
+    background: #f97316;
+    color: #fff;
+    border: none;
+    border-radius: 16px;
+    padding: 12px 18px;
+    font-family: var(--font);
+    font-size: 1rem;
+    font-weight: 900;
+    cursor: pointer;
+    flex-shrink: 0;
+    box-shadow: 0 4px 14px rgba(249,115,22,.35);
+    transition: transform .12s;
+}
+.btn-escuchar-consigna:active { transform: scale(.94); }
+
+/* Paso actual en secuencia */
+.consigna-paso-indicator {
+    text-align: center;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #3b82f6;
+    min-height: 28px;
+}
+
+.consigna-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+    align-content: center;
+}
+
+.consigna-item {
+    background: #fff;
+    border: 4px solid #e2e8f0;
+    border-radius: 22px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 20px 10px;
+    cursor: pointer;
+    font-family: var(--font);
+    box-shadow: 0 4px 14px rgba(0,0,0,0.07);
+    transition: border-color .12s, transform .12s;
+    min-height: 110px;
+}
+.consigna-item:hover  { border-color: #94a3b8; transform: translateY(-2px); }
+.consigna-item:active { transform: scale(.94); }
+.consigna-item.ok     { border-color: #10b981; background: #f0fdf4; animation: itemPop .25s; }
+.consigna-item.err    { border-color: #ef4444; background: #fef2f2; animation: itemShake .3s; }
+.consigna-item.done   { border-color: #10b981; background: #f0fdf4; opacity: .75; pointer-events: none; }
+
+.consigna-item-emoji { font-size: clamp(2rem, 5vw, 3rem); line-height: 1; }
+.consigna-item-name  { font-size: clamp(0.85rem, 2vw, 1rem); font-weight: 800; text-align: center; color: var(--text); }
+
+.consigna-feedback {
+    min-height: 40px;
+    text-align: center;
+    font-size: 1.05rem;
+    font-weight: 800;
+    border-radius: 14px;
+    padding: 8px 16px;
+    transition: opacity .2s;
+}
+.consigna-feedback.ok  { color: #065f46; background: #d1fae5; }
+.consigna-feedback.err { color: #991b1b; background: #fee2e2; }
+.consigna-feedback.hidden { opacity: 0; }
+
+@media (max-width: 600px) {
+    .mochila-body, .consigna-body { padding: 10px 16px 12px; gap: 10px; }
+    .mochila-grid.cols-4 { grid-template-columns: repeat(2, 1fr); }
+    .consigna-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
 /* Reducción de movimiento */
 @media (prefers-reduced-motion: reduce) {
     .hub-card, .cat-card, .btn-volver, .fc-btn { transition: none; }
@@ -732,12 +925,11 @@ body {
         </button>
 
         <button class="hub-card practico"
-                onclick="navTo('view-placeholder', '✏️ Practico', 'practico')"
+                onclick="navTo('view-practico', '✏️ Practico', 'practico')"
                 aria-label="Practico: juegos y ejercicios">
             <span class="hub-card-icon" aria-hidden="true">✏️</span>
             <span class="hub-card-label">Practico</span>
             <span class="hub-card-sub">Juegos y ejercicios</span>
-            <span class="hub-card-badge">Próximamente</span>
         </button>
 
         <button class="hub-card escuela"
@@ -845,6 +1037,58 @@ body {
         <div class="placeholder-icon" aria-hidden="true">🚧</div>
         <div class="placeholder-title" id="placeholderTitle">Próximamente</div>
         <div class="placeholder-sub">Esta sección está siendo preparada para Samuel. ¡Volvé pronto!</div>
+    </div>
+</div>
+
+<!-- ============================================================
+     VISTA: PRACTICO — sub-hub
+     ============================================================ -->
+<div class="view" id="view-practico" hidden>
+    <div class="subhub-2-grid">
+        <button class="hub-card practico"
+                onclick="navTo('view-mochila','🎒 Preparo mi Mochila','mochila'); initMochila()"
+                aria-label="Preparo mi mochila">
+            <span class="hub-card-icon" aria-hidden="true">🎒</span>
+            <span class="hub-card-label">Mi Mochila</span>
+            <span class="hub-card-sub">¿Qué llevo a la escuela?</span>
+        </button>
+        <button class="hub-card aprendo"
+                onclick="navTo('view-consignas','📋 Consignas','consignas'); initConsignas()"
+                aria-label="Comprensión de consignas">
+            <span class="hub-card-icon" aria-hidden="true">👂</span>
+            <span class="hub-card-label">Consignas</span>
+            <span class="hub-card-sub">Escuchá y tocá</span>
+        </button>
+    </div>
+</div>
+
+<!-- ============================================================
+     VISTA: PREPARO MI MOCHILA
+     ============================================================ -->
+<div class="view" id="view-mochila" hidden>
+    <div class="mochila-body">
+        <div class="mochila-nivel"     id="mochilaNivel"></div>
+        <div class="mochila-instruccion">🎒 Tocá solo lo que necesitás para la escuela</div>
+        <div class="mochila-grid"      id="mochilaGrid"></div>
+        <div class="mochila-feedback hidden" id="mochilaFeedback"></div>
+    </div>
+</div>
+
+<!-- ============================================================
+     VISTA: COMPRENSIÓN DE CONSIGNAS
+     ============================================================ -->
+<div class="view" id="view-consignas" hidden>
+    <div class="consigna-body">
+        <div class="consigna-progreso"      id="consignaProgreso"></div>
+        <div class="consigna-box">
+            <span class="consigna-texto"    id="consignaTexto"></span>
+            <button class="btn-escuchar-consigna" onclick="repeatConsigna()" aria-label="Escuchar otra vez">
+                🔊 Escuchar
+            </button>
+        </div>
+        <div class="consigna-paso-indicator" id="consignaPasoIndicator"></div>
+        <div class="consigna-grid"           id="consignaGrid"></div>
+        <div class="consigna-feedback hidden" id="consignaFeedback"></div>
     </div>
 </div>
 
@@ -988,6 +1232,9 @@ function updateHeader(viewId) {
             'view-voy-escuela':  '🏫 Voy a la Escuela',
             'view-agenda':       '📅 Agenda del Día',
             'view-pd':           '↔️ Primero y Después',
+            'view-practico':     '✏️ Practico',
+            'view-mochila':      '🎒 Preparo mi Mochila',
+            'view-consignas':    '👂 Consignas',
         };
         title.textContent = titles[viewId] || '📚 Escuela de Samuel';
     }
@@ -1206,7 +1453,179 @@ function cancelSpeak() {
 }
 
 /* ============================================================
-   AGENDA VISUAL
+   PREPARO MI MOCHILA
+   ============================================================ */
+const MOCHILA_CORRECTOS = [
+    { id:'cuaderno',   emoji:'📓', nombre:'Cuaderno' },
+    { id:'lapiz',      emoji:'✏️', nombre:'Lápiz' },
+    { id:'goma',       emoji:'⬜', nombre:'Goma' },
+    { id:'regla',      emoji:'📏', nombre:'Regla' },
+    { id:'cartuchera', emoji:'🖊️', nombre:'Cartuchera' },
+    { id:'botella',    emoji:'💧', nombre:'Agua' },
+];
+const MOCHILA_DISTRACTORES = [
+    { id:'control',  emoji:'📺', nombre:'Control remoto' },
+    { id:'sarten',   emoji:'🍳', nombre:'Sartén' },
+    { id:'almohada', emoji:'🛋️', nombre:'Almohada' },
+    { id:'secador',  emoji:'💨', nombre:'Secador' },
+    { id:'juguete',  emoji:'🧸', nombre:'Juguete' },
+];
+const MOCHILA_NIVELES = [[1,2],[2,3],[3,4]]; // [nCorrectos, total]
+
+let mochilaLevel     = 0;
+let mochilaItems     = [];
+let mochilaPending   = 0;
+let mochilaBloqueado = false;
+
+function initMochila() { mochilaLevel = 0; loadMochilaLevel(); }
+
+function loadMochilaLevel() {
+    mochilaBloqueado = false;
+    const [nC, total] = MOCHILA_NIVELES[mochilaLevel];
+    const nD = total - nC;
+    mochilaItems = shuffle([
+        ...shuffle([...MOCHILA_CORRECTOS]).slice(0,nC).map(i=>({item:i,correcto:true, tocado:false})),
+        ...shuffle([...MOCHILA_DISTRACTORES]).slice(0,nD).map(i=>({item:i,correcto:false,tocado:false})),
+    ]);
+    mochilaPending = nC;
+    document.getElementById('mochilaNivel').textContent = `Nivel ${mochilaLevel+1} de ${MOCHILA_NIVELES.length}`;
+    document.getElementById('mochilaFeedback').className = 'mochila-feedback hidden';
+    const grid = document.getElementById('mochilaGrid');
+    grid.className = `mochila-grid cols-${total}`;
+    grid.innerHTML = '';
+    mochilaItems.forEach((entry, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'mochila-item';
+        btn.setAttribute('aria-label', entry.item.nombre);
+        btn.innerHTML = `<span class="mochila-item-emoji" aria-hidden="true">${entry.item.emoji}</span>
+                         <span class="mochila-item-name">${entry.item.nombre}</span>
+                         <span class="mochila-item-check" aria-hidden="true"></span>`;
+        btn.onclick = () => tapMochilaItem(idx, btn);
+        grid.appendChild(btn);
+    });
+    setTimeout(() => sayText('Tocá solo lo que necesitás llevar a la escuela.'), 400);
+}
+
+function tapMochilaItem(idx, btn) {
+    if (mochilaBloqueado || mochilaItems[idx].tocado) return;
+    const entry = mochilaItems[idx];
+    const fb    = document.getElementById('mochilaFeedback');
+    if (entry.correcto) {
+        entry.tocado = true;
+        btn.classList.add('correcto');
+        btn.querySelector('.mochila-item-check').textContent = '✅';
+        btn.disabled = true;
+        mochilaPending--;
+        sayText('¡Muy bien, Samuel!');
+        fb.textContent = '¡Muy bien, Samuel! ✅';
+        fb.className = 'mochila-feedback ok';
+        if (mochilaPending === 0) {
+            mochilaBloqueado = true;
+            setTimeout(() => {
+                if (mochilaLevel < MOCHILA_NIVELES.length - 1) { mochilaLevel++; loadMochilaLevel(); }
+                else showCelebration();
+            }, 1400);
+        }
+    } else {
+        mochilaBloqueado = true;
+        btn.classList.add('incorrecto');
+        sayText('Eso no va en la mochila. Probemos otra vez.');
+        fb.textContent = 'Eso no va en la mochila. Probemos otra vez 🔁';
+        fb.className = 'mochila-feedback err';
+        setTimeout(() => { btn.classList.remove('incorrecto'); fb.className='mochila-feedback hidden'; mochilaBloqueado=false; }, 1300);
+    }
+}
+
+/* ============================================================
+   COMPRENSIÓN DE CONSIGNAS
+   ============================================================ */
+const CONSIGNAS = [
+    { instruccion:'Tocá el lápiz', speak:'Tocá el lápiz.', tipo:'simple', correcto:['lapiz'],
+      objetos:[{id:'lapiz',emoji:'✏️',nombre:'Lápiz'},{id:'cuaderno',emoji:'📓',nombre:'Cuaderno'},{id:'goma',emoji:'⬜',nombre:'Goma'}] },
+    { instruccion:'Tocá el cuaderno', speak:'Tocá el cuaderno.', tipo:'simple', correcto:['cuaderno'],
+      objetos:[{id:'lapiz',emoji:'✏️',nombre:'Lápiz'},{id:'cuaderno',emoji:'📓',nombre:'Cuaderno'},{id:'regla',emoji:'📏',nombre:'Regla'}] },
+    { instruccion:'Tocá el lápiz azul', speak:'Tocá el lápiz azul.', tipo:'color', correcto:['lapiz-azul'],
+      objetos:[{id:'lapiz-azul',emoji:'✏️',nombre:'Lápiz azul',color:'#bfdbfe'},{id:'lapiz-rojo',emoji:'✏️',nombre:'Lápiz rojo',color:'#fecaca'},{id:'lapiz-verde',emoji:'✏️',nombre:'Lápiz verde',color:'#bbf7d0'}] },
+    { instruccion:'Primero tocá el lápiz y después el cuaderno', speak:'Primero tocá el lápiz. Después tocá el cuaderno.', tipo:'secuencia',
+      pasos:['lapiz','cuaderno'],
+      objetos:[{id:'lapiz',emoji:'✏️',nombre:'Lápiz'},{id:'cuaderno',emoji:'📓',nombre:'Cuaderno'},{id:'goma',emoji:'⬜',nombre:'Goma'},{id:'regla',emoji:'📏',nombre:'Regla'}] },
+];
+
+let consignaIdx  = 0;
+let consignaPaso = 0;
+let consignaBloq = false;
+
+function initConsignas() { consignaIdx=0; consignaPaso=0; consignaBloq=false; renderConsigna(); }
+
+function renderConsigna() {
+    consignaBloq = false;
+    const c = CONSIGNAS[consignaIdx];
+    document.getElementById('consignaProgreso').textContent = `Ejercicio ${consignaIdx+1} de ${CONSIGNAS.length}`;
+    document.getElementById('consignaTexto').textContent = c.instruccion;
+    document.getElementById('consignaFeedback').className = 'consigna-feedback hidden';
+    updatePasoIndicator(c);
+    const grid  = document.getElementById('consignaGrid');
+    const items = c.tipo === 'color' ? c.objetos : shuffle([...c.objetos]);
+    grid.innerHTML = '';
+    grid.style.gridTemplateColumns = items.length <= 3 ? 'repeat(3,1fr)' : 'repeat(2,1fr)';
+    items.forEach(obj => {
+        const btn = document.createElement('button');
+        btn.className = 'consigna-item';
+        btn.dataset.id = obj.id;
+        btn.setAttribute('aria-label', obj.nombre);
+        if (obj.color) btn.style.background = obj.color;
+        btn.innerHTML = `<span class="consigna-item-emoji" aria-hidden="true">${obj.emoji}</span>
+                         <span class="consigna-item-name">${obj.nombre}</span>`;
+        btn.onclick = () => tapConsignaItem(obj.id, btn, c);
+        grid.appendChild(btn);
+    });
+    setTimeout(() => sayText(c.speak), 450);
+}
+
+function updatePasoIndicator(c) {
+    const el = document.getElementById('consignaPasoIndicator');
+    if (c.tipo === 'secuencia' && consignaPaso < c.pasos.length) {
+        const obj = c.objetos.find(o => o.id === c.pasos[consignaPaso]);
+        el.textContent = obj ? `Ahora tocá: ${obj.nombre}` : '';
+    } else { el.textContent = ''; }
+}
+
+function tapConsignaItem(id, btn, c) {
+    if (consignaBloq) return;
+    const fb = document.getElementById('consignaFeedback');
+    const ok = c.tipo === 'secuencia' ? id === c.pasos[consignaPaso] : c.correcto.includes(id);
+    if (ok) {
+        btn.classList.add('ok');
+        sayText('¡Muy bien, Samuel!');
+        fb.textContent = '¡Muy bien, Samuel! ✅'; fb.className = 'consigna-feedback ok';
+        if (c.tipo === 'secuencia') {
+            btn.classList.replace('ok','done');
+            consignaPaso++;
+            if (consignaPaso < c.pasos.length) { updatePasoIndicator(c); fb.className='consigna-feedback hidden'; return; }
+        }
+        consignaBloq = true;
+        setTimeout(() => {
+            if (consignaIdx < CONSIGNAS.length - 1) { consignaIdx++; consignaPaso=0; renderConsigna(); }
+            else showCelebration();
+        }, 1400);
+    } else {
+        consignaBloq = true;
+        btn.classList.add('err');
+        sayText('Probemos otra vez.');
+        fb.textContent = 'Probemos otra vez 🔁'; fb.className = 'consigna-feedback err';
+        setTimeout(() => { btn.classList.remove('err'); fb.className='consigna-feedback hidden'; consignaBloq=false; if(c.tipo==='secuencia') updatePasoIndicator(c); }, 1300);
+    }
+}
+
+function repeatConsigna() { sayText(CONSIGNAS[consignaIdx].speak); }
+
+function shuffle(arr) {
+    for (let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}
+    return arr;
+}
+
+/* ============================================================
+   AGENDA VISUAL — datos y lógica
    ============================================================ */
 const AGENDA_STEPS = [
     { emoji:'⏰', texto:'Despertarse',         speak:'Despertarse' },
