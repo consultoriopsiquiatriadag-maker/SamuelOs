@@ -1,5 +1,5 @@
 /* Aplicación de Samuel - Service Worker */
-const CACHE_VERSION = 'samuel-app-v76-escuela-numeros-consignas';
+const CACHE_VERSION = 'samuel-app-v77-fix-overlay-hidden';
 const CACHE_NAME = CACHE_VERSION;
 
 const ASSETS = [
