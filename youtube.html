@@ -635,6 +635,30 @@
         <div class="cat-desc">Lavar y limpiar autos, muy divertido</div>
       </button>
 
+      <button class="cat-card cat-canciones" onclick="openCategory('zenon')" aria-label="La Granja de Zenón">
+        <div class="cat-emoji">🐄</div>
+        <div class="cat-name">La Granja de Zenón</div>
+        <div class="cat-desc">Canciones con animales de la granja</div>
+      </button>
+
+      <button class="cat-card cat-dibujos" onclick="openCategory('bluey')" aria-label="Bluey">
+        <div class="cat-emoji">🐕</div>
+        <div class="cat-name">Bluey</div>
+        <div class="cat-desc">Episodios completos en español</div>
+      </button>
+
+      <button class="cat-card cat-autos" onclick="openCategory('bicicleta')" aria-label="Partes de la bicicleta">
+        <div class="cat-emoji">🚲</div>
+        <div class="cat-name">Partes de la bicicleta</div>
+        <div class="cat-desc">Conocé cada parte de la bici</div>
+      </button>
+
+      <button class="cat-card cat-autos" onclick="openCategory('partesauto')" aria-label="Partes del auto">
+        <div class="cat-emoji">🔧</div>
+        <div class="cat-name">Partes del auto</div>
+        <div class="cat-desc">¿Cómo se llama cada parte?</div>
+      </button>
+
     </div>
   </div>
 
@@ -782,10 +806,12 @@
       badgeStyle: 'background:linear-gradient(135deg,#0e7490,#06b6d4)',
       videos: [
         // ✅ Canales oficiales, verificados
-        { id: 'sP8hEsTGp1Q', titulo: 'Blippi - Auto Lavado 🚗',     canal: 'Blippi en Español' },
-        { id: '1y0GLO0OrPM', titulo: 'Auto Lavado de Blippi 🫧',    canal: 'Blippi en Español' },
-        { id: 'FCvIwuYyPQU', titulo: 'Auto Lavado de Blippi 🚿',    canal: 'Moonbug Kids en Español' },
-        { id: 'Y1vP1gBNiik', titulo: 'El Autolavado de Jorge ✨',    canal: 'Jorge el Curioso en Español' },
+        { id: 'sP8hEsTGp1Q', titulo: 'Blippi - Auto Lavado 🚗',          canal: 'Blippi en Español' },
+        { id: '1y0GLO0OrPM', titulo: 'Auto Lavado de Blippi 🫧',         canal: 'Blippi en Español' },
+        { id: 'lz8MtNXg7WI', titulo: 'Blippi Lava su Camioneta 🚿',      canal: 'Blippi en Español' },
+        { id: 'Ftp7RCEAt-4', titulo: 'Blippi en el Auto Lavado 🧼',      canal: 'Blippi en Español' },
+        { id: 'FCvIwuYyPQU', titulo: 'Auto Lavado de Blippi (2) 🚿',     canal: 'Moonbug Kids en Español' },
+        { id: 'Y1vP1gBNiik', titulo: 'El Autolavado de Jorge ✨',         canal: 'Jorge el Curioso en Español' },
       ]
     },
     {
@@ -805,6 +831,72 @@
       badgeStyle: 'background:linear-gradient(135deg,#0f766e,#22c55e)',
       // Se construye a partir de videosAprender (ver más abajo).
       videos: []
+    },
+    // ============================================================
+    // LA GRANJA DE ZENÓN (Fase 5A)
+    // ============================================================
+    {
+      id: 'zenon',
+      nombre: 'La Granja de Zenón',
+      emoji: '🐄',
+      claseColor: 'cat-canciones',
+      badgeStyle: 'background:linear-gradient(135deg,#16a34a,#4ade80)',
+      videos: [
+        { id: 'AEWkfm8Zc78', titulo: '40 min — Las Mejores Canciones 🎵', canal: 'La Granja de Zenón' },
+        { id: 'ww9fra0MlWY',  titulo: 'Temporadas 5, 6 y 7 🌈',           canal: 'La Granja de Zenón' },
+        { id: '-YLPDnfvW4Y',  titulo: 'Aventuras de Zenón 🌟',             canal: 'La Granja de Zenón' },
+        { id: 'sWkPiywoZDA',  titulo: 'Zenón arma una Fiesta 🎉',          canal: 'La Granja de Zenón' },
+        { id: 'mtesEyvxhcM',  titulo: 'Un Día En La Granja 🐓',            canal: 'El Reino Infantil' },
+      ]
+    },
+    // ============================================================
+    // BLUEY (categoría propia, Fase 5A)
+    // ============================================================
+    {
+      id: 'bluey',
+      nombre: 'Bluey',
+      emoji: '🐕',
+      claseColor: 'cat-dibujos',
+      badgeStyle: 'background:linear-gradient(135deg,#1d4ed8,#60a5fa)',
+      videos: [
+        { id: '6sLHsFToPCQ', titulo: 'Bluey — Temporadas 1 a 3 ⭐',    canal: 'Bluey Español Oficial' },
+        { id: 'Cbdd2FUQCB4', titulo: 'Bluey — 2 Horas de Episodios 💙', canal: 'Bluey Español Oficial' },
+        { id: 'DJ8gvT3H5rA', titulo: 'Diversión Familiar 🥰',            canal: 'Bluey Español Oficial' },
+        { id: 'W34WDGRmblc', titulo: 'Bluey Temporada 1 Completa 💙',   canal: 'Bluey Español Oficial' },
+        { id: 'TrOrws8PWUc', titulo: 'Aventuras Soleadas ☀️',           canal: 'Bluey Español Oficial' },
+      ]
+    },
+    // ============================================================
+    // PARTES DE LA BICICLETA (Fase 5A)
+    // ============================================================
+    {
+      id: 'bicicleta',
+      nombre: 'Partes de la bicicleta',
+      emoji: '🚲',
+      claseColor: 'cat-autos',
+      badgeStyle: 'background:linear-gradient(135deg,#7c3aed,#a78bfa)',
+      videos: [
+        { id: 'hNigN_RfqQs', titulo: 'La Bicicleta — Happy Learning 🚴', canal: 'Happy Learning Español' },
+        { id: 'CjU3VKjE2dE', titulo: 'Cómo se fabrica una bicicleta 🔧', canal: 'Cómo se fabrica' },
+        { id: 'xiOKfqb5sMA', titulo: 'Partes de la bicicleta 📋',        canal: 'Educación vial' },
+        { id: 'lsVVKmGxOmM', titulo: '¿Cómo se llaman las partes? 🏷️',  canal: 'Aprendo con videos' },
+      ]
+    },
+    // ============================================================
+    // PARTES DEL AUTO (Fase 5A)
+    // ============================================================
+    {
+      id: 'partesauto',
+      nombre: 'Partes del auto',
+      emoji: '🔧',
+      claseColor: 'cat-autos',
+      badgeStyle: 'background:linear-gradient(135deg,#b45309,#f59e0b)',
+      videos: [
+        { id: 'uZQYvPs4wPk', titulo: 'Partes del auto cantando 🎵',     canal: 'Doremila' },
+        { id: 'ZW3_G4ZaOd0', titulo: 'Conoce las partes del carro 🚗',  canal: 'Videos para niños' },
+        { id: '6rUr4a_MpEA', titulo: '¡Explorá un coche por dentro! 🔍', canal: 'Aprendo con videos' },
+        { id: 'f2WwGwfOO80', titulo: 'Partes y funciones del auto 📖',   canal: 'Aprendo con videos' },
+      ]
     },
     // ============================================================
     // TRICICLETA (Fase 3 nuevo plan)
