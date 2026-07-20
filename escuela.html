@@ -340,6 +340,89 @@ body {
 /* ============================================================
    PLACEHOLDER "PRÓXIMAMENTE"
    ============================================================ */
+/* ============================================================
+   ME COMUNICO — frases AAC
+   ============================================================ */
+.comunico-cat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    padding: 20px 16px 24px;
+}
+.comunico-cat-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 22px 12px;
+    border: none;
+    border-radius: 24px;
+    background: #fff;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.09);
+    cursor: pointer;
+    font-family: var(--font);
+    transition: transform .12s, box-shadow .12s;
+    border-bottom: 8px solid var(--color-comunico);
+}
+.comunico-cat-btn:active { transform: scale(.96); }
+.comunico-cat-icon  { font-size: 2.6rem; }
+.comunico-cat-label { font-size: 1rem; font-weight: 900; color: var(--text); text-align: center; }
+
+/* Grilla de frases */
+.frases-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    padding: 16px 16px 28px;
+}
+.frase-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-height: 130px;
+    padding: 18px 10px;
+    border: 3px solid #e2e8f0;
+    border-radius: 22px;
+    background: #fff;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.07);
+    cursor: pointer;
+    font-family: var(--font);
+    transition: border-color .15s, background .15s, transform .1s;
+}
+.frase-btn:active { transform: scale(.95); }
+.frase-btn.hablando {
+    border-color: var(--color-comunico);
+    background: #f0fdf4;
+}
+.frase-emoji { font-size: 2.4rem; pointer-events: none; }
+.frase-texto { font-size: 0.88rem; font-weight: 800; color: var(--text); text-align: center; pointer-events: none; line-height: 1.25; }
+.frase-repetir {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin: 4px 16px 20px;
+    padding: 12px;
+    background: #f0fdf4;
+    border: 2px solid #10b981;
+    border-radius: 16px;
+    font-family: var(--font);
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #065f46;
+    cursor: pointer;
+    width: calc(100% - 32px);
+}
+
+@media (max-width: 380px) {
+    .comunico-cat-grid { grid-template-columns: 1fr 1fr; gap: 10px; padding: 14px 12px; }
+    .frases-grid        { grid-template-columns: 1fr 1fr; gap: 10px; padding: 12px; }
+    .frase-btn          { min-height: 110px; }
+}
+
 .placeholder-body {
     flex: 1;
     display: flex;
@@ -1154,12 +1237,11 @@ body {
         </button>
 
         <button id="hub-card-comunico" class="hub-card comunico"
-                onclick="navTo('view-placeholder', '💬 Me Comunico', 'comunico')"
+                onclick="navTo('view-comunico', '💬 Me Comunico', 'comunico')"
                 aria-label="Me comunico: frases y expresiones">
             <span class="hub-card-icon" aria-hidden="true">💬</span>
             <span class="hub-card-label">Me Comunico</span>
-            <span class="hub-card-sub">Frases y expresiones</span>
-            <span class="hub-card-badge">Próximamente</span>
+            <span class="hub-card-sub">Frases para el aula</span>
         </button>
 
         <button id="hub-card-organizo" class="hub-card organizo"
@@ -1245,6 +1327,40 @@ body {
 <!-- ============================================================
      VISTA: PLACEHOLDER (secciones próximamente)
      ============================================================ -->
+<!-- ============================================================
+     VISTA: ME COMUNICO — sub-hub 4 categorías
+     ============================================================ -->
+<div class="view" id="view-comunico" hidden>
+    <div class="comunico-cat-grid">
+        <button class="comunico-cat-btn" onclick="openComunicoCat('necesito')" aria-label="Necesito algo">
+            <span class="comunico-cat-icon" aria-hidden="true">🙋</span>
+            <span class="comunico-cat-label">Necesito algo</span>
+        </button>
+        <button class="comunico-cat-btn" onclick="openComunicoCat('siento')" aria-label="Cómo me siento">
+            <span class="comunico-cat-icon" aria-hidden="true">😊</span>
+            <span class="comunico-cat-label">¿Cómo me siento?</span>
+        </button>
+        <button class="comunico-cat-btn" onclick="openComunicoCat('clase')" aria-label="En clase">
+            <span class="comunico-cat-icon" aria-hidden="true">📝</span>
+            <span class="comunico-cat-label">En clase</span>
+        </button>
+        <button class="comunico-cat-btn" onclick="openComunicoCat('companeros')" aria-label="Con mis compañeros">
+            <span class="comunico-cat-icon" aria-hidden="true">👫</span>
+            <span class="comunico-cat-label">Con mis compañeros</span>
+        </button>
+    </div>
+</div>
+
+<!-- ============================================================
+     VISTA: ME COMUNICO — grilla de frases
+     ============================================================ -->
+<div class="view" id="view-comunico-cat" hidden>
+    <button class="frase-repetir" id="comunico-repetir" onclick="repetirFrase()" aria-label="Repetir última frase">
+        🔊 Repetir
+    </button>
+    <div class="frases-grid" id="frases-grid"></div>
+</div>
+
 <div class="view" id="view-placeholder" hidden>
     <div class="placeholder-body">
         <div class="placeholder-icon" aria-hidden="true">🚧</div>
@@ -1525,9 +1641,11 @@ function updateHeader(viewId) {
             'view-voy-escuela':  '🏫 Voy a la Escuela',
             'view-agenda':       '📅 Agenda del Día',
             'view-pd':           '↔️ Primero y Después',
-            'view-practico':     '✏️ Practico',
-            'view-mochila':      '🎒 Preparo mi Mochila',
-            'view-consignas':    '👂 Consignas',
+            'view-practico':       '✏️ Practico',
+            'view-mochila':        '🎒 Preparo mi Mochila',
+            'view-consignas':      '👂 Consignas',
+            'view-comunico':       '💬 Me Comunico',
+            'view-comunico-cat':   '💬 ' + (window._comunicoCatNombre || 'Me Comunico'),
         };
         title.textContent = titles[viewId] || '📚 Escuela de Samuel';
     }
@@ -2126,6 +2244,104 @@ function speakPD() {
     if (ptxt !== 'Tocar para elegir') parts.push(`Primero: ${ptxt}`);
     if (dtxt !== 'Tocar para elegir') parts.push(`Después: ${dtxt}`);
     sayText(parts.join('. '));
+}
+
+/* ============================================================
+   ME COMUNICO — datos y lógica
+   ============================================================ */
+const COMUNICO_CATS = {
+    necesito: {
+        nombre: 'Necesito algo',
+        frases: [
+            { emoji:'🚽', texto:'Necesito ir al baño',  speak:'Necesito ir al baño' },
+            { emoji:'💧', texto:'Quiero agua',           speak:'Quiero agua' },
+            { emoji:'🍎', texto:'Tengo hambre',          speak:'Tengo hambre' },
+            { emoji:'😴', texto:'Quiero descansar',      speak:'Quiero descansar' },
+            { emoji:'🤕', texto:'Me duele algo',         speak:'Me duele algo' },
+            { emoji:'🆘', texto:'Necesito ayuda',        speak:'Necesito ayuda' },
+        ]
+    },
+    siento: {
+        nombre: '¿Cómo me siento?',
+        frases: [
+            { emoji:'😊', texto:'Estoy bien',     speak:'Estoy bien' },
+            { emoji:'😔', texto:'Estoy triste',   speak:'Estoy triste' },
+            { emoji:'😠', texto:'Estoy enojado',  speak:'Estoy enojado' },
+            { emoji:'😨', texto:'Tengo miedo',    speak:'Tengo miedo' },
+            { emoji:'😴', texto:'Estoy cansado',  speak:'Estoy cansado' },
+            { emoji:'🤩', texto:'Estoy contento', speak:'Estoy contento' },
+        ]
+    },
+    clase: {
+        nombre: 'En clase',
+        frases: [
+            { emoji:'🤔', texto:'No entendí',         speak:'No entendí' },
+            { emoji:'✋', texto:'Tengo una pregunta',  speak:'Tengo una pregunta' },
+            { emoji:'✅', texto:'Terminé',             speak:'Terminé' },
+            { emoji:'🔁', texto:'¿Podés repetir?',    speak:'¿Podés repetir?' },
+            { emoji:'🚪', texto:'¿Puedo salir?',      speak:'¿Puedo salir?' },
+            { emoji:'🤫', texto:'Necesito silencio',  speak:'Necesito silencio' },
+        ]
+    },
+    companeros: {
+        nombre: 'Con mis compañeros',
+        frases: [
+            { emoji:'🤝', texto:'¿Jugamos juntos?',       speak:'¿Jugamos juntos?' },
+            { emoji:'🙏', texto:'Por favor',               speak:'Por favor' },
+            { emoji:'😊', texto:'Gracias',                 speak:'Gracias' },
+            { emoji:'❌', texto:'No quiero',               speak:'No quiero' },
+            { emoji:'✋', texto:'Pará',                    speak:'Pará' },
+            { emoji:'💕', texto:'Quiero ser tu amigo',     speak:'Quiero ser tu amigo' },
+        ]
+    }
+};
+
+let _ultimaFrase = '';
+let _ultimaFraseBtn = null;
+
+function openComunicoCat(catKey) {
+    const cat = COMUNICO_CATS[catKey];
+    window._comunicoCatNombre = cat.nombre;
+    navStack.push(currentViewId());
+    showView('view-comunico-cat');
+    // Actualizar título del header dinámicamente
+    const titleEl = document.getElementById('headerTitle');
+    if (titleEl) titleEl.textContent = '💬 ' + cat.nombre;
+
+    _ultimaFrase = '';
+    _ultimaFraseBtn = null;
+
+    const grid = document.getElementById('frases-grid');
+    grid.innerHTML = '';
+    cat.frases.forEach(f => {
+        const btn = document.createElement('button');
+        btn.className = 'frase-btn';
+        btn.setAttribute('aria-label', f.texto);
+        btn.innerHTML = `<span class="frase-emoji" aria-hidden="true">${f.emoji}</span>
+                         <span class="frase-texto">${f.texto}</span>`;
+        btn.onclick = () => tapFrase(f, btn);
+        grid.appendChild(btn);
+    });
+    // Hablar intro de categoría
+    setTimeout(() => sayText(cat.nombre), 300);
+}
+
+function tapFrase(f, btn) {
+    // Quitar highlight anterior
+    if (_ultimaFraseBtn && _ultimaFraseBtn !== btn) {
+        _ultimaFraseBtn.classList.remove('hablando');
+    }
+    _ultimaFrase = f.speak;
+    _ultimaFraseBtn = btn;
+    btn.classList.add('hablando');
+    sayText(f.speak);
+    // Quitar highlight tras 2s
+    setTimeout(() => btn.classList.remove('hablando'), 2000);
+}
+
+function repetirFrase() {
+    if (_ultimaFrase) sayText(_ultimaFrase);
+    else sayText('Tocá una frase para escucharla.');
 }
 
 /* ============================================================
