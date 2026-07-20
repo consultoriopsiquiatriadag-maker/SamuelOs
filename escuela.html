@@ -341,6 +341,117 @@ body {
    PLACEHOLDER "PRÓXIMAMENTE"
    ============================================================ */
 /* ============================================================
+   ME ORGANIZO — horario semanal
+   ============================================================ */
+.organizo-hoy-banner {
+    background: linear-gradient(135deg, #f59e0b, #fbbf24);
+    border-radius: 20px;
+    margin: 14px 16px 0;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 4px 16px rgba(245,158,11,0.25);
+}
+.organizo-hoy-label { font-size: 0.8rem; font-weight: 800; color: #78350f; text-transform: uppercase; letter-spacing: 1px; }
+.organizo-hoy-dia   { font-size: 1.5rem; font-weight: 900; color: #1c1917; }
+.organizo-dias-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 14px 16px 24px;
+}
+.organizo-dia-btn {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 18px;
+    border: 3px solid #e2e8f0;
+    border-radius: 18px;
+    background: #fff;
+    cursor: pointer;
+    font-family: var(--font);
+    transition: border-color .15s, background .15s;
+    text-align: left;
+}
+.organizo-dia-btn.hoy {
+    border-color: #f59e0b;
+    background: #fffbeb;
+}
+.organizo-dia-btn:active { transform: scale(.98); }
+.organizo-dia-nombre  { font-size: 1rem; font-weight: 900; color: var(--text); min-width: 90px; }
+.organizo-dia-materias { font-size: 0.82rem; font-weight: 600; color: var(--text-soft); line-height: 1.4; }
+.organizo-dia-emoji   { font-size: 1.6rem; flex-shrink: 0; }
+
+/* ============================================================
+   ME CALMO — técnicas de regulación
+   ============================================================ */
+.calmo-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    padding: 18px 16px 24px;
+}
+.calmo-tecnica-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 22px 12px;
+    border: none;
+    border-radius: 24px;
+    background: #fff;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.09);
+    cursor: pointer;
+    font-family: var(--font);
+    border-bottom: 8px solid var(--color-calmo, #06b6d4);
+    transition: transform .12s;
+}
+.calmo-tecnica-btn:active { transform: scale(.96); }
+.calmo-tecnica-icon  { font-size: 2.8rem; }
+.calmo-tecnica-label { font-size: 0.95rem; font-weight: 900; color: var(--text); text-align: center; }
+
+/* Vista de técnica individual */
+.calmo-pasos-wrap {
+    padding: 16px 16px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+.calmo-paso {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: #fff;
+    border-radius: 20px;
+    padding: 16px 18px;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.07);
+    border-left: 6px solid var(--color-calmo, #06b6d4);
+    opacity: .45;
+    transition: opacity .3s, transform .2s;
+}
+.calmo-paso.activo  { opacity: 1; transform: scale(1.02); border-left-width: 8px; }
+.calmo-paso.hecho   { opacity: .7; border-left-color: #10b981; }
+.calmo-paso-num     { font-size: 1.4rem; font-weight: 900; color: var(--text-soft); min-width: 28px; }
+.calmo-paso-emoji   { font-size: 2rem; flex-shrink: 0; }
+.calmo-paso-texto   { font-size: 0.92rem; font-weight: 800; color: var(--text); line-height: 1.3; }
+.calmo-btn-iniciar  {
+    margin: 0 16px;
+    padding: 16px;
+    background: linear-gradient(135deg, #06b6d4, #0891b2);
+    color: #fff;
+    border: none;
+    border-radius: 18px;
+    font-family: var(--font);
+    font-size: 1.1rem;
+    font-weight: 900;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(6,182,212,0.35);
+}
+.calmo-btn-iniciar:active { transform: scale(.97); }
+
+/* ============================================================
    ME COMUNICO — frases AAC
    ============================================================ */
 .comunico-cat-grid {
@@ -1245,21 +1356,19 @@ body {
         </button>
 
         <button id="hub-card-organizo" class="hub-card organizo"
-                onclick="navTo('view-placeholder', '📋 Me Organizo', 'organizo')"
-                aria-label="Me organizo: mi agenda y horarios">
+                onclick="navTo('view-organizo', '📋 Me Organizo', 'organizo'); initOrganizo()"
+                aria-label="Me organizo: mi horario semanal">
             <span class="hub-card-icon" aria-hidden="true">📋</span>
             <span class="hub-card-label">Me Organizo</span>
-            <span class="hub-card-sub">Mi agenda y horarios</span>
-            <span class="hub-card-badge">Próximamente</span>
+            <span class="hub-card-sub">Mi horario semanal</span>
         </button>
 
         <button id="hub-card-calmo" class="hub-card calmo"
-                onclick="navTo('view-placeholder', '🌬️ Me Calmo', 'calmo')"
-                aria-label="Me calmo: respiro y me tranquilizo">
-            <span class="hub-card-icon" aria-hidden="true">🌬️</span>
+                onclick="navTo('view-calmo', '😌 Me Calmo', 'calmo')"
+                aria-label="Me calmo: técnicas para tranquilizarme">
+            <span class="hub-card-icon" aria-hidden="true">😌</span>
             <span class="hub-card-label">Me Calmo</span>
-            <span class="hub-card-sub">Respiro y me tranquilizo</span>
-            <span class="hub-card-badge">Próximamente</span>
+            <span class="hub-card-sub">Me tranquilizo</span>
         </button>
 
     </div>
@@ -1359,6 +1468,52 @@ body {
         🔊 Repetir
     </button>
     <div class="frases-grid" id="frases-grid"></div>
+</div>
+
+<!-- ============================================================
+     VISTA: ME ORGANIZO — horario semanal
+     ============================================================ -->
+<div class="view" id="view-organizo" hidden>
+    <div class="organizo-hoy-banner" id="organizoHoyBanner">
+        <span style="font-size:2rem">📅</span>
+        <div>
+            <div class="organizo-hoy-label">Hoy es</div>
+            <div class="organizo-hoy-dia" id="organizoHoyDia">—</div>
+        </div>
+    </div>
+    <div class="organizo-dias-grid" id="organizoDiasGrid"></div>
+</div>
+
+<!-- ============================================================
+     VISTA: ME CALMO — selector de técnica
+     ============================================================ -->
+<div class="view" id="view-calmo" hidden>
+    <div class="calmo-grid">
+        <button class="calmo-tecnica-btn" onclick="openCalmoTecnica('respirar')" aria-label="Respirar">
+            <span class="calmo-tecnica-icon" aria-hidden="true">🌬️</span>
+            <span class="calmo-tecnica-label">Respirar</span>
+        </button>
+        <button class="calmo-tecnica-btn" onclick="openCalmoTecnica('contar')" aria-label="Contar">
+            <span class="calmo-tecnica-icon" aria-hidden="true">🔢</span>
+            <span class="calmo-tecnica-label">Contar</span>
+        </button>
+        <button class="calmo-tecnica-btn" onclick="openCalmoTecnica('apretar')" aria-label="Apretar y soltar">
+            <span class="calmo-tecnica-icon" aria-hidden="true">✊</span>
+            <span class="calmo-tecnica-label">Apretar y soltar</span>
+        </button>
+        <button class="calmo-tecnica-btn" onclick="openCalmoTecnica('descansar')" aria-label="Tomarme un descanso">
+            <span class="calmo-tecnica-icon" aria-hidden="true">🛋️</span>
+            <span class="calmo-tecnica-label">Descansar</span>
+        </button>
+    </div>
+</div>
+
+<!-- ============================================================
+     VISTA: ME CALMO — guía de técnica paso a paso
+     ============================================================ -->
+<div class="view" id="view-calmo-tecnica" hidden>
+    <button class="calmo-btn-iniciar" id="calmoIniciarBtn" onclick="iniciarCalmo()">▶️ Empezar</button>
+    <div class="calmo-pasos-wrap" id="calmoPasosWrap"></div>
 </div>
 
 <div class="view" id="view-placeholder" hidden>
@@ -1646,6 +1801,9 @@ function updateHeader(viewId) {
             'view-consignas':      '👂 Consignas',
             'view-comunico':       '💬 Me Comunico',
             'view-comunico-cat':   '💬 ' + (window._comunicoCatNombre || 'Me Comunico'),
+            'view-organizo':       '📋 Me Organizo',
+            'view-calmo':          '😌 Me Calmo',
+            'view-calmo-tecnica':  '😌 ' + (window._calmoTecnicaNombre || 'Me Calmo'),
         };
         title.textContent = titles[viewId] || '📚 Escuela de Samuel';
     }
@@ -2244,6 +2402,178 @@ function speakPD() {
     if (ptxt !== 'Tocar para elegir') parts.push(`Primero: ${ptxt}`);
     if (dtxt !== 'Tocar para elegir') parts.push(`Después: ${dtxt}`);
     sayText(parts.join('. '));
+}
+
+/* ============================================================
+   ME ORGANIZO — horario semanal
+   ============================================================ */
+const DIAS_SEMANA = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+const HORARIO = [
+    { nombre:'Lunes',      emoji:'1️⃣', materias:['📖 Lengua','🔢 Matemática','🏃 Ed. Física'] },
+    { nombre:'Martes',     emoji:'2️⃣', materias:['🌿 Ciencias Naturales','🎨 Plástica','🔢 Matemática'] },
+    { nombre:'Miércoles',  emoji:'3️⃣', materias:['📖 Lengua','🌍 Ciencias Sociales','🎵 Música'] },
+    { nombre:'Jueves',     emoji:'4️⃣', materias:['🔢 Matemática','🏃 Ed. Física','📖 Lengua'] },
+    { nombre:'Viernes',    emoji:'5️⃣', materias:['🎨 Plástica','🌿 Ciencias Naturales','💻 Computación'] },
+];
+
+function initOrganizo() {
+    const hoy = new Date().getDay(); // 0=dom, 1=lun ... 6=sab
+    const nombreHoy = DIAS_SEMANA[hoy];
+    const esEscolar = hoy >= 1 && hoy <= 5;
+
+    // Banner de hoy
+    const diaBanner = document.getElementById('organizoHoyDia');
+    diaBanner.textContent = esEscolar ? nombreHoy : nombreHoy + ' (sin clases)';
+
+    // Grilla de días
+    const grid = document.getElementById('organizoDiasGrid');
+    grid.innerHTML = '';
+    HORARIO.forEach((dia, i) => {
+        const diaNum = i + 1; // lunes=1
+        const esHoy = hoy === diaNum;
+        const btn = document.createElement('button');
+        btn.className = 'organizo-dia-btn' + (esHoy ? ' hoy' : '');
+        btn.setAttribute('aria-label', `${dia.nombre}: ${dia.materias.join(', ')}`);
+        btn.innerHTML = `
+            <span class="organizo-dia-emoji" aria-hidden="true">${dia.emoji}</span>
+            <div>
+                <div class="organizo-dia-nombre">${dia.nombre}${esHoy ? ' ⭐' : ''}</div>
+                <div class="organizo-dia-materias">${dia.materias.join(' · ')}</div>
+            </div>`;
+        btn.onclick = () => {
+            sayText(`${dia.nombre}. ${dia.materias.join('. ')}`);
+        };
+        grid.appendChild(btn);
+    });
+
+    // Audio intro
+    setTimeout(() => {
+        if (esEscolar) {
+            const idx = hoy - 1;
+            const d = HORARIO[idx];
+            sayText(`Hoy es ${nombreHoy}. Tenés: ${d.materias.join(', ')}.`);
+        } else {
+            sayText(`Hoy es ${nombreHoy}. No hay clases.`);
+        }
+    }, 400);
+}
+
+/* ============================================================
+   ME CALMO — técnicas de regulación
+   ============================================================ */
+const CALMO_TECNICAS = {
+    respirar: {
+        nombre: 'Respirar',
+        pasos: [
+            { emoji:'👃', texto:'Cerrá los ojos y respirá por la nariz despacio', speak:'Cerrá los ojos. Respirá por la nariz despacio.' },
+            { emoji:'🫁', texto:'Guardá el aire adentro y contá hasta 3', speak:'Guardá el aire adentro. Uno... dos... tres.' },
+            { emoji:'💨', texto:'Soltá el aire por la boca muy despacio', speak:'Soltá el aire por la boca muy despacio.' },
+            { emoji:'😌', texto:'Repetilo 3 veces. ¡Ya estás más calmo!', speak:'Repetilo tres veces. ¡Ya estás más calmo!' },
+        ]
+    },
+    contar: {
+        nombre: 'Contar',
+        pasos: [
+            { emoji:'😤', texto:'Cuando sentís que te enojás, pará un momento', speak:'Cuando sentís que te enojás, pará un momento.' },
+            { emoji:'1️⃣', texto:'Contá despacio: 1, 2, 3...', speak:'Contá despacio. Uno... dos... tres...' },
+            { emoji:'🔟', texto:'...4, 5, 6, 7, 8, 9, 10', speak:'Cuatro... cinco... seis... siete... ocho... nueve... diez.' },
+            { emoji:'😊', texto:'¡Muy bien! Ya te calmaste', speak:'¡Muy bien, Samuel! Ya te calmaste.' },
+        ]
+    },
+    apretar: {
+        nombre: 'Apretar y soltar',
+        pasos: [
+            { emoji:'✊', texto:'Apretá los puños con fuerza', speak:'Apretá los puños con fuerza.' },
+            { emoji:'⏳', texto:'Mantenelos apretados y contá hasta 5', speak:'Mantenelos apretados. Uno... dos... tres... cuatro... cinco.' },
+            { emoji:'🖐️', texto:'Abrí las manos despacio y soltá todo', speak:'Abrí las manos despacio y soltá todo.' },
+            { emoji:'😌', texto:'Sentís cómo se va la tensión. ¡Genial!', speak:'Sentís cómo se va la tensión. ¡Genial, Samuel!' },
+        ]
+    },
+    descansar: {
+        nombre: 'Descansar',
+        pasos: [
+            { emoji:'🚶', texto:'Alejate un ratito del lugar donde estás', speak:'Alejate un ratito del lugar donde estás.' },
+            { emoji:'🪑', texto:'Buscá un lugar tranquilo y sentate', speak:'Buscá un lugar tranquilo y sentate.' },
+            { emoji:'🌈', texto:'Pensá en algo lindo: tu familia, tus juguetes', speak:'Pensá en algo lindo. Tu familia, tus juguetes.' },
+            { emoji:'💪', texto:'Cuando te sentís mejor, ¡volvés!', speak:'Cuando te sentís mejor, ¡volvés!' },
+        ]
+    }
+};
+
+let _calmoKey     = null;
+let _calmoPasoIdx = -1;
+let _calmoTimer   = null;
+
+function openCalmoTecnica(key) {
+    const tec = CALMO_TECNICAS[key];
+    _calmoKey = key;
+    _calmoPasoIdx = -1;
+    window._calmoTecnicaNombre = tec.nombre;
+    if (_calmoTimer) { clearTimeout(_calmoTimer); _calmoTimer = null; }
+
+    navStack.push(currentViewId());
+    showView('view-calmo-tecnica');
+    const titleEl = document.getElementById('headerTitle');
+    if (titleEl) titleEl.textContent = '😌 ' + tec.nombre;
+
+    // Renderizar pasos (todos inactivos)
+    const wrap = document.getElementById('calmoPasosWrap');
+    wrap.innerHTML = '';
+    tec.pasos.forEach((paso, i) => {
+        const div = document.createElement('div');
+        div.className = 'calmo-paso';
+        div.id = `calmo-paso-${i}`;
+        div.innerHTML = `<span class="calmo-paso-num">${i+1}</span>
+                         <span class="calmo-paso-emoji" aria-hidden="true">${paso.emoji}</span>
+                         <span class="calmo-paso-texto">${paso.texto}</span>`;
+        wrap.appendChild(div);
+    });
+
+    // Restaurar botón
+    const btn = document.getElementById('calmoIniciarBtn');
+    btn.textContent = '▶️ Empezar';
+    btn.disabled = false;
+
+    sayText(tec.nombre + '. Tocá Empezar cuando estés listo.');
+}
+
+function iniciarCalmo() {
+    const tec = CALMO_TECNICAS[_calmoKey];
+    if (!tec) return;
+    const btn = document.getElementById('calmoIniciarBtn');
+    btn.disabled = true;
+    btn.textContent = '⏳ En progreso...';
+    _calmoPasoIdx = 0;
+    avanzarCalmoPaso();
+}
+
+function avanzarCalmoPaso() {
+    const tec = CALMO_TECNICAS[_calmoKey];
+    if (!tec || _calmoPasoIdx >= tec.pasos.length) {
+        // Fin
+        document.getElementById('calmoIniciarBtn').textContent = '🔁 Repetir';
+        document.getElementById('calmoIniciarBtn').disabled = false;
+        document.getElementById('calmoIniciarBtn').onclick = () => openCalmoTecnica(_calmoKey);
+        return;
+    }
+    // Marcar anterior como hecho
+    if (_calmoPasoIdx > 0) {
+        const prev = document.getElementById(`calmo-paso-${_calmoPasoIdx - 1}`);
+        if (prev) { prev.classList.remove('activo'); prev.classList.add('hecho'); }
+    }
+    // Activar actual
+    const actual = document.getElementById(`calmo-paso-${_calmoPasoIdx}`);
+    if (actual) { actual.classList.add('activo'); actual.scrollIntoView({ behavior:'smooth', block:'nearest' }); }
+
+    const paso = tec.pasos[_calmoPasoIdx];
+    sayText(paso.speak);
+
+    // Avanzar al siguiente después de ~3.5s
+    const delay = paso.speak.length * 55 + 1800;
+    _calmoTimer = setTimeout(() => {
+        _calmoPasoIdx++;
+        avanzarCalmoPaso();
+    }, delay);
 }
 
 /* ============================================================
