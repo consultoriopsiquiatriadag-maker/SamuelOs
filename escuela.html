@@ -1103,6 +1103,17 @@ body {
     padding: 14px 24px 16px;
     overflow: hidden;
 }
+.mochila-dia-banner {
+    text-align: center;
+    font-size: clamp(1rem, 2.5vw, 1.1rem);
+    font-weight: 700;
+    color: #fff;
+    background: var(--primary, #5b8dee);
+    border-radius: 14px;
+    padding: 8px 16px;
+    display: none; /* shown by JS when content set */
+}
+.mochila-dia-banner:not(:empty) { display: block; }
 .mochila-nivel {
     text-align: center;
     font-size: 0.9rem;
@@ -1551,6 +1562,7 @@ body {
      ============================================================ -->
 <div class="view" id="view-mochila" hidden>
     <div class="mochila-body">
+        <div class="mochila-dia-banner" id="mochilaDiaBanner"></div>
         <div class="mochila-nivel"     id="mochilaNivel"></div>
         <div class="mochila-instruccion">🎒 Tocá solo lo que necesitás para la escuela</div>
         <div class="mochila-grid"      id="mochilaGrid"></div>
@@ -1730,6 +1742,14 @@ body {
             <section class="ap-section">
                 <div class="ap-section-title">📊 Resumen de actividades</div>
                 <div class="ap-stats" id="apStats"></div>
+            </section>
+
+            <!-- Horario editable -->
+            <section class="ap-section" id="apHorarioSection">
+                <div class="ap-section-title">📋 Horario de Samuel (editable)</div>
+                <div id="apHorarioEditor"></div>
+                <button class="ap-toggle-btn" style="margin-top:10px;width:100%" onclick="guardarHorario()">💾 Guardar horario</button>
+                <div class="ap-reset-msg" id="apHorarioMsg" aria-live="polite"></div>
             </section>
 
             <!-- Reiniciar -->
@@ -2058,7 +2078,17 @@ let mochilaItems     = [];
 let mochilaPending   = 0;
 let mochilaBloqueado = false;
 
-function initMochila() { mochilaLevel = nivelMochila; loadMochilaLevel(); }
+function initMochila() {
+    mochilaLevel = nivelMochila;
+    // Banner día
+    const banner = document.getElementById('mochilaDiaBanner');
+    if (banner) {
+        const d = new Date().getDay();
+        const nombres = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+        banner.textContent = `📅 Hoy es ${nombres[d]}`;
+    }
+    loadMochilaLevel();
+}
 
 function loadMochilaLevel() {
     mochilaBloqueado = false;
@@ -2417,6 +2447,9 @@ const HORARIO = [
 ];
 
 function initOrganizo() {
+    const savedHorario = JSON.parse(localStorage.getItem('samuel_horario') || 'null');
+    const horarioActual = savedHorario || HORARIO;
+
     const hoy = new Date().getDay(); // 0=dom, 1=lun ... 6=sab
     const nombreHoy = DIAS_SEMANA[hoy];
     const esEscolar = hoy >= 1 && hoy <= 5;
@@ -2428,7 +2461,7 @@ function initOrganizo() {
     // Grilla de días
     const grid = document.getElementById('organizoDiasGrid');
     grid.innerHTML = '';
-    HORARIO.forEach((dia, i) => {
+    horarioActual.forEach((dia, i) => {
         const diaNum = i + 1; // lunes=1
         const esHoy = hoy === diaNum;
         const btn = document.createElement('button');
@@ -2450,7 +2483,7 @@ function initOrganizo() {
     setTimeout(() => {
         if (esEscolar) {
             const idx = hoy - 1;
-            const d = HORARIO[idx];
+            const d = horarioActual[idx];
             sayText(`Hoy es ${nombreHoy}. Tenés: ${d.materias.join(', ')}.`);
         } else {
             sayText(`Hoy es ${nombreHoy}. No hay clases.`);
@@ -2780,6 +2813,7 @@ function openAdultoPanel() {
     renderApModules();
     renderApRefuerzo();
     renderApStats();
+    renderApHorarioEditor();
     document.getElementById('apResetMsg').textContent = '';
     document.getElementById('adultoPanel').hidden = false;
 }
@@ -2859,6 +2893,33 @@ function renderApStats() {
         <div class="ap-stat-row"><span>👂 Consignas completadas</span><span>${statsData.consignas || 0}</span></div>
         <div class="ap-stat-row"><span>📅 Veces abierto</span><span>${statsData.sesiones || 0}</span></div>
     `;
+}
+
+// Horario editable
+function renderApHorarioEditor() {
+    const el = document.getElementById('apHorarioEditor');
+    if (!el) return;
+    const saved = JSON.parse(localStorage.getItem('samuel_horario') || 'null') || HORARIO;
+    el.innerHTML = saved.map((dia, i) => `
+        <div style="margin-bottom:10px">
+            <div style="font-weight:700;margin-bottom:4px">${dia.emoji} ${dia.nombre}</div>
+            <input type="text" id="ap-horario-${i}"
+                style="width:100%;padding:8px 10px;border-radius:10px;border:2px solid #ddd;font-size:0.95rem"
+                value="${dia.materias.join(', ')}"
+                placeholder="${dia.nombre}: materias separadas por coma">
+        </div>`).join('');
+}
+
+function guardarHorario() {
+    const saved = JSON.parse(localStorage.getItem('samuel_horario') || 'null') || HORARIO;
+    const nuevo = saved.map((dia, i) => {
+        const inp = document.getElementById(`ap-horario-${i}`);
+        const materias = inp ? inp.value.split(',').map(s => s.trim()).filter(Boolean) : dia.materias;
+        return { ...dia, materias };
+    });
+    localStorage.setItem('samuel_horario', JSON.stringify(nuevo));
+    const msg = document.getElementById('apHorarioMsg');
+    if (msg) { msg.textContent = '✅ Horario guardado'; setTimeout(() => { msg.textContent = ''; }, 2500); }
 }
 
 // Reiniciar progreso
