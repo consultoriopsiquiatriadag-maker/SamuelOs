@@ -1,10 +1,17 @@
 # JUEGOS FAMILIARES — ESTADO DEL PROYECTO
 
 ## FASE ACTUAL
-Fase 2 — Sistema compartido completado. Esperando autorización para Fase 3 (Memotest).
+Fase 3 — Memotest completo (lotes 3.1–3.4 en un solo archivo).
 
 ## LOTE TERMINADO
-Lote 2.2 — Sistema compartido completo (players, storage, audio, css)
+Lote 3 — `juegos-familia/memotest/index.html` completo:
+- Dificultad: Fácil (6 pares), Medio (8), Avanzado (12)
+- Multijugador 2–4 jugadores con FamiliaJugadores
+- Turno, chips, turn-banner, audio, SpeechSynthesis
+- Par encontrado → mismo jugador sigue; error → pasa turno
+- Pantalla final con FamiliaJugadores.renderFinal
+- Portal `juegos-familia/index.html` actualizado: card Memotest habilitada (badge ¡Nuevo!)
+- SW bumped a v88-memotest, memotest/index.html en ASSETS
 
 ## ARCHIVOS CREADOS (Fase 1)
 - `juegos-familia/index.html` — portal con 5 tarjetas, todas "En construcción"

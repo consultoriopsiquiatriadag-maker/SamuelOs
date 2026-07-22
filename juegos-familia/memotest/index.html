@@ -1,0 +1,455 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#f59e0b" />
+  <link rel="manifest" href="../../manifest.webmanifest" />
+  <title>Memotest — Juegos en Familia</title>
+  <link rel="stylesheet" href="../shared/family-game.css" />
+  <style>
+    body { background: var(--fg-bg); min-height: 100svh; }
+
+    /* ── PANTALLAS ── */
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    /* ── DIFICULTAD ── */
+    .dif-grid {
+      display: grid; grid-template-columns: repeat(3,1fr);
+      gap: 16px; margin: 24px 0;
+    }
+    @media (max-width:520px) { .dif-grid { grid-template-columns: 1fr; } }
+    .dif-card {
+      background: var(--fg-card); border-radius: 20px;
+      border: 2.5px solid var(--fg-stroke); box-shadow: var(--fg-shadow);
+      padding: 28px 16px; text-align: center; cursor: pointer;
+      transition: transform .14s, border-color .14s, box-shadow .14s;
+    }
+    .dif-card:hover  { transform: translateY(-3px); box-shadow: 0 22px 44px rgba(2,6,23,.17); }
+    .dif-card:active { transform: scale(.97); }
+    .dif-card.selected { border-color: #f59e0b; box-shadow: 0 0 0 3px rgba(245,158,11,.25); }
+    .dif-emoji  { font-size: 44px; margin-bottom: 10px; }
+    .dif-titulo { font-size: 20px; font-weight: 950; }
+    .dif-sub    { font-size: 13px; color: var(--fg-muted); font-weight: 700; margin-top: 4px; }
+    .dif-badge  {
+      display: inline-block; margin-top: 10px; padding: 4px 12px;
+      border-radius: 99px; font-size: 12px; font-weight: 900;
+    }
+    .dif-verde { background:#dcfce7; color:#166534; }
+    .dif-azul  { background:#dbeafe; color:#1e40af; }
+    .dif-rojo  { background:#fee2e2; color:#991b1b; }
+
+    /* ── TABLERO ── */
+    #pantalla-juego { padding-bottom: 20px; }
+
+    .memo-grid {
+      display: grid; gap: 10px;
+      margin-top: 14px;
+    }
+    .memo-grid.facil    { grid-template-columns: repeat(4, 1fr); }
+    .memo-grid.medio    { grid-template-columns: repeat(4, 1fr); }
+    .memo-grid.avanzado { grid-template-columns: repeat(6, 1fr); }
+    @media (max-width:600px) {
+      .memo-grid.avanzado { grid-template-columns: repeat(4, 1fr); }
+    }
+
+    /* Carta */
+    .memo-card {
+      aspect-ratio: 1;
+      perspective: 700px;
+      cursor: pointer;
+    }
+    .memo-card-inner {
+      position: relative; width: 100%; height: 100%;
+      transform-style: preserve-3d;
+      transition: transform .38s cubic-bezier(.4,0,.2,1);
+    }
+    .memo-card.flipped   .memo-card-inner { transform: rotateY(180deg); }
+    .memo-card.encontrada .memo-card-inner { transform: rotateY(180deg); }
+
+    .memo-card-cover,
+    .memo-card-face {
+      position: absolute; inset: 0;
+      border-radius: 14px;
+      backface-visibility: hidden;
+      display: flex; align-items: center; justify-content: center;
+    }
+    /* Dorso de la carta */
+    .memo-card-cover {
+      background: linear-gradient(135deg, #7c3aed, #5b21b6);
+      border: 2px solid rgba(255,255,255,.15);
+      box-shadow: 0 6px 16px rgba(2,6,23,.22);
+      font-size: clamp(18px, 4vw, 28px);
+    }
+    /* Cara de la carta */
+    .memo-card-face {
+      transform: rotateY(180deg);
+      background: var(--fg-card);
+      border: 2.5px solid var(--fg-stroke);
+      box-shadow: 0 6px 16px rgba(2,6,23,.14);
+      font-size: clamp(24px, 5vw, 44px);
+      flex-direction: column; gap: 4px;
+    }
+    .memo-card-face .card-label {
+      font-size: clamp(9px, 1.8vw, 12px);
+      font-weight: 800; color: var(--fg-muted); line-height: 1;
+    }
+    .memo-card.encontrada .memo-card-face {
+      background: #f0fdf4;
+      border-color: #86efac;
+      opacity: .75;
+    }
+    .memo-card.bloqueada { pointer-events: none; }
+
+    /* Halo de acierto */
+    @keyframes memo-match {
+      0%   { box-shadow: 0 0 0 0 rgba(34,197,94,.6); }
+      70%  { box-shadow: 0 0 0 14px rgba(34,197,94,0); }
+      100% { box-shadow: 0 0 0 0 rgba(34,197,94,0); }
+    }
+    .memo-card.pulse-match .memo-card-inner {
+      animation: memo-match .5s ease;
+    }
+
+    /* ── STATS ── */
+    .memo-stats {
+      display: flex; gap: 12px; align-items: center;
+      margin-top: 12px; flex-wrap: wrap;
+    }
+    .memo-stat {
+      padding: 8px 14px; border-radius: 99px;
+      background: var(--fg-card); box-shadow: var(--fg-shadow);
+      font-size: 13px; font-weight: 800; color: var(--fg-muted);
+    }
+    .memo-stat span { color: var(--fg-text); font-weight: 950; }
+
+    /* ── SELECTOR (overlay) ── */
+    #contenedor-selector { min-height: 0; }
+  </style>
+</head>
+<body>
+<div class="fg-shell">
+
+  <!-- ══ PANTALLA: DIFICULTAD ════════════════════════════════ -->
+  <div id="pantalla-dificultad" class="screen active">
+    <header class="fg-game-header">
+      <a class="fg-btn-volver" href="../index.html">◀ Volver</a>
+      <div class="fg-game-title">🧠 Memotest</div>
+    </header>
+
+    <div style="text-align:center; margin-bottom:8px;">
+      <strong style="font-size:18px; font-weight:950;">¿Qué tan difícil?</strong>
+      <p style="color:var(--fg-muted); font-weight:700; margin-top:4px;">Samuel empieza en Fácil</p>
+    </div>
+
+    <div class="dif-grid">
+      <div class="dif-card selected" id="dif-facil" onclick="seleccionarDificultad('facil')">
+        <div class="dif-emoji">🌟</div>
+        <div class="dif-titulo">Fácil</div>
+        <div class="dif-sub">6 pares · 12 cartas</div>
+        <span class="dif-badge dif-verde">Recomendado</span>
+      </div>
+      <div class="dif-card" id="dif-medio" onclick="seleccionarDificultad('medio')">
+        <div class="dif-emoji">🔥</div>
+        <div class="dif-titulo">Medio</div>
+        <div class="dif-sub">8 pares · 16 cartas</div>
+        <span class="dif-badge dif-azul">Desafío</span>
+      </div>
+      <div class="dif-card" id="dif-avanzado" onclick="seleccionarDificultad('avanzado')">
+        <div class="dif-emoji">🏆</div>
+        <div class="dif-titulo">Avanzado</div>
+        <div class="dif-sub">12 pares · 24 cartas</div>
+        <span class="dif-badge dif-rojo">Experto</span>
+      </div>
+    </div>
+
+    <button class="fg-btn fg-btn-amber fg-btn-full" style="margin-top:8px;"
+            onclick="irAlSelector()">▶ Siguiente — Elegir jugadores</button>
+  </div>
+
+  <!-- ══ PANTALLA: SELECTOR DE JUGADORES ═════════════════════ -->
+  <div id="pantalla-selector" class="screen">
+    <div id="contenedor-selector"></div>
+  </div>
+
+  <!-- ══ PANTALLA: JUEGO ══════════════════════════════════════ -->
+  <div id="pantalla-juego" class="screen">
+    <header class="fg-game-header">
+      <a class="fg-btn-volver" href="../index.html">◀ Volver</a>
+      <div class="fg-game-title">🧠 Memotest</div>
+      <div id="contenedor-sonido"></div>
+    </header>
+
+    <!-- Turno -->
+    <div class="fg-turn-banner" id="turn-banner"></div>
+
+    <!-- Chips de jugadores -->
+    <div class="fg-players-bar" id="players-bar"></div>
+
+    <!-- Stats -->
+    <div class="memo-stats">
+      <div class="memo-stat">Pares: <span id="stat-pares">0</span> / <span id="stat-total">0</span></div>
+      <div class="memo-stat">Intentos: <span id="stat-intentos">0</span></div>
+    </div>
+
+    <!-- Tablero -->
+    <div class="memo-grid facil" id="memo-grid"></div>
+  </div>
+
+  <!-- ══ PANTALLA: FIN ═════════════════════════════════════════ -->
+  <div id="pantalla-fin" class="screen">
+    <header class="fg-game-header" style="margin-bottom:24px;">
+      <a class="fg-btn-volver" href="../index.html">◀ Volver</a>
+    </header>
+    <div id="contenedor-fin"></div>
+  </div>
+
+</div>
+
+<script src="../shared/storage.js"></script>
+<script src="../shared/players.js"></script>
+<script src="../shared/audio.js"></script>
+<script>
+/* ============================================================
+   MEMOTEST FAMILIAR
+   ============================================================ */
+
+/* ── ANIMALES (24 pares disponibles) ── */
+var ANIMALES = [
+  { emoji: '🐶', nombre: 'Perro'     },
+  { emoji: '🐱', nombre: 'Gato'      },
+  { emoji: '🐭', nombre: 'Ratón'     },
+  { emoji: '🐰', nombre: 'Conejo'    },
+  { emoji: '🦊', nombre: 'Zorro'     },
+  { emoji: '🐻', nombre: 'Oso'       },
+  { emoji: '🐼', nombre: 'Panda'     },
+  { emoji: '🐨', nombre: 'Koala'     },
+  { emoji: '🐯', nombre: 'Tigre'     },
+  { emoji: '🦁', nombre: 'León'      },
+  { emoji: '🐮', nombre: 'Vaca'      },
+  { emoji: '🐷', nombre: 'Cerdo'     },
+  { emoji: '🐸', nombre: 'Rana'      },
+  { emoji: '🐵', nombre: 'Mono'      },
+  { emoji: '🐔', nombre: 'Gallina'   },
+  { emoji: '🐧', nombre: 'Pingüino'  },
+  { emoji: '🦆', nombre: 'Pato'      },
+  { emoji: '🦉', nombre: 'Búho'      },
+  { emoji: '🦋', nombre: 'Mariposa'  },
+  { emoji: '🐢', nombre: 'Tortuga'   },
+  { emoji: '🐬', nombre: 'Delfín'    },
+  { emoji: '🦒', nombre: 'Jirafa'    },
+  { emoji: '🦓', nombre: 'Cebra'     },
+  { emoji: '🐘', nombre: 'Elefante'  }
+];
+
+var DIFICULTADES = {
+  facil:    { pares: 6,  cols: 'facil'    },
+  medio:    { pares: 8,  cols: 'medio'    },
+  avanzado: { pares: 12, cols: 'avanzado' }
+};
+
+/* ── ESTADO ── */
+var dificultadActual = 'facil';
+var cartas      = [];   // [{id, animal, flipped, matched}]
+var voltadas     = [];   // índices de cartas dadas vuelta (máx 2)
+var bloqueado    = false;
+var paresEncontrados = 0;
+var intentos     = 0;
+
+/* ── PANTALLAS ── */
+function mostrarPantalla(id) {
+  document.querySelectorAll('.screen').forEach(function (s) {
+    s.classList.toggle('active', s.id === id);
+  });
+}
+
+/* ── DIFICULTAD ── */
+function seleccionarDificultad(d) {
+  dificultadActual = d;
+  document.querySelectorAll('.dif-card').forEach(function (c) {
+    c.classList.toggle('selected', c.id === 'dif-' + d);
+  });
+  FamiliaStorage.setDificultad(d);
+}
+
+function irAlSelector() {
+  mostrarPantalla('pantalla-selector');
+  FamiliaAudio.cargarPreferencia();
+  FamiliaJugadores.renderSelector('contenedor-selector', { min: 2, max: 4 }, function () {
+    iniciarJuego();
+  });
+}
+
+/* ── INICIAR JUEGO ── */
+function iniciarJuego() {
+  FamiliaStorage.setUltimoJuego('memotest');
+  var cfg  = DIFICULTADES[dificultadActual];
+  paresEncontrados = 0;
+  intentos = 0;
+  voltadas = [];
+  bloqueado = false;
+
+  /* Mezclar animales y crear pares */
+  var pool = mezclar(ANIMALES.slice()).slice(0, cfg.pares);
+  var doble = pool.concat(pool).map(function (a, i) {
+    return { id: i, animal: a, flipped: false, matched: false };
+  });
+  cartas = mezclar(doble);
+
+  /* Actualizar UI */
+  var grid = document.getElementById('memo-grid');
+  grid.className = 'memo-grid ' + cfg.cols;
+
+  actualizarStats();
+  renderTablero();
+
+  FamiliaJugadores.renderTurnBanner('turn-banner');
+  FamiliaJugadores.renderChips('players-bar');
+  FamiliaAudio.renderBotonSonido('contenedor-sonido');
+  FamiliaAudio.anunciarTurno(FamiliaJugadores.actual().name);
+
+  mostrarPantalla('pantalla-juego');
+}
+
+/* ── TABLERO ── */
+function renderTablero() {
+  var grid = document.getElementById('memo-grid');
+  grid.innerHTML = cartas.map(function (c, idx) {
+    var clases = 'memo-card';
+    if (c.flipped)  clases += ' flipped';
+    if (c.matched)  clases += ' encontrada';
+    return '<div class="' + clases + '" id="carta-' + idx + '" ' +
+      'onclick="voltarCarta(' + idx + ')" ' +
+      'role="button" tabindex="0" ' +
+      'aria-label="' + (c.flipped || c.matched ? c.animal.nombre : 'Carta oculta') + '">' +
+      '<div class="memo-card-inner">' +
+        '<div class="memo-card-cover">🃏</div>' +
+        '<div class="memo-card-face">' +
+          c.animal.emoji +
+          '<div class="card-label">' + c.animal.nombre + '</div>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+
+  /* Teclado */
+  grid.querySelectorAll('.memo-card').forEach(function (el, idx) {
+    el.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); voltarCarta(idx); }
+    });
+  });
+}
+
+/* ── VOLTEAR CARTA ── */
+function voltarCarta(idx) {
+  if (bloqueado) return;
+  var c = cartas[idx];
+  if (c.flipped || c.matched) return;
+  if (voltadas.length >= 2) return;
+
+  FamiliaAudio.tap();
+  c.flipped = true;
+  voltadas.push(idx);
+  actualizarCarta(idx);
+
+  if (voltadas.length === 2) {
+    bloqueado = true;
+    intentos++;
+    actualizarStats();
+    setTimeout(verificarPar, 900);
+  }
+}
+
+function verificarPar() {
+  var i1 = voltadas[0], i2 = voltadas[1];
+  var c1 = cartas[i1], c2 = cartas[i2];
+
+  if (c1.animal.emoji === c2.animal.emoji) {
+    /* ¡Par encontrado! */
+    c1.matched = c2.matched = true;
+    c1.flipped = c2.flipped = false;
+    paresEncontrados++;
+    actualizarCarta(i1, true);
+    actualizarCarta(i2, true);
+    FamiliaJugadores.sumarPuntos(1);
+    FamiliaJugadores.renderChips('players-bar');
+    FamiliaAudio.acierto();
+
+    var cfg = DIFICULTADES[dificultadActual];
+    if (paresEncontrados >= cfg.pares) {
+      /* Juego terminado */
+      setTimeout(function () {
+        FamiliaAudio.celebracion();
+        FamiliaAudio.anunciarGanador(FamiliaJugadores.ganador()
+          ? FamiliaJugadores.ganador().name : null);
+        FamiliaJugadores.renderFinal('contenedor-fin', {
+          onRevancha: function () { iniciarJuego(); mostrarPantalla('pantalla-juego'); },
+          onCambiarJugadores: function () { mostrarPantalla('pantalla-dificultad'); }
+        });
+        mostrarPantalla('pantalla-fin');
+      }, 800);
+      voltadas = [];
+      bloqueado = false;
+      actualizarStats();
+      return;
+    }
+    /* El mismo jugador sigue (encontró par) */
+    voltadas = [];
+    bloqueado = false;
+    actualizarStats();
+  } else {
+    /* No es par — animar y pasar turno */
+    FamiliaAudio.error();
+    c1.flipped = c2.flipped = false;
+    actualizarCarta(i1);
+    actualizarCarta(i2);
+    voltadas = [];
+    bloqueado = false;
+    actualizarStats();
+
+    var sig = FamiliaJugadores.siguiente();
+    FamiliaJugadores.renderTurnBanner('turn-banner');
+    FamiliaJugadores.renderChips('players-bar');
+    FamiliaAudio.anunciarTurno(sig.name);
+  }
+}
+
+function actualizarCarta(idx, pulse) {
+  var el = document.getElementById('carta-' + idx);
+  if (!el) return;
+  var c  = cartas[idx];
+  el.className = 'memo-card' +
+    (c.flipped  ? ' flipped'    : '') +
+    (c.matched  ? ' encontrada' : '');
+  if (pulse) {
+    el.classList.add('pulse-match');
+    setTimeout(function () { el.classList.remove('pulse-match'); }, 600);
+  }
+  el.setAttribute('aria-label',
+    c.matched ? c.animal.nombre + ' encontrada' :
+    c.flipped ? c.animal.nombre : 'Carta oculta');
+}
+
+function actualizarStats() {
+  var cfg = DIFICULTADES[dificultadActual];
+  document.getElementById('stat-pares').textContent    = paresEncontrados;
+  document.getElementById('stat-total').textContent    = cfg.pares;
+  document.getElementById('stat-intentos').textContent = intentos;
+}
+
+/* ── UTILIDAD: mezclar Fisher-Yates ── */
+function mezclar(arr) {
+  for (var i = arr.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
+  }
+  return arr;
+}
+
+/* ── INIT ── */
+FamiliaAudio.cargarPreferencia();
+seleccionarDificultad(FamiliaStorage.getDificultad() || 'facil');
+</script>
+</body>
+</html>

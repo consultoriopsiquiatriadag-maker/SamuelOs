@@ -1,5 +1,5 @@
 /* Aplicación de Samuel - Service Worker */
-const CACHE_VERSION = 'samuel-app-v87-shared-familia';
+const CACHE_VERSION = 'samuel-app-v88-memotest';
 const CACHE_NAME = CACHE_VERSION;
 
 const ASSETS = [
@@ -18,6 +18,7 @@ const ASSETS = [
   './juegos-familia/shared/players.js',
   './juegos-familia/shared/storage.js',
   './juegos-familia/shared/audio.js',
+  './juegos-familia/memotest/index.html',
   './app.js',
   './flags-data.js',
   './manifest.webmanifest',
