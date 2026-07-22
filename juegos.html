@@ -669,26 +669,86 @@
       </div>
     </section>
 
-    <!-- APRENDER: sub-hub de Fichas + Historias (Fase 24) -->
+    <!-- APRENDER: sub-hub de Fichas + Historias (Fase 56) -->
     <section id="viewAprender" class="view" aria-label="Aprender">
       <div class="top-actions" style="margin-bottom:6px;">
         <button class="btn ghost" id="aprenderHome">⬅️ Centro de juegos</button>
       </div>
       <div class="grid">
-        <button class="game hub-card hub-fichas" id="goFichas">
-          <div class="gtitle"><span class="gicon">📚</span>Fichas de aprendizaje</div>
-          <div class="gdesc">Animales, vehículos, emociones y más.</div>
+
+        <button class="home-hub-card" id="goFichas" style="--hub-color:#f59e0b" aria-label="Fichas de aprendizaje">
+          <svg width="64" height="64" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+            <rect width="64" height="64" rx="16" fill="#FEF3C7"/>
+            <!-- stack of cards -->
+            <rect x="10" y="22" width="36" height="28" rx="5" fill="#d97706" opacity="0.4"/>
+            <rect x="14" y="18" width="36" height="28" rx="5" fill="#d97706" opacity="0.6"/>
+            <rect x="18" y="14" width="36" height="28" rx="5" fill="#f59e0b"/>
+            <rect x="24" y="20" width="12" height="3" rx="1.5" fill="#fff"/>
+            <rect x="24" y="26" width="20" height="2" rx="1" fill="#fff" opacity="0.8"/>
+            <rect x="24" y="31" width="16" height="2" rx="1" fill="#fff" opacity="0.8"/>
+            <!-- dog face -->
+            <circle cx="44" cy="44" r="12" fill="#f59e0b"/>
+            <circle cx="40" cy="42" r="2" fill="#1e293b"/>
+            <circle cx="48" cy="42" r="2" fill="#1e293b"/>
+            <path d="M40 48 Q44 51 48 48" stroke="#1e293b" stroke-width="2" stroke-linecap="round" fill="none"/>
+            <path d="M37 38 L38 42" stroke="#92400e" stroke-width="2" stroke-linecap="round"/>
+            <path d="M51 38 L50 42" stroke="#92400e" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <div class="hub-label">Fichas</div>
+          <div class="hub-sub">Animales, vehículos y más</div>
+          <div class="hub-accent-bar" style="background:#f59e0b"></div>
         </button>
 
-        <button class="game hub-card hub-historias" id="goHistorias">
-          <div class="gtitle"><span class="gicon">📖</span>Historias sociales</div>
-          <div class="gdesc">Para entender los momentos del día.</div>
+        <button class="home-hub-card" id="goHistorias" style="--hub-color:#ec4899" aria-label="Historias sociales">
+          <svg width="64" height="64" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+            <rect width="64" height="64" rx="16" fill="#FDF2F8"/>
+            <!-- open book -->
+            <path d="M10 16 L32 20 L32 52 L10 48 Z" fill="#ec4899" opacity="0.7"/>
+            <path d="M54 16 L32 20 L32 52 L54 48 Z" fill="#db2777"/>
+            <line x1="32" y1="20" x2="32" y2="52" stroke="#fff" stroke-width="1.5"/>
+            <!-- left page lines -->
+            <line x1="15" y1="27" x2="28" y2="28" stroke="#fff" stroke-width="1.5" stroke-linecap="round" opacity="0.8"/>
+            <line x1="15" y1="33" x2="28" y2="34" stroke="#fff" stroke-width="1.5" stroke-linecap="round" opacity="0.8"/>
+            <line x1="15" y1="39" x2="26" y2="40" stroke="#fff" stroke-width="1.5" stroke-linecap="round" opacity="0.8"/>
+            <!-- right page lines -->
+            <line x1="49" y1="27" x2="36" y2="28" stroke="#fff" stroke-width="1.5" stroke-linecap="round" opacity="0.8"/>
+            <line x1="49" y1="33" x2="36" y2="34" stroke="#fff" stroke-width="1.5" stroke-linecap="round" opacity="0.8"/>
+            <line x1="49" y1="39" x2="38" y2="40" stroke="#fff" stroke-width="1.5" stroke-linecap="round" opacity="0.8"/>
+            <!-- person icon top -->
+            <circle cx="44" cy="13" r="5" fill="#db2777"/>
+            <path d="M38 22 Q44 18 50 22" stroke="#db2777" stroke-width="2" fill="none" stroke-linecap="round"/>
+          </svg>
+          <div class="hub-label">Historias</div>
+          <div class="hub-sub">Momentos del día</div>
+          <div class="hub-accent-bar" style="background:#ec4899"></div>
         </button>
 
-        <button class="game hub-card hub-cuentos" id="goCuentos">
-          <div class="gtitle"><span class="gicon">🎬</span>Cuentos interactivos</div>
-          <div class="gdesc">Escuchá un cuento y tocá los personajes.</div>
+        <button class="home-hub-card" id="goCuentos" style="--hub-color:#06b6d4" aria-label="Cuentos interactivos">
+          <svg width="64" height="64" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+            <rect width="64" height="64" rx="16" fill="#ECFEFF"/>
+            <!-- film frame -->
+            <rect x="10" y="16" width="44" height="32" rx="5" fill="#0e7490"/>
+            <rect x="14" y="20" width="36" height="24" rx="3" fill="#06b6d4" opacity="0.4"/>
+            <!-- play button -->
+            <circle cx="32" cy="32" r="10" fill="#fff" opacity="0.9"/>
+            <path d="M29 27 L41 32 L29 37 Z" fill="#0e7490"/>
+            <!-- film holes -->
+            <rect x="12" y="12" width="4" height="5" rx="1" fill="#0e7490"/>
+            <rect x="20" y="12" width="4" height="5" rx="1" fill="#0e7490"/>
+            <rect x="28" y="12" width="4" height="5" rx="1" fill="#0e7490"/>
+            <rect x="36" y="12" width="4" height="5" rx="1" fill="#0e7490"/>
+            <rect x="44" y="12" width="4" height="5" rx="1" fill="#0e7490"/>
+            <rect x="12" y="48" width="4" height="5" rx="1" fill="#0e7490"/>
+            <rect x="20" y="48" width="4" height="5" rx="1" fill="#0e7490"/>
+            <rect x="28" y="48" width="4" height="5" rx="1" fill="#0e7490"/>
+            <rect x="36" y="48" width="4" height="5" rx="1" fill="#0e7490"/>
+            <rect x="44" y="48" width="4" height="5" rx="1" fill="#0e7490"/>
+          </svg>
+          <div class="hub-label">Cuentos</div>
+          <div class="hub-sub">Escuchá y tocá personajes</div>
+          <div class="hub-accent-bar" style="background:#06b6d4"></div>
         </button>
+
       </div>
     </section>
 
@@ -698,25 +758,80 @@
         <button class="btn ghost" id="simplesHome">⬅️ Centro de juegos</button>
       </div>
       <div class="grid">
-        <button class="game hub-card hub-sonidos" id="goSonidos">
-          <div class="gtitle"><span class="gicon">🔊</span>Sonidos</div>
-          <div class="gdesc">Animales, vehículos y piano de sonidos.</div>
+
+        <!-- Sonidos -->
+        <button class="home-hub-card" id="goSonidos" style="--hub-color:#2563eb" aria-label="Sonidos">
+          <svg width="64" height="64" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+            <rect width="64" height="64" rx="16" fill="#E6F1FB"/>
+            <rect x="14" y="22" width="14" height="20" rx="3" fill="#378ADD"/>
+            <path d="M28 22 L40 14 L40 50 L28 42Z" fill="#185FA5"/>
+            <path d="M44 24 Q52 32 44 40" stroke="#378ADD" stroke-width="3" stroke-linecap="round" fill="none"/>
+            <path d="M48 19 Q60 32 48 45" stroke="#185FA5" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+          </svg>
+          <div class="hub-label">Sonidos</div>
+          <div class="hub-sub">Animales, vehículos y piano</div>
+          <div class="hub-accent-bar"></div>
         </button>
 
-        <button class="game hub-card hub-explotar" id="goExplotar">
-          <div class="gtitle"><span class="gicon">🎈</span>Para tocar</div>
-          <div class="gdesc">Burbujas, globos y estrellas mágicas.</div>
+        <!-- Para tocar -->
+        <button class="home-hub-card" id="goExplotar" style="--hub-color:#22c55e" aria-label="Para tocar">
+          <svg width="64" height="64" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+            <rect width="64" height="64" rx="16" fill="#DCFCE7"/>
+            <circle cx="24" cy="20" r="8" fill="none" stroke="#16a34a" stroke-width="2.5"/>
+            <circle cx="42" cy="28" r="6" fill="none" stroke="#16a34a" stroke-width="2.5"/>
+            <circle cx="28" cy="40" r="10" fill="none" stroke="#22c55e" stroke-width="3"/>
+            <circle cx="46" cy="44" r="5" fill="none" stroke="#16a34a" stroke-width="2"/>
+            <!-- hand tap -->
+            <path d="M32 52 L32 42 M28 52 L28 44 M36 52 L36 43 M24 52 L24 46 L22 44" stroke="#15803d" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <div class="hub-label">Para tocar</div>
+          <div class="hub-sub">Burbujas, globos y estrellas</div>
+          <div class="hub-accent-bar" style="background:#22c55e"></div>
         </button>
 
-        <button class="game hub-card hub-movimiento" id="goMovimiento">
-          <div class="gtitle"><span class="gicon">🚗</span>Movimiento</div>
-          <div class="gdesc">Carrera, esquivar y luces de colores.</div>
+        <!-- Movimiento -->
+        <button class="home-hub-card" id="goMovimiento" style="--hub-color:#f97316" aria-label="Movimiento">
+          <svg width="64" height="64" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+            <rect width="64" height="64" rx="16" fill="#FFF7ED"/>
+            <!-- road -->
+            <rect x="8" y="34" width="48" height="14" rx="4" fill="#ea580c"/>
+            <rect x="18" y="39" width="8" height="3" rx="1.5" fill="#fff" opacity="0.7"/>
+            <rect x="30" y="39" width="8" height="3" rx="1.5" fill="#fff" opacity="0.7"/>
+            <!-- car body -->
+            <rect x="16" y="22" width="32" height="16" rx="5" fill="#f97316"/>
+            <rect x="21" y="16" width="22" height="10" rx="4" fill="#fb923c"/>
+            <!-- wheels -->
+            <circle cx="22" cy="38" r="5" fill="#1e293b"/>
+            <circle cx="42" cy="38" r="5" fill="#1e293b"/>
+            <circle cx="22" cy="38" r="2" fill="#94a3b8"/>
+            <circle cx="42" cy="38" r="2" fill="#94a3b8"/>
+            <!-- speed lines -->
+            <line x1="8" y1="20" x2="14" y2="20" stroke="#f97316" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="6" y1="26" x2="14" y2="26" stroke="#fb923c" stroke-width="2" stroke-linecap="round"/>
+            <line x1="8" y1="32" x2="13" y2="32" stroke="#f97316" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <div class="hub-label">Movimiento</div>
+          <div class="hub-sub">Carrera, esquivar y colores</div>
+          <div class="hub-accent-bar" style="background:#f97316"></div>
         </button>
 
-        <button class="game hub-card hub-didacticos" id="goDidacticos">
-          <div class="gtitle"><span class="gicon">🧠</span>Desafíos</div>
-          <div class="gdesc">Memotest, rompecabezas, tetris y más.</div>
+        <!-- Desafíos -->
+        <button class="home-hub-card" id="goDidacticos" style="--hub-color:#7c3aed" aria-label="Desafíos">
+          <svg width="64" height="64" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+            <rect width="64" height="64" rx="16" fill="#F3F0FF"/>
+            <!-- brain outline -->
+            <path d="M32 12 C22 12 16 18 16 26 C16 30 18 33 20 35 C18 37 17 40 18 43 C19 47 23 50 28 50 L36 50 C41 50 45 47 46 43 C47 40 46 37 44 35 C46 33 48 30 48 26 C48 18 42 12 32 12Z" fill="#7c3aed" opacity="0.15"/>
+            <path d="M32 12 C22 12 16 18 16 26 C16 30 18 33 20 35 C18 37 17 40 18 43 C19 47 23 50 28 50 L36 50 C41 50 45 47 46 43 C47 40 46 37 44 35 C46 33 48 30 48 26 C48 18 42 12 32 12Z" stroke="#7c3aed" stroke-width="2.5" fill="none"/>
+            <!-- puzzle piece inside -->
+            <rect x="26" y="26" width="12" height="12" rx="2" fill="#7c3aed"/>
+            <rect x="30" y="22" width="4" height="6" rx="2" fill="#7c3aed"/>
+            <rect x="38" y="30" width="6" height="4" rx="2" fill="#7c3aed"/>
+          </svg>
+          <div class="hub-label">Desafíos</div>
+          <div class="hub-sub">Memotest, tetris y más</div>
+          <div class="hub-accent-bar" style="background:#7c3aed"></div>
         </button>
+
       </div>
     </section>
 
@@ -804,31 +919,101 @@
       </div>
     </section>
 
-    <!-- INSTRUMENTOS MUSICALES: mini-hub (Fase 45/46) -->
+    <!-- INSTRUMENTOS MUSICALES: mini-hub (Fase 56) -->
     <section id="viewInstrumentos" class="view" aria-label="Instrumentos musicales">
       <div class="top-actions" style="margin-bottom:6px;">
         <button class="btn ghost" id="instrumentosHome">⬅️ Centro de juegos</button>
       </div>
       <div class="grid">
-        <button class="game hub-card hub-instrumentos" id="goInstrumentosTocar">
-          <div class="gtitle"><span class="gicon">🥁</span>Tocar instrumentos</div>
-          <div class="gdesc">Tambor, maracas, campana, trompeta, piano y guitarra.</div>
+
+        <button class="home-hub-card" id="goInstrumentosTocar" style="--hub-color:#a855f7" aria-label="Tocar instrumentos">
+          <svg width="64" height="64" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+            <rect width="64" height="64" rx="16" fill="#FAF5FF"/>
+            <!-- drum -->
+            <ellipse cx="32" cy="38" rx="18" ry="7" fill="#a855f7"/>
+            <rect x="14" y="28" width="36" height="10" rx="3" fill="#9333ea"/>
+            <ellipse cx="32" cy="28" rx="18" ry="7" fill="#c084fc"/>
+            <!-- drumsticks -->
+            <line x1="20" y1="14" x2="30" y2="26" stroke="#7c3aed" stroke-width="3" stroke-linecap="round"/>
+            <line x1="44" y1="14" x2="34" y2="26" stroke="#7c3aed" stroke-width="3" stroke-linecap="round"/>
+            <circle cx="20" cy="13" r="3" fill="#7c3aed"/>
+            <circle cx="44" cy="13" r="3" fill="#7c3aed"/>
+          </svg>
+          <div class="hub-label">Tocar</div>
+          <div class="hub-sub">Tambor, campana, trompeta</div>
+          <div class="hub-accent-bar" style="background:#a855f7"></div>
         </button>
 
-        <button class="game hub-card hub-guitarra" id="goGuitarraTutorial">
-          <div class="gtitle"><span class="gicon">🎸</span>Aprender guitarra</div>
-          <div class="gdesc">Conocé la guitarra y probá tocar sus cuerdas.</div>
+        <button class="home-hub-card" id="goGuitarraTutorial" style="--hub-color:#b45309" aria-label="Guitarra">
+          <svg width="64" height="64" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+            <rect width="64" height="64" rx="16" fill="#FFFBEB"/>
+            <!-- guitar body -->
+            <ellipse cx="30" cy="44" rx="14" ry="12" fill="#b45309"/>
+            <ellipse cx="30" cy="44" rx="9" ry="8" fill="#92400e" opacity="0.5"/>
+            <circle cx="30" cy="44" r="4" fill="#1e293b" opacity="0.7"/>
+            <!-- guitar neck -->
+            <rect x="27" y="14" width="6" height="34" rx="3" fill="#d97706"/>
+            <!-- tuning pegs -->
+            <circle cx="24" cy="14" r="3" fill="#92400e"/>
+            <circle cx="36" cy="14" r="3" fill="#92400e"/>
+            <circle cx="24" cy="20" r="2.5" fill="#92400e"/>
+            <circle cx="36" cy="20" r="2.5" fill="#92400e"/>
+            <!-- strings -->
+            <line x1="28" y1="14" x2="28" y2="50" stroke="#fff" stroke-width="1" opacity="0.6"/>
+            <line x1="30" y1="14" x2="30" y2="50" stroke="#fff" stroke-width="1" opacity="0.6"/>
+            <line x1="32" y1="14" x2="32" y2="50" stroke="#fff" stroke-width="1" opacity="0.6"/>
+          </svg>
+          <div class="hub-label">Guitarra</div>
+          <div class="hub-sub">Cuerdas y canciones</div>
+          <div class="hub-accent-bar" style="background:#b45309"></div>
         </button>
 
-        <button class="game hub-card hub-bateria" id="goBateriaTutorial">
-          <div class="gtitle"><span class="gicon">🥁</span>Tocar batería</div>
-          <div class="gdesc">Bombo, tambor y platillos, vistos desde arriba.</div>
+        <button class="home-hub-card" id="goBateriaTutorial" style="--hub-color:#7c3aed" aria-label="Batería">
+          <svg width="64" height="64" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+            <rect width="64" height="64" rx="16" fill="#F5F3FF"/>
+            <!-- bass drum (center) -->
+            <ellipse cx="32" cy="46" rx="14" ry="9" fill="#7c3aed"/>
+            <ellipse cx="32" cy="46" rx="10" ry="6" fill="#6d28d9" opacity="0.5"/>
+            <!-- tom left -->
+            <ellipse cx="18" cy="36" rx="8" ry="5" fill="#8b5cf6"/>
+            <rect x="10" y="31" width="16" height="10" rx="3" fill="#7c3aed" opacity="0.6"/>
+            <!-- tom right -->
+            <ellipse cx="46" cy="36" rx="8" ry="5" fill="#8b5cf6"/>
+            <rect x="38" y="31" width="16" height="10" rx="3" fill="#7c3aed" opacity="0.6"/>
+            <!-- cymbal left -->
+            <ellipse cx="14" cy="22" rx="10" ry="3" fill="#f59e0b"/>
+            <!-- cymbal right -->
+            <ellipse cx="50" cy="22" rx="10" ry="3" fill="#f59e0b"/>
+          </svg>
+          <div class="hub-label">Batería</div>
+          <div class="hub-sub">Bombo, toms y platillos</div>
+          <div class="hub-accent-bar" style="background:#7c3aed"></div>
         </button>
 
-        <button class="game hub-card hub-piano" id="goPianoTutorial">
-          <div class="gtitle"><span class="gicon">🎹</span>Aprender piano</div>
-          <div class="gdesc">Conocé el piano y probá tocar sus teclas.</div>
+        <button class="home-hub-card" id="goPianoTutorial" style="--hub-color:#0ea5e9" aria-label="Piano">
+          <svg width="64" height="64" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+            <rect width="64" height="64" rx="16" fill="#F0F9FF"/>
+            <!-- piano body -->
+            <rect x="8" y="22" width="48" height="28" rx="5" fill="#1e293b"/>
+            <!-- white keys -->
+            <rect x="10" y="26" width="7" height="20" rx="2" fill="#fff"/>
+            <rect x="19" y="26" width="7" height="20" rx="2" fill="#fff"/>
+            <rect x="28" y="26" width="7" height="20" rx="2" fill="#fff"/>
+            <rect x="37" y="26" width="7" height="20" rx="2" fill="#fff"/>
+            <rect x="46" y="26" width="8" height="20" rx="2" fill="#fff"/>
+            <!-- black keys -->
+            <rect x="15" y="26" width="5" height="13" rx="2" fill="#1e293b"/>
+            <rect x="24" y="26" width="5" height="13" rx="2" fill="#1e293b"/>
+            <rect x="41" y="26" width="5" height="13" rx="2" fill="#1e293b"/>
+            <rect x="50" y="26" width="5" height="13" rx="2" fill="#1e293b"/>
+            <!-- lid -->
+            <path d="M8 22 Q32 10 56 22" fill="#0ea5e9" opacity="0.3"/>
+          </svg>
+          <div class="hub-label">Piano</div>
+          <div class="hub-sub">Teclas y melodías</div>
+          <div class="hub-accent-bar" style="background:#0ea5e9"></div>
         </button>
+
       </div>
     </section>
 
