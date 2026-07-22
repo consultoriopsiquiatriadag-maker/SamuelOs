@@ -83,6 +83,30 @@
     .hub-card{ border-bottom: 10px solid var(--hub-color, #2563eb); }
     .hub-card .gtitle{ display:flex; align-items:center; gap:10px; }
     .hub-card .gicon{ font-size:40px; line-height:1; }
+
+    /* HOME: tarjetas con SVG grande (Fase 55) */
+    .home-hub-card{
+      display:flex; flex-direction:column; align-items:center;
+      justify-content:flex-start; text-align:center;
+      padding:20px 12px 18px; gap:10px; min-height:200px;
+      border-radius:18px; border:2px solid rgba(15,23,42,.12);
+      background:var(--card); box-shadow:var(--shadow);
+      cursor:pointer; transition:transform .12s ease, box-shadow .12s ease;
+    }
+    .home-hub-card:active{ transform:scale(0.97); }
+    .home-hub-card svg{ flex-shrink:0; }
+    .home-hub-card .hub-label{
+      font-size:15px; font-weight:900; letter-spacing:-.01em;
+      color:var(--text); line-height:1.2;
+    }
+    .home-hub-card .hub-sub{
+      font-size:11px; font-weight:700; color:var(--muted);
+      line-height:1.35; margin-top:-4px;
+    }
+    .hub-accent-bar{
+      width:36px; height:5px; border-radius:99px; margin-top:auto;
+      background:var(--hub-color,#2563eb);
+    }
     .hub-simples{ --hub-color:#2563eb; }
     .hub-didacticos{ --hub-color:#7c3aed; }
     .hub-fichas{ --hub-color:#f59e0b; }
@@ -572,25 +596,76 @@
     <!-- HOME: Centro de Juegos y Aprendizaje -->
     <section id="viewHome" class="view active" aria-label="Centro de juegos">
       <div class="grid">
-        <button class="game hub-card hub-simples" id="goSimples">
-          <div class="gtitle"><span class="gicon">🎮</span>Juegos simples</div>
-          <div class="gdesc">Tocar, sonidos y diversión sin reglas complicadas.</div>
+
+        <!-- JUGAR -->
+        <button class="home-hub-card" id="goSimples" style="--hub-color:#2563eb" aria-label="Jugar">
+          <svg width="80" height="80" viewBox="0 0 80 80" fill="none" aria-hidden="true">
+            <rect width="80" height="80" rx="20" fill="#E6F1FB"/>
+            <rect x="20" y="34" width="40" height="22" rx="6" fill="#378ADD"/>
+            <circle cx="30" cy="41" r="4" fill="#fff"/>
+            <circle cx="50" cy="41" r="4" fill="#fff"/>
+            <rect x="38" y="34" width="5" height="5" rx="1.5" fill="#fff"/>
+            <rect x="38" y="45" width="5" height="5" rx="1.5" fill="#fff"/>
+            <rect x="12" y="29" width="14" height="8" rx="4" fill="#185FA5"/>
+            <rect x="54" y="29" width="14" height="8" rx="4" fill="#185FA5"/>
+          </svg>
+          <div class="hub-label">Jugar</div>
+          <div class="hub-sub">Tocar, explorar y movimiento</div>
+          <div class="hub-accent-bar"></div>
         </button>
 
-        <button class="game hub-card hub-didacticos" id="goDidacticos">
-          <div class="gtitle"><span class="gicon">🧠</span>Juegos didácticos</div>
-          <div class="gdesc">Memoria, atención y aprendizaje jugando.</div>
+        <!-- APRENDER -->
+        <button class="home-hub-card" id="goAprender" style="--hub-color:#16a34a" aria-label="Aprender">
+          <svg width="80" height="80" viewBox="0 0 80 80" fill="none" aria-hidden="true">
+            <rect width="80" height="80" rx="20" fill="#EAF3DE"/>
+            <rect x="20" y="16" width="34" height="44" rx="5" fill="#639922"/>
+            <rect x="26" y="24" width="16" height="3" rx="1.5" fill="#fff"/>
+            <rect x="26" y="31" width="22" height="3" rx="1.5" fill="#fff"/>
+            <rect x="26" y="38" width="18" height="3" rx="1.5" fill="#fff"/>
+            <rect x="26" y="45" width="12" height="3" rx="1.5" fill="#fff"/>
+            <circle cx="59" cy="22" r="12" fill="#3B6D11"/>
+            <text x="59" y="27" text-anchor="middle" fill="#fff" font-size="14" font-weight="700" font-family="sans-serif">A</text>
+          </svg>
+          <div class="hub-label">Aprender</div>
+          <div class="hub-sub">Fichas, cuentos e historias</div>
+          <div class="hub-accent-bar" style="background:#16a34a"></div>
         </button>
 
-        <button class="game hub-card hub-aprender" id="goAprender">
-          <div class="gtitle"><span class="gicon">📚</span>Aprender</div>
-          <div class="gdesc">Fichas e historias para aprender jugando.</div>
+        <!-- MÚSICA -->
+        <button class="home-hub-card" id="goMusica" style="--hub-color:#b45309" aria-label="Música">
+          <svg width="80" height="80" viewBox="0 0 80 80" fill="none" aria-hidden="true">
+            <rect width="80" height="80" rx="20" fill="#FAEEDA"/>
+            <ellipse cx="26" cy="60" rx="10" ry="7" fill="#BA7517"/>
+            <ellipse cx="56" cy="54" rx="10" ry="7" fill="#BA7517"/>
+            <line x1="36" y1="60" x2="36" y2="28" stroke="#EF9F27" stroke-width="4" stroke-linecap="round"/>
+            <line x1="66" y1="54" x2="66" y2="22" stroke="#EF9F27" stroke-width="4" stroke-linecap="round"/>
+            <line x1="36" y1="28" x2="66" y2="22" stroke="#EF9F27" stroke-width="4" stroke-linecap="round"/>
+            <circle cx="36" cy="22" r="5" fill="#854F0B"/>
+            <circle cx="66" cy="16" r="5" fill="#854F0B"/>
+          </svg>
+          <div class="hub-label">Música</div>
+          <div class="hub-sub">Guitarra, piano y batería</div>
+          <div class="hub-accent-bar" style="background:#b45309"></div>
         </button>
 
-        <button class="game hub-card hub-comunicacion" id="goComunicacion">
-          <div class="gtitle"><span class="gicon">🗣️</span>Comunicación</div>
-          <div class="gdesc">Frases para decir lo que necesito.</div>
+        <!-- COMUNICAR -->
+        <button class="home-hub-card" id="goComunicacion" style="--hub-color:#0ea5a4" aria-label="Comunicar">
+          <svg width="80" height="80" viewBox="0 0 80 80" fill="none" aria-hidden="true">
+            <rect width="80" height="80" rx="20" fill="#E0F7FA"/>
+            <rect x="10" y="16" width="38" height="28" rx="8" fill="#0ea5a4"/>
+            <rect x="16" y="24" width="12" height="3" rx="1.5" fill="#fff"/>
+            <rect x="16" y="31" width="22" height="3" rx="1.5" fill="#fff"/>
+            <path d="M10 44 L22 56 L22 44Z" fill="#0ea5a4"/>
+            <rect x="34" y="32" width="36" height="26" rx="8" fill="#0d6e6d"/>
+            <rect x="40" y="40" width="10" height="3" rx="1.5" fill="#fff"/>
+            <rect x="40" y="47" width="18" height="3" rx="1.5" fill="#fff"/>
+            <path d="M70 58 L58 70 L58 58Z" fill="#0d6e6d"/>
+          </svg>
+          <div class="hub-label">Comunicar</div>
+          <div class="hub-sub">Frases para pedir y expresar</div>
+          <div class="hub-accent-bar" style="background:#0ea5a4"></div>
         </button>
+
       </div>
     </section>
 
@@ -617,8 +692,8 @@
       </div>
     </section>
 
-    <!-- JUEGOS SIMPLES: mini-hub de 3 subcategorías (Fase 24) -->
-    <section id="viewSimples" class="view" aria-label="Juegos simples">
+    <!-- JUGAR: mini-hub (Fase 55, antes "Juegos simples") -->
+    <section id="viewSimples" class="view" aria-label="Jugar">
       <div class="top-actions" style="margin-bottom:6px;">
         <button class="btn ghost" id="simplesHome">⬅️ Centro de juegos</button>
       </div>
@@ -638,9 +713,9 @@
           <div class="gdesc">Carrera, esquivar y luces de colores.</div>
         </button>
 
-        <button class="game hub-card hub-instrumentos" id="goInstrumentos">
-          <div class="gtitle"><span class="gicon">🥁</span>Instrumentos</div>
-          <div class="gdesc">Instrumentos, guitarra, batería y piano.</div>
+        <button class="game hub-card hub-didacticos" id="goDidacticos">
+          <div class="gtitle"><span class="gicon">🧠</span>Desafíos</div>
+          <div class="gdesc">Memotest, rompecabezas, tetris y más.</div>
         </button>
       </div>
     </section>
@@ -732,7 +807,7 @@
     <!-- INSTRUMENTOS MUSICALES: mini-hub (Fase 45/46) -->
     <section id="viewInstrumentos" class="view" aria-label="Instrumentos musicales">
       <div class="top-actions" style="margin-bottom:6px;">
-        <button class="btn ghost" id="instrumentosHome">⬅️ Juegos simples</button>
+        <button class="btn ghost" id="instrumentosHome">⬅️ Centro de juegos</button>
       </div>
       <div class="grid">
         <button class="game hub-card hub-instrumentos" id="goInstrumentosTocar">
@@ -856,7 +931,7 @@
     <!-- JUEGOS DIDÁCTICOS -->
     <section id="viewDidacticos" class="view" aria-label="Juegos didácticos">
       <div class="top-actions" style="margin-bottom:6px;">
-        <button class="btn ghost" id="didacticosHome">⬅️ Centro de juegos</button>
+        <button class="btn ghost" id="didacticosHome">⬅️ Jugar</button>
       </div>
       <div class="grid">
         <button class="game" id="goMemo">
@@ -1621,9 +1696,10 @@
       window.scrollTo({ top: 0, behavior: 'instant' });
     }
 
-    document.getElementById('goSimples').addEventListener('click', () => { showView('simples'); speak('Juegos simples.'); });
-    document.getElementById('goDidacticos').addEventListener('click', () => { showView('didacticos'); speak('Juegos didácticos.'); });
+    document.getElementById('goSimples').addEventListener('click', () => { showView('simples'); speak('Jugar.'); });
+    document.getElementById('goDidacticos').addEventListener('click', () => { showView('didacticos'); speak('Desafíos.'); });
     document.getElementById('goAprender').addEventListener('click', () => { showView('aprender'); speak('Aprender.'); });
+    document.getElementById('goMusica').addEventListener('click', () => { showView('instrumentos'); speak('Música.'); });
     document.getElementById('goComunicacion').addEventListener('click', () => { showView('comunicacion'); window.__comunicacionStart && window.__comunicacionStart(); });
     document.getElementById('aprenderHome').addEventListener('click', () => showView('home'));
 
@@ -1634,11 +1710,11 @@
     document.getElementById('goSonidos').addEventListener('click', () => { showView('sonidos'); speak('Sonidos.'); });
     document.getElementById('goExplotar').addEventListener('click', () => { showView('explotar'); speak('Para tocar.'); });
     document.getElementById('goMovimiento').addEventListener('click', () => { showView('movimiento'); speak('Movimiento.'); });
-    document.getElementById('goInstrumentos').addEventListener('click', () => { showView('instrumentos'); speak('Instrumentos.'); });
+    /* goInstrumentos eliminado — Música sube al nivel raíz via goMusica (Fase 55) */
     document.getElementById('sonidosHome').addEventListener('click', () => showView('simples'));
     document.getElementById('explotarHome').addEventListener('click', () => showView('simples'));
     document.getElementById('movimientoHome').addEventListener('click', () => showView('simples'));
-    document.getElementById('instrumentosHome').addEventListener('click', () => showView('simples'));
+    document.getElementById('instrumentosHome').addEventListener('click', () => showView('home'));
 
     document.getElementById('goInstrumentosTocar').addEventListener('click', () => { showView('instrumentosTocar'); renderInstrumentos(); });
     document.getElementById('instrumentosTocarHome').addEventListener('click', () => showView('instrumentos'));
@@ -1668,7 +1744,7 @@
     document.getElementById('pianoVehiculosHome').addEventListener('click', () => showView('sonidos'));
 
     document.getElementById('simplesHome').addEventListener('click', () => showView('home'));
-    document.getElementById('didacticosHome').addEventListener('click', () => showView('home'));
+    document.getElementById('didacticosHome').addEventListener('click', () => showView('simples'));
     document.getElementById('fichasHome').addEventListener('click', () => showView('aprender'));
     document.getElementById('comunicacionHome').addEventListener('click', () => showView('home'));
     document.getElementById('historiasHome').addEventListener('click', () => showView('aprender'));
