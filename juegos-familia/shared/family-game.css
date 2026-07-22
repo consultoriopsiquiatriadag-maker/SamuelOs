@@ -1,0 +1,217 @@
+/* ============================================================
+   JUEGOS EN FAMILIA — Estilos compartidos
+   Incluir en cada juego familiar junto a players.js / audio.js
+   ============================================================ */
+
+:root {
+  --fg-bg:      #f2f5f8;
+  --fg-card:    #ffffff;
+  --fg-stroke:  #e5e7eb;
+  --fg-shadow:  0 16px 34px rgba(2,6,23,.13);
+  --fg-text:    #0f172a;
+  --fg-muted:   #475569;
+  --fg-radius:  18px;
+  --fg-familia: #7c3aed;
+}
+
+/* ── RESET MÍNIMO ── */
+*, *::before, *::after { box-sizing: border-box; }
+
+/* ── LAYOUT BASE ── */
+.fg-shell {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 16px 16px 40px;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+  color: var(--fg-text);
+}
+
+/* ── BOTÓN VOLVER ── */
+.fg-btn-volver {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: #f97316; color: #fff; border: none;
+  padding: 14px 22px; border-radius: 18px;
+  font-size: 17px; font-weight: 900; min-height: 52px;
+  box-shadow: 0 8px 20px rgba(249,115,22,.36);
+  cursor: pointer; text-decoration: none;
+  transition: transform .12s, box-shadow .12s;
+  flex-shrink: 0;
+}
+.fg-btn-volver:hover  { transform: translateY(-2px); }
+.fg-btn-volver:active { transform: scale(.95); }
+
+/* ── BOTÓN PRINCIPAL ── */
+.fg-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 14px 22px; border-radius: var(--fg-radius); border: none;
+  font-size: 16px; font-weight: 900; cursor: pointer;
+  transition: transform .12s, box-shadow .12s;
+  min-height: 52px;
+}
+.fg-btn:active { transform: scale(.96); }
+.fg-btn-primary {
+  background: var(--fg-familia); color: #fff;
+  box-shadow: 0 8px 20px rgba(124,58,237,.32);
+}
+.fg-btn-primary:hover { box-shadow: 0 12px 26px rgba(124,58,237,.42); }
+.fg-btn-green  { background: #22c55e; color: #fff; box-shadow: 0 8px 18px rgba(34,197,94,.30); }
+.fg-btn-amber  { background: #f59e0b; color: #1c1917; box-shadow: 0 8px 18px rgba(245,158,11,.30); }
+.fg-btn-ghost  { background: rgba(15,23,42,.07); color: var(--fg-text); }
+.fg-btn-full   { width: 100%; }
+.fg-btn:disabled { opacity: .45; cursor: not-allowed; transform: none !important; }
+
+/* ── BANNER DE TURNO ── */
+.fg-turn-banner {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 20px; border-radius: var(--fg-radius);
+  background: var(--fg-card); box-shadow: var(--fg-shadow);
+  border-left: 6px solid var(--player-color, var(--fg-familia));
+  margin-bottom: 16px; font-size: 18px; font-weight: 900;
+  transition: border-color .3s;
+}
+.fg-turn-banner .fg-turn-emoji { font-size: 28px; line-height: 1; }
+.fg-turn-banner .fg-turn-name  { flex: 1; }
+.fg-turn-banner .fg-turn-sub   { font-size: 13px; font-weight: 700; color: var(--fg-muted); }
+
+/* ── PANEL DE JUGADORES (turno + puntos) ── */
+.fg-players-bar {
+  display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px;
+}
+.fg-player-chip {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 14px; border-radius: 99px;
+  background: var(--fg-card); box-shadow: var(--fg-shadow);
+  border: 2.5px solid var(--player-color, #ccc);
+  font-size: 14px; font-weight: 900;
+  transition: transform .2s, box-shadow .2s;
+}
+.fg-player-chip.active {
+  transform: scale(1.07);
+  box-shadow: 0 10px 24px rgba(0,0,0,.18);
+}
+.fg-player-chip .fg-chip-dot {
+  width: 14px; height: 14px; border-radius: 50%;
+  background: var(--player-color, #ccc);
+  flex-shrink: 0;
+}
+.fg-player-chip .fg-chip-score {
+  font-size: 12px; color: var(--fg-muted); font-weight: 800;
+}
+
+/* ── SELECTOR DE JUGADORES (modal) ── */
+.fg-overlay {
+  position: fixed; inset: 0; z-index: 500;
+  background: rgba(15,23,42,.78);
+  display: flex; align-items: center; justify-content: center;
+  padding: 16px;
+}
+.fg-overlay[hidden] { display: none; }
+
+.fg-selector-card {
+  background: #1e293b; border-radius: 26px; padding: 32px 24px;
+  width: min(480px, 100%); border: 2px solid rgba(255,255,255,.1);
+  box-shadow: 0 24px 60px rgba(0,0,0,.45);
+}
+.fg-selector-title {
+  font-size: 22px; font-weight: 950; color: #f8fafc;
+  text-align: center; margin-bottom: 20px;
+}
+
+/* Selector de cantidad de jugadores */
+.fg-count-row {
+  display: flex; gap: 10px; justify-content: center; margin-bottom: 24px;
+}
+.fg-count-btn {
+  width: 56px; height: 56px; border-radius: 50%; border: 2.5px solid rgba(255,255,255,.2);
+  background: rgba(255,255,255,.08); color: #f8fafc;
+  font-size: 20px; font-weight: 900; cursor: pointer;
+  transition: background .15s, border-color .15s;
+}
+.fg-count-btn.selected {
+  background: var(--fg-familia); border-color: var(--fg-familia);
+  box-shadow: 0 4px 14px rgba(124,58,237,.45);
+}
+
+/* Filas de nombre por jugador */
+.fg-player-rows { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
+.fg-player-row  { display: flex; align-items: center; gap: 10px; }
+.fg-player-row[hidden] { display: none; }
+.fg-player-swatch {
+  width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0;
+  border: 2px solid rgba(255,255,255,.3);
+}
+.fg-player-input {
+  flex: 1; padding: 12px 14px; border-radius: 12px;
+  border: 2px solid rgba(255,255,255,.15);
+  background: rgba(255,255,255,.07); color: #f8fafc;
+  font-size: 15px; font-weight: 700; outline: none;
+  transition: border-color .2s;
+}
+.fg-player-input:focus { border-color: var(--fg-familia); }
+.fg-player-emoji { font-size: 22px; }
+
+/* ── PANTALLA FINAL ── */
+.fg-end-card {
+  background: var(--fg-card); border-radius: 26px;
+  padding: 40px 28px; text-align: center;
+  box-shadow: var(--fg-shadow); max-width: 440px; margin: 0 auto;
+}
+.fg-end-trophy { font-size: 60px; margin-bottom: 10px; }
+.fg-end-title  { font-size: 26px; font-weight: 950; margin-bottom: 8px; }
+.fg-end-sub    { color: var(--fg-muted); font-weight: 700; margin-bottom: 24px; }
+.fg-end-scores {
+  display: flex; flex-direction: column; gap: 10px;
+  margin-bottom: 28px; text-align: left;
+}
+.fg-end-score-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px; border-radius: 12px;
+  background: var(--fg-bg); font-weight: 800;
+}
+.fg-end-score-row .fg-score-dot {
+  width: 14px; height: 14px; border-radius: 50%;
+  background: var(--player-color, #ccc); flex-shrink: 0;
+}
+.fg-end-score-row .fg-score-pts {
+  margin-left: auto; font-size: 18px; font-weight: 950;
+}
+.fg-end-actions { display: flex; flex-direction: column; gap: 10px; }
+
+/* ── INDICADOR DE SONIDO ── */
+.fg-sound-btn {
+  background: rgba(15,23,42,.07); border: 2px solid var(--fg-stroke);
+  border-radius: 12px; padding: 10px 14px; cursor: pointer;
+  font-size: 20px; line-height: 1; transition: background .15s;
+}
+.fg-sound-btn:hover  { background: rgba(15,23,42,.12); }
+.fg-sound-btn.muted  { opacity: .5; }
+
+/* ── HEADER COMÚN DE JUEGO ── */
+.fg-game-header {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 16px; flex-wrap: wrap;
+}
+.fg-game-title {
+  flex: 1; font-size: clamp(18px,3vw,24px);
+  font-weight: 950; letter-spacing: -.01em;
+}
+
+/* ── BADGE MENSAJE AMABLE ── */
+.fg-msg {
+  padding: 10px 18px; border-radius: 99px;
+  background: #fef3c7; color: #92400e;
+  font-size: 14px; font-weight: 800;
+  text-align: center; margin-bottom: 12px;
+  animation: fg-msg-in .25s ease;
+}
+@keyframes fg-msg-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── RESPONSIVO ── */
+@media (max-width: 520px) {
+  .fg-selector-card { padding: 24px 16px; }
+  .fg-turn-banner   { font-size: 16px; padding: 12px 16px; }
+  .fg-btn           { font-size: 15px; padding: 12px 18px; }
+}
