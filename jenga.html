@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Jenga 3D — Samuel OS</title>
+<style>
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+body { background:#0f172a; overflow:hidden; font-family:'Segoe UI',system-ui,sans-serif; touch-action:none; }
+canvas { display:block; position:fixed; top:0; left:0; z-index:1; }
+
+/* ── OVERLAY DE INICIO ── */
+#overlay {
+  position:fixed; inset:0; z-index:200;
+  background:rgba(15,23,42,0.93);
+  display:flex; align-items:center; justify-content:center;
+}
+.ov-card {
+  background:#1e293b; border-radius:26px; padding:36px 28px;
+  width:min(400px,92vw); text-align:center;
+  border:2px solid rgba(255,255,255,.1);
+}
+.ov-emoji { font-size:3.5rem; margin-bottom:8px; }
+.ov-title { font-size:2rem; font-weight:900; color:#f8fafc; margin-bottom:4px; }
+.ov-sub   { color:#94a3b8; font-size:1rem; margin-bottom:28px; line-height:1.5; }
+.player-row { display:flex; flex-direction:column; gap:14px; margin-bottom:28px; }
+.player-wrap { display:flex; align-items:center; gap:12px; }
+.p-dot { width:20px; height:20px; border-radius:50%; flex-shrink:0; }
+.p-input {
+  flex:1; padding:13px 16px; border-radius:13px;
+  border:2px solid rgba(255,255,255,.15);
+  background:rgba(255,255,255,.07); color:#f8fafc;
+  font-size:1.05rem; font-weight:700; outline:none;
+  transition:border-color .2s;
+}
+.p-input:focus { border-color:#f59e0b; }
+.btn-start {
+  width:100%; padding:17px; border-radius:15px; border:none;
+  background:#f59e0b; color:#1c1917;
+  font-size:1.25rem; font-weight:900; cursor:pointer;
+  transition:transform .12s, box-shadow .12s;
+  box-shadow:0 4px 18px rgba(245,158,11,.35);
+}
+.btn-start:active { transform:scale(.97); }
+
+/* ── HUD SUPERIOR ── */
+#hud {
+  position:fixed; top:0; left:0; right:0; z-index:100;
+  padding:14px 16px; display:none;
+  align-items:center; justify-content:space-between;
+  background:linear-gradient(180deg,rgba(15,23,42,.92) 0%,transparent 100%);
+  pointer-events:none;
+}
+#hud.vis { display:flex; }
+#hud > * { pointer-events:all; }
+#btnBack {
+  padding:11px 20px; border-radius:13px;
+  border:2px solid rgba(255,255,255,.22);
+  background:rgba(255,255,255,.1); color:#f8fafc;
+  font-size:1rem; font-weight:800; cursor:pointer;
+  transition:background .15s;
+}
+#btnBack:active { background:rgba(255,255,255,.2); }
+#turnBadge {
+  padding:11px 22px; border-radius:13px;
+  font-size:1rem; font-weight:900; color:#1c1917;
+  background:#f59e0b; max-width:180px; text-align:center;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+
+/* ── CONTROLES CÁMARA ── */
+#camBtns {
+  position:fixed; bottom:28px; left:50%; transform:translateX(-50%);
+  z-index:100; display:none; gap:14px; align-items:center;
+}
+#camBtns.vis { display:flex; }
+.cam-btn {
+  width:62px; height:62px; border-radius:50%; border:none;
+  background:rgba(255,255,255,.12); color:#f8fafc;
+  font-size:1.6rem; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  transition:background .15s;
+}
+.cam-btn:active { background:rgba(255,255,255,.22); }
+
+/* ── GAME OVER ── */
+#gameOver {
+  position:fixed; inset:0; z-index:300;
+  background:rgba(15,23,42,.92);
+  display:none; align-items:center; justify-content:center;
+}
+#gameOver.vis { display:flex; }
+.go-card {
+  background:#1e293b; border-radius:26px; padding:44px 32px;
+  text-align:center; border:2px solid rgba(255,255,255,.1);
+  width:min(360px,88vw);
+}
+.go-emoji  { font-size:4rem; margin-bottom:10px; }
+.go-title  { font-size:1.9rem; font-weight:900; color:#f8fafc; margin-bottom:8px; }
+.go-sub    { color:#94a3b8; font-size:1rem; margin-bottom:30px; }
+.btn-restart {
+  padding:15px 36px; border-radius:14px; border:none;
+  background:#f59e0b; color:#1c1917;
+  font-size:1.1rem; font-weight:900; cursor:pointer;
+}
+</style>
+</head>
+<body>
+
+<!-- ══ OVERLAY INICIO ═══════════════════════════════════════ -->
+<div id="overlay">
+  <div class="ov-card">
+    <div class="ov-emoji">🏗️</div>
+    <div class="ov-title">Jenga 3D</div>
+    <div class="ov-sub">Por turnos — sacá un bloque sin tirar la torre</div>
+    <div class="player-row">
+      <div class="player-wrap">
+        <div class="p-dot" style="background:#f59e0b"></div>
+        <input class="p-input" id="p1" type="text" placeholder="Jugador 1" value="Samuel" maxlength="12">
+      </div>
+      <div class="player-wrap">
+        <div class="p-dot" style="background:#38bdf8"></div>
+        <input class="p-input" id="p2" type="text" placeholder="Jugador 2" value="Jugador 2" maxlength="12">
+      </div>
+    </div>
+    <button class="btn-start" id="btnStart">▶ ¡Empezar!</button>
+  </div>
+</div>
+
+<!-- ══ HUD ═══════════════════════════════════════════════════ -->
+<div id="hud">
+  <button id="btnBack">⬅ Volver</button>
+  <div id="turnBadge">—</div>
+</div>
+
+<!-- ══ CÁMARA CONTROLES ═══════════════════════════════════════ -->
+<div id="camBtns">
+  <button class="cam-btn" id="btnRotL" aria-label="Rotar izquierda">◀</button>
+  <button class="cam-btn" id="btnRotR" aria-label="Rotar derecha">▶</button>
+</div>
+
+<!-- ══ GAME OVER ══════════════════════════════════════════════ -->
+<div id="gameOver">
+  <div class="go-card">
+    <div class="go-emoji">💥</div>
+    <div class="go-title" id="goTitle">¡Se cayó la torre!</div>
+    <div class="go-sub"   id="goSub">Perdió el jugador en turno</div>
+    <button class="btn-restart" id="btnRestart">🔄 Jugar de nuevo</button>
+  </div>
+</div>
+
+<!-- ══ THREE.JS ═══════════════════════════════════════════════ -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<script>
+/* ============================================================
+   JENGA 3D — LOTE 1: Torre visual + cámara
+   Three.js r128 (sin física aún)
+   ============================================================ */
+
+/* ── CONSTANTES ──────────────────────────────────────────── */
+const BL = 1.5, BW = 0.5, BH = 0.3;   // largo × ancho × alto del bloque
+const LAYERS = 18;
+const WOOD_COLORS = [0xC8A070, 0xB8904A, 0xD4B480, 0xA07838, 0xCC9E62];
+const CAM_RADIUS  = 9;
+const CAM_HEIGHT  = 4.2;
+const CAM_TARGET  = new THREE.Vector3(0, LAYERS * BH / 2, 0);
+
+/* ── ESCENA ──────────────────────────────────────────────── */
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0f172a);
+scene.fog = new THREE.FogExp2(0x0f172a, 0.04);
+
+/* ── CÁMARA ──────────────────────────────────────────────── */
+const camera = new THREE.PerspectiveCamera(42, innerWidth / innerHeight, 0.1, 100);
+let camAngle = 0.3; // ángulo inicial ligeramente de costado
+
+function positionCamera() {
+  camera.position.set(
+    CAM_RADIUS * Math.sin(camAngle),
+    CAM_HEIGHT,
+    CAM_RADIUS * Math.cos(camAngle)
+  );
+  camera.lookAt(CAM_TARGET);
+}
+positionCamera();
+
+/* ── RENDERER ────────────────────────────────────────────── */
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(innerWidth, innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+document.body.appendChild(renderer.domElement);
+
+/* ── LUCES ───────────────────────────────────────────────── */
+// Ambiente cálido
+scene.add(new THREE.AmbientLight(0xfff8e0, 0.55));
+
+// Sol principal con sombras
+const sun = new THREE.DirectionalLight(0xfffaf0, 1.5);
+sun.position.set(6, 12, 8);
+sun.castShadow = true;
+sun.shadow.mapSize.set(2048, 2048);
+sun.shadow.camera.near = 0.5;
+sun.shadow.camera.far  = 40;
+sun.shadow.camera.left   = -5;
+sun.shadow.camera.right  = 5;
+sun.shadow.camera.top    = 15;
+sun.shadow.camera.bottom = -2;
+sun.shadow.bias = -0.001;
+scene.add(sun);
+
+// Relleno frío lateral
+const fill = new THREE.DirectionalLight(0x8ab4f8, 0.35);
+fill.position.set(-6, 4, -4);
+scene.add(fill);
+
+/* ── SUELO ───────────────────────────────────────────────── */
+// Mesa redonda
+const tableGeo = new THREE.CylinderGeometry(2.5, 2.5, 0.12, 48);
+const tableMat = new THREE.MeshLambertMaterial({ color: 0x334155 });
+const table = new THREE.Mesh(tableGeo, tableMat);
+table.position.y = -0.06;
+table.receiveShadow = true;
+scene.add(table);
+
+// Borde de mesa
+const rimGeo = new THREE.TorusGeometry(2.5, 0.06, 8, 48);
+const rimMat = new THREE.MeshLambertMaterial({ color: 0x475569 });
+const rim = new THREE.Mesh(rimGeo, rimMat);
+rim.rotation.x = Math.PI / 2;
+rim.position.y = 0;
+scene.add(rim);
+
+/* ── BLOQUES ─────────────────────────────────────────────── */
+const blockMeshes = [];   // guardamos meshes para Lote 2
+const blockGeo   = new THREE.BoxGeometry(BL, BH, BW);
+const edgeGeo    = new THREE.EdgesGeometry(blockGeo);
+const edgeMat    = new THREE.LineBasicMaterial({ color: 0x78350f, transparent: true, opacity: 0.5 });
+
+function makeBlock(x, y, z, rotY) {
+  const col = WOOD_COLORS[Math.floor(Math.random() * WOOD_COLORS.length)];
+  const mat = new THREE.MeshLambertMaterial({ color: col });
+  const mesh = new THREE.Mesh(blockGeo, mat.clone());
+
+  // borde oscuro
+  const edges = new THREE.LineSegments(edgeGeo, edgeMat.clone());
+  mesh.add(edges);
+
+  mesh.castShadow    = true;
+  mesh.receiveShadow = true;
+  mesh.position.set(x, y, z);
+  mesh.rotation.y = rotY;
+
+  // guardamos metadata para Lote 2
+  mesh.userData = { layer: -1, pos: -1, removed: false };
+
+  scene.add(mesh);
+  blockMeshes.push(mesh);
+  return mesh;
+}
+
+function buildTower() {
+  for (let l = 0; l < LAYERS; l++) {
+    const y    = BH / 2 + l * BH;
+    const even = l % 2 === 0;
+
+    for (let i = 0; i < 3; i++) {
+      const off = (i - 1) * BW;   // -0.5, 0, 0.5
+
+      const mesh = even
+        ? makeBlock(0, y, off, 0)            // bloques a lo largo del eje X
+        : makeBlock(off, y, 0, Math.PI / 2); // bloques a lo largo del eje Z
+
+      mesh.userData.layer = l;
+      mesh.userData.pos   = i;
+    }
+  }
+}
+
+buildTower();
+
+/* ── CONTROLES DE CÁMARA ─────────────────────────────────── */
+const ROT_STEP = Math.PI / 8;
+
+document.getElementById('btnRotL').addEventListener('click', () => {
+  camAngle -= ROT_STEP;
+  positionCamera();
+});
+document.getElementById('btnRotR').addEventListener('click', () => {
+  camAngle += ROT_STEP;
+  positionCamera();
+});
+
+// Arrastre táctil horizontal para rotar cámara
+let touchStartX = null;
+renderer.domElement.addEventListener('touchstart', e => {
+  if (e.touches.length === 1) touchStartX = e.touches[0].clientX;
+}, { passive: true });
+
+renderer.domElement.addEventListener('touchmove', e => {
+  if (touchStartX === null || e.touches.length !== 1) return;
+  const dx = e.touches[0].clientX - touchStartX;
+  if (Math.abs(dx) > 8) {
+    camAngle -= dx * 0.004;
+    touchStartX = e.touches[0].clientX;
+    positionCamera();
+  }
+}, { passive: true });
+
+renderer.domElement.addEventListener('touchend', () => { touchStartX = null; });
+
+// Arrastre con mouse
+let mouseDown = false, lastMouseX = 0;
+renderer.domElement.addEventListener('mousedown', e => { mouseDown = true; lastMouseX = e.clientX; });
+window.addEventListener('mouseup', () => { mouseDown = false; });
+window.addEventListener('mousemove', e => {
+  if (!mouseDown) return;
+  const dx = e.clientX - lastMouseX;
+  camAngle -= dx * 0.005;
+  lastMouseX = e.clientX;
+  positionCamera();
+});
+
+/* ── JUGADORES ───────────────────────────────────────────── */
+let players = ['Samuel', 'Jugador 2'];
+let currentPlayer = 0;
+
+function updateTurnBadge() {
+  document.getElementById('turnBadge').textContent = `Turno de ${players[currentPlayer]}`;
+  document.getElementById('turnBadge').style.background =
+    currentPlayer === 0 ? '#f59e0b' : '#38bdf8';
+}
+
+/* ── INICIO ──────────────────────────────────────────────── */
+document.getElementById('btnStart').addEventListener('click', () => {
+  players[0] = document.getElementById('p1').value.trim() || 'Samuel';
+  players[1] = document.getElementById('p2').value.trim() || 'Jugador 2';
+  document.getElementById('overlay').style.display = 'none';
+  document.getElementById('hud').classList.add('vis');
+  document.getElementById('camBtns').classList.add('vis');
+  updateTurnBadge();
+});
+
+document.getElementById('btnBack').addEventListener('click', () => {
+  window.location.href = 'juegos.html';
+});
+
+document.getElementById('btnRestart').addEventListener('click', () => {
+  window.location.reload();
+});
+
+/* ── RESIZE ──────────────────────────────────────────────── */
+window.addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+
+/* ── LOOP ────────────────────────────────────────────────── */
+function animate() {
+  requestAnimationFrame(animate);
+  renderer.render(scene, camera);
+}
+animate();
+</script>
+</body>
+</html>
