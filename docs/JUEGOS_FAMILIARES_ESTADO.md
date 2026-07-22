@@ -1,10 +1,23 @@
 # JUEGOS FAMILIARES — ESTADO DEL PROYECTO
 
 ## FASE ACTUAL
-Fase 0 — Auditoría completada. Esperando autorización para Fase 1.
+Fase 1 — Portal completado. Esperando autorización para Fase 2.
 
 ## LOTE TERMINADO
-Lote 0.1 — Auditoría mínima
+Lote 1.2 — Integración en juegos.html
+
+## ARCHIVOS CREADOS (Fase 1)
+- `juegos-familia/index.html` — portal con 5 tarjetas, todas "En construcción"
+
+## ARCHIVOS MODIFICADOS (Fase 1)
+- `juegos.html` — nueva tarjeta "En Familia" en viewHome (5ª card)
+- `sw-aac.js` — v86, agrega `./juegos-familia/index.html` a ASSETS
+
+## PRÓXIMO LOTE PROPUESTO
+Fase 2 — Lote 2.1: `shared/players.js` + `shared/family-game.css`
+Fase 2 — Lote 2.2: `shared/storage.js` + `shared/audio.js`
+
+---
 
 ## ARCHIVOS INSPECCIONADOS
 - `juegos.html` — Hub de juegos existente
