@@ -1,5 +1,5 @@
 /* Aplicación de Samuel - Service Worker */
-const CACHE_VERSION = 'samuel-app-v83-jenga-lote1';
+const CACHE_VERSION = 'samuel-app-v84-jenga-lote2';
 const CACHE_NAME = CACHE_VERSION;
 
 const ASSETS = [
