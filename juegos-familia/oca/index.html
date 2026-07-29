@@ -1,0 +1,466 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#16a34a" />
+  <link rel="manifest" href="../../manifest.webmanifest" />
+  <title>Juego de la Oca — Juegos en Familia</title>
+  <link rel="stylesheet" href="../shared/family-game.css" />
+  <style>
+    body { background: var(--fg-bg); min-height: 100svh; }
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    /* ══ TABLERO ══ */
+    .oca-board-wrap {
+      overflow-x: auto; overflow-y: hidden;
+      margin: 10px 0;
+      border-radius: 16px;
+      box-shadow: var(--fg-shadow);
+    }
+    .oca-board {
+      display: grid;
+      grid-template-columns: repeat(9, 1fr);
+      grid-template-rows: repeat(7, 1fr);
+      gap: 2px;
+      background: #15803d;
+      padding: 3px;
+      border-radius: 14px;
+      min-width: 288px;      /* 9 × 32 */
+      width: 100%;
+      aspect-ratio: 9 / 7;
+    }
+
+    .oca-cell {
+      border-radius: 6px;
+      background: #f0fdf4;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      position: relative;
+      font-size: clamp(7px, 1.5vw, 11px);
+      font-weight: 900;
+      color: #1e293b;
+      overflow: hidden;
+      cursor: default;
+      user-select: none;
+    }
+    .oca-cell .cell-num {
+      position: absolute; top: 1px; left: 2px;
+      font-size: clamp(6px, 1.2vw, 10px);
+      opacity: .55; font-weight: 900; line-height: 1;
+    }
+    .oca-cell .cell-icon {
+      font-size: clamp(12px, 2.8vw, 20px); line-height: 1;
+    }
+
+    /* Tipos de casillas */
+    .cell-oca      { background: #bbf7d0; }
+    .cell-puente   { background: #bfdbfe; }
+    .cell-posada   { background: #fef9c3; }
+    .cell-dados    { background: #f3e8ff; }
+    .cell-laberinto{ background: #fce7f3; }
+    .cell-carcel   { background: #fee2e2; }
+    .cell-muerte   { background: #1f2937; color: #f1f5f9; }
+    .cell-muerte .cell-num { color: #94a3b8; }
+    .cell-fin      { background: #fef08a; }
+    .cell-inicio   { background: #dcfce7; }
+
+    /* Tokens de jugadores */
+    .cell-tokens {
+      position: absolute; bottom: 1px; right: 1px;
+      display: flex; flex-wrap: wrap; gap: 1px;
+      max-width: 80%; justify-content: flex-end;
+    }
+    .token {
+      width: clamp(8px, 1.8vw, 14px);
+      height: clamp(8px, 1.8vw, 14px);
+      border-radius: 50%;
+      border: 1.5px solid rgba(255,255,255,.8);
+      flex-shrink: 0;
+    }
+
+    /* ══ ZONA DE DADOS ══ */
+    .oca-panel {
+      display: grid; grid-template-columns: 1fr auto;
+      gap: 12px; align-items: center;
+      margin: 10px 0;
+    }
+    .oca-msg {
+      background: var(--fg-card); border-radius: 14px;
+      padding: 12px 14px; font-size: 14px; font-weight: 800;
+      color: var(--fg-text); box-shadow: var(--fg-shadow);
+      min-height: 48px; display: flex; align-items: center;
+      line-height: 1.3;
+    }
+    .oca-dice-btn {
+      width: clamp(72px, 18vw, 96px);
+      height: clamp(72px, 18vw, 96px);
+      border-radius: 20px;
+      background: #16a34a;
+      border: none; cursor: pointer;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      box-shadow: 0 6px 18px rgba(22,163,74,.4);
+      transition: transform .12s;
+      flex-shrink: 0;
+      color: white; font-weight: 950;
+    }
+    .oca-dice-btn:hover  { transform: scale(1.06); }
+    .oca-dice-btn:active { transform: scale(.93); }
+    .oca-dice-btn:disabled { opacity: .45; cursor: default; transform: none; }
+    .oca-dice-face {
+      font-size: clamp(28px, 7vw, 44px); line-height: 1;
+    }
+    .oca-dice-label { font-size: 10px; margin-top: 2px; letter-spacing: .04em; }
+
+    @keyframes oca-shake {
+      0%,100% { transform: rotate(0deg); }
+      25% { transform: rotate(-12deg) scale(1.1); }
+      75% { transform: rotate(12deg) scale(1.1); }
+    }
+    .oca-dice-btn.rolling { animation: oca-shake .12s linear infinite; cursor: default; }
+
+    #contenedor-selector { min-height: 0; }
+  </style>
+</head>
+<body>
+<div class="fg-shell">
+
+  <!-- ══ SELECTOR ══ -->
+  <div id="pantalla-selector" class="screen active">
+    <div id="contenedor-selector"></div>
+  </div>
+
+  <!-- ══ JUEGO ══ -->
+  <div id="pantalla-juego" class="screen">
+    <header class="fg-game-header">
+      <a class="fg-btn-volver" href="../index.html">◀ Volver</a>
+      <div class="fg-game-title">🪿 La Oca</div>
+      <div id="contenedor-sonido"></div>
+    </header>
+
+    <div class="fg-players-bar" id="players-bar"></div>
+    <div class="fg-turn-banner"  id="turn-banner"></div>
+
+    <!-- Tablero -->
+    <div class="oca-board-wrap">
+      <div class="oca-board" id="oca-board"></div>
+    </div>
+
+    <!-- Panel dados + mensaje -->
+    <div class="oca-panel">
+      <div class="oca-msg" id="oca-msg">¡Tirá el dado para empezar!</div>
+      <button class="oca-dice-btn" id="oca-dice-btn" onclick="tirarDado()">
+        <div class="oca-dice-face" id="oca-dice-face">🎲</div>
+        <div class="oca-dice-label">TIRAR</div>
+      </button>
+    </div>
+  </div>
+
+  <!-- ══ FIN ══ -->
+  <div id="pantalla-fin" class="screen">
+    <header class="fg-game-header" style="margin-bottom:24px;">
+      <a class="fg-btn-volver" href="../index.html">◀ Volver</a>
+    </header>
+    <div id="contenedor-fin"></div>
+  </div>
+
+</div>
+
+<script src="../shared/storage.js"></script>
+<script src="../shared/players.js"></script>
+<script src="../shared/audio.js"></script>
+<script>
+/* ============================================================
+   JUEGO DE LA OCA
+   63 casillas, serpentina 9×7
+   ============================================================ */
+
+var CARAS_DADO = ['⚀','⚁','⚂','⚃','⚄','⚅'];
+
+/* ── CASILLAS ESPECIALES ── */
+var ESPECIALES = {
+  1:  { tipo:'inicio',    emoji:'🏁', cls:'cell-inicio'  },
+  6:  { tipo:'puente',   emoji:'🌉', cls:'cell-puente',   txt:'¡Puente! Salts al 12',    destino:12 },
+  12: { tipo:'puente',   emoji:'🌉', cls:'cell-puente',   txt:'¡Puente! Salts al 6',     destino:6  },
+  19: { tipo:'posada',   emoji:'🏠', cls:'cell-posada',   txt:'¡Posada! Perdés 1 turno', espera:1   },
+  26: { tipo:'dados',    emoji:'🎲', cls:'cell-dados',    txt:'¡Dados! Tirá de nuevo',   doble:true },
+  42: { tipo:'laberinto',emoji:'🌀', cls:'cell-laberinto',txt:'¡Laberinto! Volvés al 30',destino:30 },
+  52: { tipo:'carcel',   emoji:'🔒', cls:'cell-carcel',   txt:'¡Cárcel! Esperás 2 turnos',espera:2  },
+  53: { tipo:'dados',    emoji:'🎲', cls:'cell-dados',    txt:'¡Dados! Tirá de nuevo',   doble:true },
+  58: { tipo:'muerte',   emoji:'💀', cls:'cell-muerte',   txt:'¡Muerte! Volvés al inicio',destino:1 },
+  63: { tipo:'fin',      emoji:'🏆', cls:'cell-fin',      txt:'¡Llegaste! ¡Ganaste!'     },
+};
+var OCAS = [9,18,27,36,45,54];
+function esOca(n) { return OCAS.indexOf(n) !== -1; }
+function siguienteOca(pos) {
+  for (var i=0;i<OCAS.length;i++) if (OCAS[i]>pos) return OCAS[i];
+  return 63;
+}
+
+/* ── POSICIÓN EN GRILLA (1-indexed row/col para CSS grid) ── */
+function celPosicion(n) {
+  var idx = n - 1;                  // 0-based
+  var fila = Math.floor(idx / 9);   // 0=bottom, 6=top
+  var seg  = idx % 9;
+  var col  = (fila % 2 === 0) ? seg : (8 - seg);
+  return { row: 7 - fila, col: col + 1 }; // CSS grid 1-indexed from top
+}
+
+/* ── ESTADO ── */
+var posiciones   = {};   // playerId → casilla (0 = fuera del tablero)
+var turnosEspera = {};   // playerId → cuántos turnos espera
+var animando     = false;
+var jugadoresArr = [];   // snapshot de FamiliaJugadores.todos()
+
+/* ── PANTALLAS ── */
+function mostrarPantalla(id) {
+  document.querySelectorAll('.screen').forEach(function(s){
+    s.classList.toggle('active', s.id === id);
+  });
+}
+
+/* ── CONSTRUIR TABLERO ── */
+function construirTablero() {
+  var board = document.getElementById('oca-board');
+  board.innerHTML = '';
+  for (var n = 1; n <= 63; n++) {
+    var pos = celPosicion(n);
+    var esp = ESPECIALES[n];
+    var isOca = esOca(n);
+
+    var cls = 'oca-cell';
+    if (isOca) cls += ' cell-oca';
+    else if (esp) cls += ' ' + esp.cls;
+
+    var icon = isOca ? '🪿' : (esp ? esp.emoji : '');
+
+    var div = document.createElement('div');
+    div.className = cls;
+    div.id = 'cel-' + n;
+    div.style.gridRow    = pos.row;
+    div.style.gridColumn = pos.col;
+    div.innerHTML =
+      '<span class="cell-num">' + n + '</span>' +
+      (icon ? '<span class="cell-icon">' + icon + '</span>' : '') +
+      '<div class="cell-tokens" id="tok-' + n + '"></div>';
+    board.appendChild(div);
+  }
+}
+
+/* ── RENDERIZAR TOKENS ── */
+function renderTokens() {
+  /* Limpiar */
+  for (var n = 1; n <= 63; n++) {
+    var el = document.getElementById('tok-' + n);
+    if (el) el.innerHTML = '';
+  }
+  /* También casilla 0 (fuera) — no se muestra */
+  jugadoresArr.forEach(function(j) {
+    var pos = posiciones[j.id] || 0;
+    if (pos < 1) return;
+    var tok = document.getElementById('tok-' + pos);
+    if (!tok) return;
+    var dot = document.createElement('div');
+    dot.className = 'token';
+    dot.style.background = j.color;
+    dot.title = j.name;
+    tok.appendChild(dot);
+  });
+}
+
+/* ── INICIAR ── */
+function iniciarJuego() {
+  FamiliaStorage.setUltimoJuego('oca');
+  jugadoresArr = FamiliaJugadores.todos();
+  jugadoresArr.forEach(function(j) {
+    posiciones[j.id]   = 0;   // fuera del tablero
+    turnosEspera[j.id] = 0;
+  });
+  animando = false;
+
+  construirTablero();
+  renderTokens();
+  FamiliaJugadores.renderTurnBanner('turn-banner');
+  FamiliaJugadores.renderChips('players-bar');
+  FamiliaAudio.renderBotonSonido('contenedor-sonido');
+  setMsg('🎲 ¡Tirá el dado para comenzar!');
+  habilitarDado(true);
+
+  FamiliaAudio.anunciarTurno(FamiliaJugadores.actual().name);
+  mostrarPantalla('pantalla-juego');
+}
+
+/* ── TIRAR DADO ── */
+function tirarDado() {
+  if (animando) return;
+  animando = true;
+  habilitarDado(false);
+
+  var j = FamiliaJugadores.actual();
+
+  /* ¿Está esperando? */
+  if (turnosEspera[j.id] > 0) {
+    turnosEspera[j.id]--;
+    var restantes = turnosEspera[j.id];
+    setMsg('⏳ ' + j.name + ' espera' + (restantes > 0 ? ' ' + restantes + ' turno(s) más' : '... ¡ya puede jugar!'));
+    FamiliaAudio.error();
+    setTimeout(function() {
+      pasarTurno();
+    }, 1500);
+    return;
+  }
+
+  /* Animación del dado */
+  FamiliaAudio.dado();
+  var btn  = document.getElementById('oca-dice-btn');
+  var face = document.getElementById('oca-dice-face');
+  btn.classList.add('rolling');
+  var t = 0, frames = 10;
+  var interval = setInterval(function() {
+    face.textContent = CARAS_DADO[Math.floor(Math.random()*6)];
+    t++;
+    if (t >= frames) {
+      clearInterval(interval);
+      btn.classList.remove('rolling');
+      var resultado = Math.floor(Math.random()*6) + 1;
+      face.textContent = CARAS_DADO[resultado-1];
+      procesarMovimiento(j, resultado);
+    }
+  }, 80);
+}
+
+/* ── PROCESAR MOVIMIENTO ── */
+function procesarMovimiento(j, dado) {
+  var posAnterior = posiciones[j.id] || 0;
+  var nueva = posAnterior + dado;
+
+  /* Si se pasa de 63, rebotar */
+  if (nueva > 63) {
+    nueva = 63 - (nueva - 63);
+  }
+
+  posiciones[j.id] = nueva;
+  renderTokens();
+  scrollACasilla(nueva);
+
+  var msg = j.name + ' tiró ' + dado + ' → casilla ' + nueva;
+  var doble = false;
+
+  /* Oca */
+  if (esOca(nueva)) {
+    var sigOca = siguienteOca(nueva);
+    posiciones[j.id] = sigOca;
+    nueva = sigOca;
+    renderTokens();
+    scrollACasilla(nueva);
+    msg = '🪿 ¡OCA! ' + j.name + ' avanza a la casilla ' + sigOca;
+    FamiliaAudio.acierto();
+    FamiliaAudio.leer('¡Oca! Avanzás a ' + sigOca);
+    doble = (nueva !== 63); // en oca se tira de nuevo, salvo que sea fin
+  }
+
+  /* Casilla especial */
+  var esp = ESPECIALES[nueva];
+  if (esp && !esOca(nueva)) {
+    if (esp.fin) {
+      /* Ganó */
+      setMsg('🏆 ¡' + j.name + ' llegó a la casilla 63 y ganó!');
+      FamiliaAudio.celebracion();
+      FamiliaJugadores.sumarPuntos(3);
+      FamiliaJugadores.renderChips('players-bar');
+      setTimeout(function() {
+        FamiliaAudio.anunciarGanador(j.name);
+        FamiliaJugadores.renderFinal('contenedor-fin', {
+          onRevancha: function() { FamiliaJugadores.reiniciarPuntos(); iniciarJuego(); },
+          onCambiarJugadores: function() { mostrarPantalla('pantalla-selector'); }
+        });
+        mostrarPantalla('pantalla-fin');
+      }, 1200);
+      animando = false;
+      return;
+    }
+    if (esp.destino !== undefined) {
+      posiciones[j.id] = esp.destino;
+      renderTokens();
+      scrollACasilla(esp.destino);
+      msg += ' · ' + esp.txt;
+    }
+    if (esp.espera) {
+      turnosEspera[j.id] = esp.espera;
+      msg += ' · ' + esp.txt;
+    }
+    if (esp.doble) {
+      msg += ' · ' + esp.txt;
+      doble = true;
+    }
+    FamiliaAudio.tap();
+    FamiliaAudio.leer(esp.txt, { rate: 0.88 });
+  } else if (!esOca(nueva)) {
+    FamiliaAudio.tap();
+  }
+
+  /* Comprobar si otro jugador estaba en esa casilla → lo manda al inicio */
+  jugadoresArr.forEach(function(otro) {
+    if (otro.id !== j.id && posiciones[otro.id] === posiciones[j.id] && posiciones[j.id] > 0) {
+      /* Solo si la casilla no es especial grave */
+      var ep = ESPECIALES[posiciones[j.id]];
+      if (!ep || (!ep.carcel && !ep.muerte)) {
+        posiciones[otro.id] = 1;
+        msg += ' · ' + otro.name + ' vuelve al inicio';
+        renderTokens();
+      }
+    }
+  });
+
+  setMsg(msg);
+  FamiliaJugadores.renderChips('players-bar');
+
+  if (nueva === 63) return; /* ya terminó */
+
+  setTimeout(function() {
+    if (doble) {
+      /* Mismo jugador tira de nuevo */
+      setMsg(msg + ' — ¡Tirás de nuevo!');
+      animando = false;
+      habilitarDado(true);
+    } else {
+      pasarTurno();
+    }
+  }, 1400);
+}
+
+function pasarTurno() {
+  var sig = FamiliaJugadores.siguiente();
+  FamiliaJugadores.renderTurnBanner('turn-banner');
+  FamiliaJugadores.renderChips('players-bar');
+  animando = false;
+  habilitarDado(true);
+  FamiliaAudio.anunciarTurno(sig.name);
+}
+
+/* ── HELPERS ── */
+function setMsg(txt) {
+  document.getElementById('oca-msg').textContent = txt;
+}
+function habilitarDado(on) {
+  document.getElementById('oca-dice-btn').disabled = !on;
+  var label = document.querySelector('.oca-dice-label');
+  if (label) label.textContent = on ? 'TIRAR' : '...';
+}
+function scrollACasilla(n) {
+  var el = document.getElementById('cel-' + n);
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+}
+
+/* ── INIT ── */
+FamiliaAudio.cargarPreferencia();
+FamiliaAudio.cargarPreferencia();
+mostrarPantalla('pantalla-selector');
+FamiliaJugadores.renderSelector('contenedor-selector', { min: 2, max: 4 }, function() {
+  iniciarJuego();
+});
+</script>
+</body>
+</html>
