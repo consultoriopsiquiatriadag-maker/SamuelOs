@@ -1,0 +1,463 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#2563eb" />
+  <link rel="manifest" href="../../manifest.webmanifest" />
+  <title>Preguntados — Juegos en Familia</title>
+  <link rel="stylesheet" href="../shared/family-game.css" />
+  <style>
+    body { background: var(--fg-bg); min-height: 100svh; }
+
+    /* ── PANTALLAS ── */
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    /* ── SELECTOR DE DIFICULTAD ── */
+    .dif-grid {
+      display: grid; grid-template-columns: repeat(3,1fr);
+      gap: 16px; margin: 24px 0;
+    }
+    @media (max-width:520px) { .dif-grid { grid-template-columns: 1fr; } }
+    .dif-card {
+      background: var(--fg-card); border-radius: 20px;
+      border: 2.5px solid var(--fg-stroke); box-shadow: var(--fg-shadow);
+      padding: 28px 16px; text-align: center; cursor: pointer;
+      transition: transform .14s, border-color .14s;
+    }
+    .dif-card:hover  { transform: translateY(-3px); }
+    .dif-card.selected { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,.22); }
+    .dif-emoji  { font-size: 42px; margin-bottom: 10px; }
+    .dif-titulo { font-size: 20px; font-weight: 950; }
+    .dif-sub    { font-size: 13px; color: var(--fg-muted); font-weight: 700; margin-top: 4px; }
+    .dif-badge  {
+      display: inline-block; margin-top: 10px; padding: 4px 12px;
+      border-radius: 99px; font-size: 12px; font-weight: 900;
+    }
+    .badge-verde { background:#dcfce7; color:#166534; }
+    .badge-azul  { background:#dbeafe; color:#1e40af; }
+    .badge-rojo  { background:#fee2e2; color:#991b1b; }
+
+    /* ── PANTALLA JUEGO ── */
+    #pantalla-juego { padding-bottom: 24px; }
+
+    .pq-categoria {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 13px; font-weight: 900; color: var(--fg-muted);
+      text-transform: uppercase; letter-spacing: .06em;
+      margin-top: 14px;
+    }
+    .pq-categoria-emoji { font-size: 22px; }
+
+    .pq-progreso {
+      display: flex; gap: 6px; margin: 10px 0;
+      flex-wrap: wrap;
+    }
+    .pq-dot {
+      width: 10px; height: 10px; border-radius: 99px;
+      background: var(--fg-stroke); transition: background .2s;
+    }
+    .pq-dot.hecha    { background: #2563eb; }
+    .pq-dot.actual   { background: #60a5fa; }
+
+    .pq-pregunta {
+      font-size: clamp(20px, 5vw, 28px);
+      font-weight: 950; line-height: 1.25;
+      margin: 18px 0 22px;
+      color: var(--fg-text);
+    }
+
+    .pq-opciones {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width:400px) {
+      .pq-opciones { grid-template-columns: 1fr; }
+    }
+
+    .pq-opcion {
+      padding: 18px 14px; border-radius: 18px;
+      border: 2.5px solid var(--fg-stroke);
+      background: var(--fg-card); box-shadow: var(--fg-shadow);
+      font-size: clamp(15px, 3.5vw, 18px); font-weight: 900;
+      cursor: pointer; text-align: center; line-height: 1.2;
+      transition: transform .12s, border-color .12s, background .15s;
+      color: var(--fg-text);
+    }
+    .pq-opcion:hover  { transform: scale(1.03); border-color: #93c5fd; }
+    .pq-opcion:active { transform: scale(.97); }
+    .pq-opcion.correcta {
+      background: #dcfce7; border-color: #4ade80; color: #166534;
+    }
+    .pq-opcion.incorrecta {
+      background: #fee2e2; border-color: #fca5a5; color: #991b1b;
+    }
+    .pq-opcion.reveal-correcta {
+      background: #dcfce7; border-color: #4ade80; color: #166534;
+    }
+    .pq-opcion.bloqueada { pointer-events: none; }
+
+    /* Feedback */
+    .pq-feedback {
+      margin-top: 18px; padding: 14px 18px;
+      border-radius: 16px; font-size: 17px; font-weight: 950;
+      text-align: center; display: none;
+    }
+    .pq-feedback.ok  { background: #dcfce7; color: #166534; }
+    .pq-feedback.mal { background: #fee2e2; color: #991b1b; }
+    .pq-feedback.show { display: block; }
+
+    .pq-siguiente {
+      margin-top: 18px; display: none;
+    }
+    .pq-siguiente.show { display: block; }
+
+    #contenedor-selector { min-height: 0; }
+  </style>
+</head>
+<body>
+<div class="fg-shell">
+
+  <!-- ══ DIFICULTAD ══════════════════════════════════════════ -->
+  <div id="pantalla-dificultad" class="screen active">
+    <header class="fg-game-header">
+      <a class="fg-btn-volver" href="../index.html">◀ Volver</a>
+      <div class="fg-game-title">🧠 Preguntados</div>
+    </header>
+
+    <div style="text-align:center; margin-bottom:8px;">
+      <strong style="font-size:18px; font-weight:950;">¿Cuántas preguntas?</strong>
+      <p style="color:var(--fg-muted); font-weight:700; margin-top:4px;">Cada jugador responde su turno</p>
+    </div>
+
+    <div class="dif-grid">
+      <div class="dif-card selected" id="dif-facil" onclick="seleccionarDif('facil')">
+        <div class="dif-emoji">🌟</div>
+        <div class="dif-titulo">Corto</div>
+        <div class="dif-sub">3 rondas</div>
+        <span class="dif-badge badge-verde">Recomendado</span>
+      </div>
+      <div class="dif-card" id="dif-medio" onclick="seleccionarDif('medio')">
+        <div class="dif-emoji">🔥</div>
+        <div class="dif-titulo">Normal</div>
+        <div class="dif-sub">5 rondas</div>
+        <span class="dif-badge badge-azul">Clásico</span>
+      </div>
+      <div class="dif-card" id="dif-avanzado" onclick="seleccionarDif('avanzado')">
+        <div class="dif-emoji">🏆</div>
+        <div class="dif-titulo">Largo</div>
+        <div class="dif-sub">8 rondas</div>
+        <span class="dif-badge badge-rojo">Desafío</span>
+      </div>
+    </div>
+
+    <button class="fg-btn fg-btn-primary fg-btn-full" style="margin-top:8px;"
+            onclick="irAlSelector()">▶ Siguiente — Elegir jugadores</button>
+  </div>
+
+  <!-- ══ SELECTOR DE JUGADORES ═══════════════════════════════ -->
+  <div id="pantalla-selector" class="screen">
+    <div id="contenedor-selector"></div>
+  </div>
+
+  <!-- ══ JUEGO ════════════════════════════════════════════════ -->
+  <div id="pantalla-juego" class="screen">
+    <header class="fg-game-header">
+      <a class="fg-btn-volver" href="../index.html">◀ Volver</a>
+      <div class="fg-game-title">🧠 Preguntados</div>
+      <div id="contenedor-sonido"></div>
+    </header>
+
+    <div class="fg-turn-banner" id="turn-banner"></div>
+    <div class="fg-players-bar"  id="players-bar"></div>
+
+    <div class="pq-categoria">
+      <span class="pq-categoria-emoji" id="pq-cat-emoji"></span>
+      <span id="pq-cat-nombre"></span>
+    </div>
+
+    <div class="pq-progreso" id="pq-progreso"></div>
+
+    <div class="pq-pregunta" id="pq-pregunta"></div>
+
+    <div class="pq-opciones" id="pq-opciones"></div>
+
+    <div class="pq-feedback" id="pq-feedback"></div>
+
+    <div class="pq-siguiente" id="pq-siguiente">
+      <button class="fg-btn fg-btn-primary fg-btn-full"
+              onclick="siguientePregunta()">Siguiente ▶</button>
+    </div>
+  </div>
+
+  <!-- ══ FIN ══════════════════════════════════════════════════ -->
+  <div id="pantalla-fin" class="screen">
+    <header class="fg-game-header" style="margin-bottom:24px;">
+      <a class="fg-btn-volver" href="../index.html">◀ Volver</a>
+    </header>
+    <div id="contenedor-fin"></div>
+  </div>
+
+</div>
+
+<script src="../shared/storage.js"></script>
+<script src="../shared/players.js"></script>
+<script src="../shared/audio.js"></script>
+<script>
+/* ============================================================
+   PREGUNTADOS SAMUEL
+   ============================================================ */
+
+/* ── BANCO DE PREGUNTAS ── */
+var PREGUNTAS = [
+  /* ANIMALES */
+  { cat:'Animales', emoji:'🐾', q:'¿Qué animal hace "guau"?',           ops:['Perro','Gato','Pato','Vaca'],       r:0 },
+  { cat:'Animales', emoji:'🐾', q:'¿Qué animal hace "miau"?',           ops:['Perro','Gato','Pato','Vaca'],       r:1 },
+  { cat:'Animales', emoji:'🐾', q:'¿Qué animal hace "cuac"?',           ops:['Gallina','Rana','Pato','Oveja'],    r:2 },
+  { cat:'Animales', emoji:'🐾', q:'¿Qué animal hace "mu"?',             ops:['Cerdo','Caballo','Oveja','Vaca'],   r:3 },
+  { cat:'Animales', emoji:'🐾', q:'¿Qué animal tiene trompa?',          ops:['León','Elefante','Jirafa','Cebra'], r:1 },
+  { cat:'Animales', emoji:'🐾', q:'¿Qué animal tiene rayas negras y blancas?', ops:['León','Leopardo','Cebra','Tigre'], r:2 },
+  { cat:'Animales', emoji:'🐾', q:'¿Cuál es el animal más alto?',       ops:['Elefante','Camello','Jirafa','Rinoceronte'], r:2 },
+  { cat:'Animales', emoji:'🐾', q:'¿Qué animal es el rey de la selva?', ops:['Tigre','León','Lobo','Gorila'],     r:1 },
+  { cat:'Animales', emoji:'🐾', q:'¿Qué animal pone huevos y vuela?',   ops:['Murciélago','Serpiente','Pájaro','Sapo'], r:2 },
+  { cat:'Animales', emoji:'🐾', q:'¿Qué animal vive en el agua y tiene aletas?', ops:['Rana','Pez','Tortuga','Cangrejo'], r:1 },
+  { cat:'Animales', emoji:'🐾', q:'¿Qué animal fabrica miel?',          ops:['Mosca','Mariposa','Abeja','Hormiga'], r:2 },
+  { cat:'Animales', emoji:'🐾', q:'¿Qué animal tiene 8 patas y hace telarañas?', ops:['Cangrejo','Araña','Pulpo','Escorpión'], r:1 },
+
+  /* COLORES */
+  { cat:'Colores', emoji:'🎨', q:'¿De qué color es el cielo despejado?', ops:['Verde','Rojo','Azul','Amarillo'],  r:2 },
+  { cat:'Colores', emoji:'🎨', q:'¿De qué color es el pasto?',           ops:['Azul','Verde','Marrón','Gris'],   r:1 },
+  { cat:'Colores', emoji:'🎨', q:'¿De qué color es el sol?',             ops:['Naranja','Rojo','Azul','Amarillo'],r:3 },
+  { cat:'Colores', emoji:'🎨', q:'¿De qué color es una banana?',         ops:['Rojo','Verde','Amarillo','Naranja'],r:2 },
+  { cat:'Colores', emoji:'🎨', q:'¿De qué color es un tomate?',          ops:['Rojo','Amarillo','Verde','Azul'],  r:0 },
+  { cat:'Colores', emoji:'🎨', q:'¿De qué color son las nubes?',         ops:['Grises','Blancas','Azules','Verdes'], r:1 },
+  { cat:'Colores', emoji:'🎨', q:'¿Qué color se forma mezclando azul y amarillo?', ops:['Rojo','Violeta','Verde','Naranja'], r:2 },
+  { cat:'Colores', emoji:'🎨', q:'¿De qué color es una uva?',            ops:['Roja','Violeta','Azul','Negra'],   r:1 },
+
+  /* NÚMEROS */
+  { cat:'Números', emoji:'🔢', q:'¿Cuántas patas tiene un perro?',       ops:['2','6','4','8'],                   r:2 },
+  { cat:'Números', emoji:'🔢', q:'¿Cuántas patas tiene una araña?',      ops:['4','6','10','8'],                  r:3 },
+  { cat:'Números', emoji:'🔢', q:'¿Cuántos dedos tiene una mano?',       ops:['4','6','5','3'],                   r:2 },
+  { cat:'Números', emoji:'🔢', q:'¿Cuánto es 2 + 2?',                    ops:['3','5','6','4'],                   r:3 },
+  { cat:'Números', emoji:'🔢', q:'¿Cuánto es 1 + 1?',                    ops:['3','2','4','1'],                   r:1 },
+  { cat:'Números', emoji:'🔢', q:'¿Cuánto es 5 + 5?',                    ops:['8','9','10','7'],                  r:2 },
+  { cat:'Números', emoji:'🔢', q:'¿Cuántos lados tiene un triángulo?',   ops:['4','2','5','3'],                   r:3 },
+  { cat:'Números', emoji:'🔢', q:'¿Cuántos lados tiene un cuadrado?',    ops:['3','6','4','5'],                   r:2 },
+  { cat:'Números', emoji:'🔢', q:'¿Cuánto es 3 + 2?',                    ops:['4','6','7','5'],                   r:3 },
+  { cat:'Números', emoji:'🔢', q:'¿Cuántas patas tiene un insecto?',     ops:['4','8','6','2'],                   r:2 },
+
+  /* CUERPO */
+  { cat:'Cuerpo', emoji:'👁️', q:'¿Con qué vemos?',                      ops:['Las orejas','La nariz','Los ojos','La boca'], r:2 },
+  { cat:'Cuerpo', emoji:'👁️', q:'¿Con qué escuchamos?',                 ops:['Las orejas','Los ojos','La nariz','La boca'], r:0 },
+  { cat:'Cuerpo', emoji:'👁️', q:'¿Con qué olemos?',                     ops:['Los ojos','La boca','La nariz','Las orejas'], r:2 },
+  { cat:'Cuerpo', emoji:'👁️', q:'¿Con qué comemos?',                    ops:['La nariz','La boca','Los ojos','Las manos'], r:1 },
+  { cat:'Cuerpo', emoji:'👁️', q:'¿Cuántos ojos tenemos normalmente?',   ops:['1','3','4','2'],                   r:3 },
+  { cat:'Cuerpo', emoji:'👁️', q:'¿Qué parte del cuerpo usamos para caminar?', ops:['Los brazos','Las piernas','La cabeza','Las manos'], r:1 },
+  { cat:'Cuerpo', emoji:'👁️', q:'¿Qué parte del cuerpo bombea la sangre?', ops:['El pulmón','El estómago','El corazón','El cerebro'], r:2 },
+
+  /* ALIMENTOS */
+  { cat:'Alimentos', emoji:'🍎', q:'¿De qué animal viene la leche que tomamos?', ops:['Cabra','Cerdo','Gallina','Vaca'], r:3 },
+  { cat:'Alimentos', emoji:'🍎', q:'¿Qué comida es redonda, tiene queso y se hornea?', ops:['Sandwich','Empanada','Pizza','Hamburguesa'], r:2 },
+  { cat:'Alimentos', emoji:'🍎', q:'¿De qué color es la manzana roja?',  ops:['Amarilla','Verde','Azul','Roja'],  r:3 },
+  { cat:'Alimentos', emoji:'🍎', q:'¿Qué fruta es amarilla y se pela?',  ops:['Frutilla','Manzana','Banana','Naranja'], r:2 },
+  { cat:'Alimentos', emoji:'🍎', q:'¿Qué animal nos da los huevos para comer?', ops:['Pato','Pavo','Gallina','Avestruz'], r:2 },
+  { cat:'Alimentos', emoji:'🍎', q:'¿Qué bebida tomamos del desayuno que viene de una vaca?', ops:['Jugo','Té','Leche','Agua'], r:2 },
+
+  /* COMUNICACIÓN */
+  { cat:'Comunicación', emoji:'💬', q:'¿Qué decimos cuando alguien nos ayuda?',  ops:['Hola','Chau','Gracias','Por favor'], r:2 },
+  { cat:'Comunicación', emoji:'💬', q:'¿Qué decimos cuando llegamos a un lugar?', ops:['Chau','Hola','Gracias','Perdón'],   r:1 },
+  { cat:'Comunicación', emoji:'💬', q:'¿Qué decimos cuando nos vamos?',           ops:['Hola','Gracias','Chau','Perdón'],   r:2 },
+  { cat:'Comunicación', emoji:'💬', q:'¿Qué decimos si chocamos sin querer a alguien?', ops:['Gracias','Hola','Bravo','Perdón'], r:3 },
+  { cat:'Comunicación', emoji:'💬', q:'¿Qué decimos antes de pedir algo?',        ops:['Gracias','Por favor','Chau','Bravo'], r:1 },
+  { cat:'Comunicación', emoji:'💬', q:'¿Cómo decimos que algo nos gusta mucho?',  ops:['No me gusta','Más o menos','Me encanta','No sé'], r:2 },
+
+  /* MUNDO / NATURALEZA */
+  { cat:'Naturaleza', emoji:'🌿', q:'¿Qué necesitan las plantas para crecer?',   ops:['Fuego','Agua y sol','Viento','Nieve'], r:1 },
+  { cat:'Naturaleza', emoji:'🌿', q:'¿Qué sale cuando llueve?',                  ops:['Nieve','Granizo','Lluvia','Viento'],  r:2 },
+  { cat:'Naturaleza', emoji:'🌿', q:'¿Cómo se llama el agua del mar?',            ops:['Río','Océano','Lago','Lluvia'],       r:1 },
+  { cat:'Naturaleza', emoji:'🌿', q:'¿Cuándo brilla el sol: de día o de noche?',  ops:['De noche','Las dos','Nunca','De día'], r:3 },
+  { cat:'Naturaleza', emoji:'🌿', q:'¿Qué aparece en el cielo cuando llueve y hay sol?', ops:['Relámpago','Luna','Arcoíris','Estrella'], r:2 },
+];
+
+/* ── CONFIGURACIÓN ── */
+var RONDAS = { facil: 3, medio: 5, avanzado: 8 };
+
+/* ── ESTADO ── */
+var dificultad    = 'facil';
+var cola          = [];   // preguntas en orden de juego
+var indiceCola    = 0;
+var totalPreguntas = 0;
+var respondida    = false;
+
+/* ── DIFICULTAD ── */
+function seleccionarDif(d) {
+  dificultad = d;
+  document.querySelectorAll('.dif-card').forEach(function (c) {
+    c.classList.toggle('selected', c.id === 'dif-' + d);
+  });
+  FamiliaStorage.setDificultad(d);
+}
+
+function irAlSelector() {
+  mostrarPantalla('pantalla-selector');
+  FamiliaAudio.cargarPreferencia();
+  FamiliaJugadores.renderSelector('contenedor-selector', { min: 2, max: 4 }, function () {
+    iniciarJuego();
+  });
+}
+
+/* ── PANTALLAS ── */
+function mostrarPantalla(id) {
+  document.querySelectorAll('.screen').forEach(function (s) {
+    s.classList.toggle('active', s.id === id);
+  });
+}
+
+/* ── INICIAR JUEGO ── */
+function iniciarJuego() {
+  FamiliaStorage.setUltimoJuego('preguntados');
+  var rondas = RONDAS[dificultad];
+  var n = FamiliaJugadores.cantidad();
+  totalPreguntas = rondas * n;
+
+  /* Mezclar preguntas y tomar las que necesitamos */
+  var pool = mezclar(PREGUNTAS.slice());
+  /* Si hay pocas, repetir el pool */
+  while (pool.length < totalPreguntas) {
+    pool = pool.concat(mezclar(PREGUNTAS.slice()));
+  }
+  cola = pool.slice(0, totalPreguntas);
+  indiceCola = 0;
+  respondida = false;
+
+  FamiliaJugadores.renderTurnBanner('turn-banner');
+  FamiliaJugadores.renderChips('players-bar');
+  FamiliaAudio.renderBotonSonido('contenedor-sonido');
+
+  mostrarPantalla('pantalla-juego');
+  mostrarPregunta();
+}
+
+/* ── MOSTRAR PREGUNTA ── */
+function mostrarPregunta() {
+  respondida = false;
+  var p = cola[indiceCola];
+
+  /* Categoría */
+  document.getElementById('pq-cat-emoji').textContent  = p.emoji;
+  document.getElementById('pq-cat-nombre').textContent = p.cat;
+
+  /* Progreso */
+  var progHtml = '';
+  for (var i = 0; i < totalPreguntas; i++) {
+    var cls = i < indiceCola ? 'hecha' : (i === indiceCola ? 'actual' : '');
+    progHtml += '<div class="pq-dot ' + cls + '"></div>';
+  }
+  document.getElementById('pq-progreso').innerHTML = progHtml;
+
+  /* Pregunta */
+  document.getElementById('pq-pregunta').textContent = p.q;
+
+  /* Opciones */
+  var opcionesEl = document.getElementById('pq-opciones');
+  opcionesEl.innerHTML = p.ops.map(function (op, i) {
+    return '<button class="pq-opcion" onclick="responder(' + i + ')">' + op + '</button>';
+  }).join('');
+
+  /* Feedback oculto */
+  var fb = document.getElementById('pq-feedback');
+  fb.className = 'pq-feedback';
+  fb.textContent = '';
+
+  document.getElementById('pq-siguiente').className = 'pq-siguiente';
+
+  /* Voz: leer pregunta */
+  setTimeout(function () {
+    FamiliaAudio.anunciarTurno(FamiliaJugadores.actual().name);
+    setTimeout(function () {
+      FamiliaAudio.leer(p.q, { rate: 0.9 });
+    }, 900);
+  }, 100);
+}
+
+/* ── RESPONDER ── */
+function responder(idx) {
+  if (respondida) return;
+  respondida = true;
+  FamiliaAudio.tap();
+
+  var p   = cola[indiceCola];
+  var ops = document.querySelectorAll('.pq-opcion');
+
+  /* Bloquear todas */
+  ops.forEach(function (b) { b.classList.add('bloqueada'); });
+
+  var fb = document.getElementById('pq-feedback');
+
+  if (idx === p.r) {
+    /* Correcto */
+    ops[idx].classList.add('correcta');
+    FamiliaJugadores.sumarPuntos(1);
+    FamiliaJugadores.renderChips('players-bar');
+    FamiliaAudio.acierto();
+    fb.className = 'pq-feedback ok show';
+    fb.textContent = '✅ ¡Correcto! ' + p.ops[p.r];
+    setTimeout(function () { FamiliaAudio.leer('¡Muy bien!'); }, 300);
+  } else {
+    /* Incorrecto */
+    ops[idx].classList.add('incorrecta');
+    ops[p.r].classList.add('reveal-correcta');
+    FamiliaAudio.error();
+    fb.className = 'pq-feedback mal show';
+    fb.textContent = '❌ Era: ' + p.ops[p.r];
+    setTimeout(function () { FamiliaAudio.leer('La respuesta era ' + p.ops[p.r]); }, 300);
+  }
+
+  /* Botón siguiente */
+  document.getElementById('pq-siguiente').className = 'pq-siguiente show';
+}
+
+/* ── SIGUIENTE PREGUNTA ── */
+function siguientePregunta() {
+  indiceCola++;
+
+  if (indiceCola >= totalPreguntas) {
+    /* Fin del juego */
+    FamiliaAudio.celebracion();
+    setTimeout(function () {
+      FamiliaAudio.anunciarGanador(
+        FamiliaJugadores.ganador() ? FamiliaJugadores.ganador().name : null
+      );
+    }, 800);
+    FamiliaJugadores.renderFinal('contenedor-fin', {
+      onRevancha: function () { iniciarJuego(); mostrarPantalla('pantalla-juego'); },
+      onCambiarJugadores: function () { mostrarPantalla('pantalla-dificultad'); }
+    });
+    mostrarPantalla('pantalla-fin');
+    return;
+  }
+
+  /* Pasar turno */
+  var sig = FamiliaJugadores.siguiente();
+  FamiliaJugadores.renderTurnBanner('turn-banner');
+  FamiliaJugadores.renderChips('players-bar');
+  respondida = false;
+  mostrarPregunta();
+}
+
+/* ── Fisher-Yates ── */
+function mezclar(arr) {
+  for (var i = arr.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var t = arr[i]; arr[i] = arr[j]; arr[j] = t;
+  }
+  return arr;
+}
+
+/* ── INIT ── */
+FamiliaAudio.cargarPreferencia();
+seleccionarDif(FamiliaStorage.getDificultad() || 'facil');
+</script>
+</body>
+</html>
