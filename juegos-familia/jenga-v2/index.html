@@ -1,0 +1,624 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+  <meta name="theme-color" content="#ef4444" />
+  <link rel="manifest" href="../../manifest.webmanifest" />
+  <title>Jenga 3D — Juegos en Familia</title>
+  <link rel="stylesheet" href="../shared/family-game.css" />
+  <style>
+    html, body { height: 100%; overflow: hidden; background: #1e293b; }
+    .screen { display: none; }
+    .screen.active { display: flex; flex-direction: column; height: 100%; }
+
+    /* ── LAYOUT JUEGO ── */
+    #pantalla-juego {
+      background: #1e293b;
+      color: #f1f5f9;
+    }
+    .j2-header {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px 6px;
+      flex-shrink: 0;
+    }
+    .j2-title {
+      font-size: 18px; font-weight: 950; color: #f1f5f9; flex: 1;
+    }
+    .j2-turn {
+      padding: 6px 14px; border-radius: 99px;
+      font-size: 13px; font-weight: 950;
+      background: var(--player-color, #ef4444);
+      color: #fff; text-align: center;
+      transition: background .4s;
+      flex-shrink: 0;
+    }
+
+    /* Players chips en dark mode */
+    #j2-players { padding: 0 14px 6px; flex-shrink: 0; }
+    #j2-players .fg-players-bar {
+      background: transparent; box-shadow: none; padding: 0;
+    }
+    #j2-players .fg-player-chip {
+      background: rgba(255,255,255,.08); color: #cbd5e1;
+      border-color: transparent;
+    }
+    #j2-players .fg-player-chip.active {
+      background: rgba(255,255,255,.15); color: #fff;
+      border-color: rgba(255,255,255,.4);
+    }
+
+    /* Canvas 3D */
+    #j2-canvas-wrap {
+      flex: 1; position: relative; overflow: hidden;
+      min-height: 0;
+    }
+    #j2-canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+
+    /* Overlay mensaje */
+    #j2-msg {
+      position: absolute; bottom: 60px; left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15,23,42,.85); color: #f1f5f9;
+      padding: 10px 20px; border-radius: 99px;
+      font-size: 14px; font-weight: 800;
+      white-space: nowrap; pointer-events: none;
+      transition: opacity .3s;
+    }
+
+    /* Overlay instrucción */
+    #j2-hint {
+      position: absolute; top: 10px; right: 10px;
+      background: rgba(15,23,42,.7); color: #94a3b8;
+      padding: 6px 12px; border-radius: 12px;
+      font-size: 11px; font-weight: 700;
+    }
+
+    /* Botón de sonido dark */
+    #j2-sound .fg-sound-btn { background: rgba(255,255,255,.1); }
+
+    /* ── SELECTOR (modo claro) ── */
+    #pantalla-selector {
+      background: var(--fg-bg); height: 100%;
+      overflow-y: auto;
+    }
+    #pantalla-selector .fg-shell { height: 100%; }
+
+    /* ── FIN ── */
+    #pantalla-fin {
+      background: #1e293b; color: #f1f5f9;
+      align-items: center; justify-content: center;
+      padding: 24px;
+    }
+    .j2-fin-emoji  { font-size: 72px; text-align: center; }
+    .j2-fin-titulo { font-size: 26px; font-weight: 950; text-align: center; margin: 12px 0 6px; }
+    .j2-fin-sub    { font-size: 15px; color: #94a3b8; text-align: center; margin-bottom: 24px; }
+    .j2-fin-btns   { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 320px; }
+
+    /* Overlay COLLAPSE */
+    #j2-collapse {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.75);
+      align-items: center; justify-content: center;
+      flex-direction: column; gap: 16px; z-index: 99;
+    }
+    #j2-collapse.show { display: flex; }
+    .j2-collapse-icon  { font-size: 80px; }
+    .j2-collapse-txt   { font-size: 28px; font-weight: 950; color: #fff; text-align: center; }
+    .j2-collapse-sub   { font-size: 16px; color: #94a3b8; text-align: center; }
+    #j2-collapse button { margin-top: 8px; }
+
+    #contenedor-selector { min-height: 0; }
+  </style>
+</head>
+<body>
+
+  <!-- ══ SELECTOR ══ -->
+  <div id="pantalla-selector" class="screen active">
+    <div class="fg-shell">
+      <div id="contenedor-selector"></div>
+    </div>
+  </div>
+
+  <!-- ══ JUEGO ══ -->
+  <div id="pantalla-juego" class="screen">
+
+    <div class="j2-header">
+      <a class="fg-btn-volver" href="../index.html"
+         style="background:rgba(255,255,255,.1);color:#f1f5f9;border-color:transparent;">◀</a>
+      <div class="j2-title">🪵 Jenga 3D</div>
+      <div class="j2-turn" id="j2-turn">—</div>
+      <div id="j2-sound"></div>
+    </div>
+
+    <div id="j2-players"><div class="fg-players-bar" id="j2-chips"></div></div>
+
+    <div id="j2-canvas-wrap">
+      <canvas id="j2-canvas"></canvas>
+      <div id="j2-hint">Arrastrá para girar · Tocá un bloque para sacarlo</div>
+      <div id="j2-msg">¡Sacá un bloque con cuidado!</div>
+    </div>
+
+  </div>
+
+  <!-- ══ FIN ══ -->
+  <div id="pantalla-fin" class="screen">
+    <div class="j2-fin-emoji" id="j2-fin-emoji">💥</div>
+    <div class="j2-fin-titulo" id="j2-fin-titulo">¡Cayó la torre!</div>
+    <div class="j2-fin-sub"   id="j2-fin-sub"></div>
+    <div class="j2-fin-btns">
+      <button class="fg-btn fg-btn-amber" onclick="jugarDeNuevo()">🔄 Jugar de nuevo</button>
+      <button class="fg-btn fg-btn-ghost" style="color:#94a3b8;border-color:#334155;"
+              onclick="mostrarPantalla('pantalla-selector')">👥 Cambiar jugadores</button>
+      <a class="fg-btn fg-btn-ghost" href="../index.html"
+         style="color:#94a3b8;border-color:#334155;text-align:center;text-decoration:none;">
+        ◀ Volver al menú
+      </a>
+    </div>
+  </div>
+
+  <!-- OVERLAY COLAPSO -->
+  <div id="j2-collapse">
+    <div class="j2-collapse-icon">💥</div>
+    <div class="j2-collapse-txt" id="j2-collapse-txt">¡CAYÓ!</div>
+    <div class="j2-collapse-sub" id="j2-collapse-sub"></div>
+    <button class="fg-btn fg-btn-amber" onclick="confirmarFin()">Ver resultados</button>
+  </div>
+
+<script src="../shared/storage.js"></script>
+<script src="../shared/players.js"></script>
+<script src="../shared/audio.js"></script>
+<!-- Three.js r128 — para offline: copiar a vendor/three.min.js (Fase 8) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+/* ============================================================
+   JENGA 3D V2 — Juegos en Familia
+   Three.js r128 · sin física (reglas simplificadas)
+   ============================================================ */
+
+/* ── CONSTANTES TORRE ── */
+var ROWS   = 18;
+var BLOCK_L = 1.5;
+var BLOCK_W = 0.48;
+var BLOCK_H = 0.30;
+var SPACING = BLOCK_W + 0.03;  // 0.51 — espacio entre bloques en fila
+
+/* ── ESTADO ── */
+var renderer, scene, camera;
+var blocks      = [];   // [{id, row, pos, mesh, removed, baseColor}]
+var rowCounts   = [];   // [3,3,3,...] bloques por fila
+var hoveredBlock = null;
+var isDragging   = false;
+var pointerDownX = 0, pointerDownY = 0;
+var cameraAngle  = Math.PI * 0.25;
+var cameraRadius = 9;
+var cameraHeight = ROWS * BLOCK_H * 0.55;
+var isAnimating  = false;
+var gameOver     = false;
+var loserName    = '';
+var raycaster, mouse;
+var geoEven, geoOdd;
+var animQueue    = []; // tweens activos
+
+/* ── PANTALLAS ── */
+function mostrarPantalla(id) {
+  document.querySelectorAll('.screen').forEach(function(s){
+    s.classList.toggle('active', s.id === id);
+  });
+}
+
+/* ── INICIAR JUEGO ── */
+function iniciarJuego() {
+  FamiliaStorage.setUltimoJuego('jenga-v2');
+  gameOver = false;
+  loserName = '';
+
+  if (!renderer) initThree();
+  else resetTower();
+
+  FamiliaJugadores.renderChips('j2-chips');
+  updateTurnUI();
+  FamiliaAudio.renderBotonSonido('j2-sound');
+  FamiliaAudio.anunciarTurno(FamiliaJugadores.actual().name);
+  setMsg('¡' + FamiliaJugadores.actual().name + ' empieza! Sacá un bloque.');
+  mostrarPantalla('pantalla-juego');
+  resize();
+  requestAnimationFrame(loop);
+}
+
+/* ── THREE.JS INIT ── */
+function initThree() {
+  var wrap = document.getElementById('j2-canvas-wrap');
+  var w = wrap.clientWidth, h = wrap.clientHeight;
+
+  renderer = new THREE.WebGLRenderer({
+    canvas: document.getElementById('j2-canvas'),
+    antialias: true, alpha: false
+  });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(w, h);
+  renderer.setClearColor(0x1e293b);
+  renderer.shadowMap.enabled = true;
+
+  scene = new THREE.Scene();
+  scene.fog = new THREE.Fog(0x1e293b, 20, 40);
+
+  camera = new THREE.PerspectiveCamera(42, w / h, 0.1, 60);
+  updateCamera();
+
+  /* Luces */
+  var ambient = new THREE.AmbientLight(0xffffff, 0.45);
+  scene.add(ambient);
+
+  var sun = new THREE.DirectionalLight(0xfff4e0, 0.9);
+  sun.position.set(5, 10, 6);
+  sun.castShadow = true;
+  scene.add(sun);
+
+  var fill = new THREE.DirectionalLight(0x8ab4f8, 0.25);
+  fill.position.set(-5, 3, -4);
+  scene.add(fill);
+
+  /* Suelo */
+  var floorGeo = new THREE.CylinderGeometry(2.5, 2.5, 0.1, 24);
+  var floorMat = new THREE.MeshLambertMaterial({ color: 0x334155 });
+  var floor = new THREE.Mesh(floorGeo, floorMat);
+  floor.position.y = -0.05;
+  floor.receiveShadow = true;
+  scene.add(floor);
+
+  raycaster = new THREE.Raycaster();
+  mouse     = new THREE.Vector2();
+  geoEven   = new THREE.BoxGeometry(BLOCK_L, BLOCK_H, BLOCK_W);
+  geoOdd    = new THREE.BoxGeometry(BLOCK_W, BLOCK_H, BLOCK_L);
+
+  buildTower();
+  bindEvents();
+}
+
+/* ── CONSTRUIR TORRE ── */
+function buildTower() {
+  /* Limpiar bloques viejos */
+  blocks.forEach(function(b){ scene.remove(b.mesh); });
+  blocks = [];
+  rowCounts = [];
+
+  var WOOD = [0xd4a870, 0xc49a5e, 0xdcb472, 0xba9650, 0xcc9e60, 0xd0a268];
+
+  for (var row = 0; row < ROWS; row++) {
+    rowCounts[row] = 3;
+    var isEven = row % 2 === 0;
+    var y = row * BLOCK_H + BLOCK_H / 2;
+
+    for (var pos = 0; pos < 3; pos++) {
+      var offset = (pos - 1) * SPACING;
+      var color = WOOD[Math.floor(Math.random() * WOOD.length)];
+      var mat = new THREE.MeshLambertMaterial({ color: color });
+      var mesh = new THREE.Mesh(isEven ? geoEven : geoOdd, mat);
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+
+      if (isEven) mesh.position.set(offset, y, 0);
+      else        mesh.position.set(0, y, offset);
+
+      scene.add(mesh);
+      blocks.push({ id: blocks.length, row: row, pos: pos,
+                    mesh: mesh, removed: false, baseColor: color });
+    }
+  }
+}
+
+function resetTower() {
+  animQueue = [];
+  isAnimating = false;
+  hoveredBlock = null;
+  document.getElementById('j2-collapse').classList.remove('show');
+  buildTower();
+}
+
+/* ── CÁMARA ── */
+function updateCamera() {
+  var towerCenterY = ROWS * BLOCK_H * 0.5;
+  camera.position.set(
+    Math.sin(cameraAngle) * cameraRadius,
+    cameraHeight,
+    Math.cos(cameraAngle) * cameraRadius
+  );
+  camera.lookAt(0, towerCenterY, 0);
+}
+
+/* ── RESIZE ── */
+function resize() {
+  if (!renderer) return;
+  var wrap = document.getElementById('j2-canvas-wrap');
+  var w = wrap.clientWidth, h = wrap.clientHeight;
+  renderer.setSize(w, h);
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+}
+window.addEventListener('resize', resize);
+
+/* ── LOOP ── */
+function loop() {
+  if (!renderer || gameOver) return;
+  requestAnimationFrame(loop);
+
+  /* Procesar tweens */
+  var now = Date.now();
+  animQueue = animQueue.filter(function(t) {
+    var p = Math.min(1, (now - t.start) / t.dur);
+    t.fn(p);
+    return p < 1;
+  });
+  if (animQueue.length === 0 && isAnimating) isAnimating = false;
+
+  /* Actualizar hover */
+  if (!isAnimating) updateHover();
+
+  renderer.render(scene, camera);
+}
+
+/* ── HOVER ── */
+function updateHover() {
+  raycaster.setFromCamera(mouse, camera);
+  var meshList = blocks.filter(function(b){ return !b.removed; }).map(function(b){ return b.mesh; });
+  var hits = raycaster.intersectObjects(meshList);
+
+  /* Resetear anterior */
+  if (hoveredBlock) {
+    hoveredBlock.mesh.material.color.setHex(hoveredBlock.baseColor);
+    hoveredBlock.mesh.material.emissive && hoveredBlock.mesh.material.emissive.setHex(0x000000);
+    hoveredBlock = null;
+  }
+
+  if (hits.length === 0) return;
+  var b = blockFromMesh(hits[0].object);
+  if (!b) return;
+  hoveredBlock = b;
+
+  if (!canRemove(b)) {
+    b.mesh.material.color.setHex(0xf87171); // rojo: no se puede
+  } else if (isDangerous(b)) {
+    b.mesh.material.color.setHex(0xfbbf24); // ámbar: peligroso
+  } else {
+    b.mesh.material.color.setHex(0x4ade80); // verde: libre
+  }
+}
+
+/* ── REGLAS ── */
+function getTopOccupiedRow() {
+  for (var r = ROWS - 1; r >= 0; r--) {
+    if (rowCounts[r] > 0) return r;
+  }
+  return 0;
+}
+
+function canRemove(b) {
+  if (b.removed) return false;
+  var top = getTopOccupiedRow();
+  return b.row < top - 1; // no sacar las 2 filas superiores ocupadas
+}
+
+function isDangerous(b) {
+  return rowCounts[b.row] === 1; // último de la fila → cae la torre
+}
+
+/* ── CLICK EN BLOQUE ── */
+function onCanvasClick() {
+  if (isAnimating || gameOver) return;
+  if (!hoveredBlock) return;
+  var b = hoveredBlock;
+
+  if (!canRemove(b)) {
+    FamiliaAudio.error();
+    setMsg('¡No podés sacar ese bloque!');
+    return;
+  }
+
+  var willFall = isDangerous(b);
+  removeBlockAnim(b, function() {
+    rowCounts[b.row]--;
+    b.removed = true;
+    hoveredBlock = null;
+
+    if (willFall) {
+      loserName = FamiliaJugadores.actual().name;
+      triggerCollapse();
+    } else {
+      FamiliaAudio.acierto();
+      FamiliaJugadores.renderChips('j2-chips');
+      var sig = FamiliaJugadores.siguiente();
+      updateTurnUI();
+      FamiliaAudio.anunciarTurno(sig.name);
+      setMsg('¡Turno de ' + sig.name + '!');
+    }
+  });
+}
+
+/* ── ANIMACIÓN: SACAR BLOQUE ── */
+function removeBlockAnim(b, onDone) {
+  isAnimating = true;
+  FamiliaAudio.tap();
+  var startPos = b.mesh.position.clone();
+  var dir = new THREE.Vector3();
+
+  if (b.row % 2 === 0) dir.set(b.pos === 0 ? -1 : 1, -0.5, 0);
+  else                  dir.set(0, -0.5, b.pos === 0 ? -1 : 1);
+  dir.multiplyScalar(3);
+
+  var endPos = startPos.clone().add(dir);
+  var start  = Date.now();
+  b.mesh.material = b.mesh.material.clone();
+  b.mesh.material.transparent = true;
+
+  animQueue.push({
+    start: start, dur: 550,
+    fn: function(p) {
+      b.mesh.position.lerpVectors(startPos, endPos, p);
+      b.mesh.material.opacity = 1 - p;
+      if (p >= 1) { scene.remove(b.mesh); onDone && onDone(); }
+    }
+  });
+}
+
+/* ── COLAPSO ── */
+function triggerCollapse() {
+  isAnimating = true;
+  FamiliaAudio.error();
+  FamiliaAudio.leer('¡Cayó la torre!');
+
+  /* Agitar cámara */
+  var shakes = 0;
+  var baseAngle = cameraAngle;
+  var shakeInterval = setInterval(function() {
+    cameraAngle = baseAngle + (Math.random() - 0.5) * 0.15;
+    updateCamera();
+    shakes++;
+    if (shakes > 12) {
+      clearInterval(shakeInterval);
+      cameraAngle = baseAngle;
+      updateCamera();
+    }
+  }, 60);
+
+  /* Dispersar bloques */
+  blocks.filter(function(b){ return !b.removed; }).forEach(function(b) {
+    var dir = new THREE.Vector3(
+      (Math.random() - 0.5) * 6,
+      Math.random() * 3,
+      (Math.random() - 0.5) * 6
+    );
+    var startPos = b.mesh.position.clone();
+    var endPos   = startPos.clone().add(dir);
+    b.mesh.material = b.mesh.material.clone();
+    b.mesh.material.transparent = true;
+    var delay = Math.random() * 200;
+    animQueue.push({
+      start: Date.now() + delay, dur: 900,
+      fn: function(p) {
+        b.mesh.position.lerpVectors(startPos, endPos, p);
+        b.mesh.material.opacity = 1 - p * 0.8;
+      }
+    });
+  });
+
+  setTimeout(function() {
+    document.getElementById('j2-collapse-txt').textContent = '¡' + loserName + ' tiró la torre!';
+    document.getElementById('j2-collapse-sub').textContent = 'Los demás jugadores ganan 🎉';
+    document.getElementById('j2-collapse').classList.add('show');
+    FamiliaAudio.celebracion();
+  }, 1200);
+}
+
+function confirmarFin() {
+  gameOver = true;
+  document.getElementById('j2-collapse').classList.remove('show');
+  /* Sumar puntos: todos menos el que la tiró */
+  FamiliaJugadores.todos().forEach(function(j) {
+    if (j.name !== loserName) FamiliaJugadores.sumarPuntosA(j.id, 1);
+  });
+  document.getElementById('j2-fin-titulo').textContent = '¡' + loserName + ' tiró la torre!';
+  document.getElementById('j2-fin-sub').textContent    = 'Los demás anotaron un punto.';
+  FamiliaJugadores.renderFinal('j2-fin-scores-wrap', {
+    onRevancha: function() { jugarDeNuevo(); },
+    onCambiarJugadores: function() { mostrarPantalla('pantalla-selector'); }
+  });
+  mostrarPantalla('pantalla-fin');
+}
+
+function jugarDeNuevo() {
+  FamiliaJugadores.reiniciarPuntos();
+  gameOver = false;
+  resetTower();
+  FamiliaJugadores.renderChips('j2-chips');
+  updateTurnUI();
+  FamiliaAudio.anunciarTurno(FamiliaJugadores.actual().name);
+  setMsg('¡Jugamos de nuevo! Turno de ' + FamiliaJugadores.actual().name);
+  mostrarPantalla('pantalla-juego');
+  requestAnimationFrame(loop);
+}
+
+/* ── EVENTOS ── */
+function bindEvents() {
+  var cvs = document.getElementById('j2-canvas');
+
+  cvs.addEventListener('pointermove', function(e) {
+    updateMousePos(e);
+    if (isDragging) {
+      var dx = e.clientX - pointerDownX;
+      cameraAngle -= dx * 0.008;
+      pointerDownX = e.clientX;
+      pointerDownY = e.clientY;
+      updateCamera();
+    }
+  });
+
+  cvs.addEventListener('pointerdown', function(e) {
+    isDragging   = false;
+    pointerDownX = e.clientX;
+    pointerDownY = e.clientY;
+    updateMousePos(e);
+    cvs.setPointerCapture(e.pointerId);
+  });
+
+  cvs.addEventListener('pointermove', function(e) {
+    if (e.buttons > 0) {
+      var d = Math.abs(e.clientX - pointerDownX) + Math.abs(e.clientY - pointerDownY);
+      if (d > 6) isDragging = true;
+    }
+  }, true);
+
+  cvs.addEventListener('pointerup', function(e) {
+    var d = Math.abs(e.clientX - pointerDownX) + Math.abs(e.clientY - pointerDownY);
+    if (d < 8) onCanvasClick();
+    isDragging = false;
+  });
+}
+
+function updateMousePos(e) {
+  var rect = document.getElementById('j2-canvas').getBoundingClientRect();
+  mouse.x =  ((e.clientX - rect.left) / rect.width)  * 2 - 1;
+  mouse.y = -((e.clientY - rect.top)  / rect.height) * 2 + 1;
+}
+
+/* ── UI HELPERS ── */
+function setMsg(t) { document.getElementById('j2-msg').textContent = t; }
+
+function updateTurnUI() {
+  var j = FamiliaJugadores.actual();
+  var el = document.getElementById('j2-turn');
+  el.textContent = '🎯 ' + j.name;
+  el.style.setProperty('--player-color', j.color);
+  el.style.background = j.color;
+}
+
+function blockFromMesh(mesh) {
+  for (var i = 0; i < blocks.length; i++) {
+    if (blocks[i].mesh === mesh) return blocks[i];
+  }
+  return null;
+}
+
+/* ── INIT ── */
+FamiliaAudio.cargarPreferencia();
+
+/* Panel de fin de juego (usando renderFinal anidado) */
+var finWrap = document.createElement('div');
+finWrap.id = 'j2-fin-scores-wrap';
+document.getElementById('pantalla-fin').appendChild(finWrap);
+
+FamiliaJugadores.renderSelector('contenedor-selector', { min: 2, max: 4 }, function() {
+  iniciarJuego();
+});
+
+/* Three.js CDN check */
+if (typeof THREE === 'undefined') {
+  document.getElementById('contenedor-selector').innerHTML =
+    '<div style="padding:40px;text-align:center;color:#ef4444;font-size:16px;font-weight:900;">' +
+    '⚠️ Necesitás conexión a internet para cargar el motor 3D.<br><br>' +
+    '<a href="../index.html" style="color:#3b82f6">← Volver al menú</a></div>';
+}
+</script>
+</body>
+</html>

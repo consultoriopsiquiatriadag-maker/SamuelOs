@@ -1,5 +1,5 @@
 /* Aplicación de Samuel - Service Worker */
-const CACHE_VERSION = 'samuel-app-v91-constructor';
+const CACHE_VERSION = 'samuel-app-v92-jenga-v2';
 const CACHE_NAME = CACHE_VERSION;
 
 const ASSETS = [
@@ -22,6 +22,7 @@ const ASSETS = [
   './juegos-familia/preguntados/index.html',
   './juegos-familia/oca/index.html',
   './juegos-familia/constructor/index.html',
+  './juegos-familia/jenga-v2/index.html',
   './app.js',
   './flags-data.js',
   './manifest.webmanifest',
