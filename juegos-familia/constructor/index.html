@@ -478,26 +478,29 @@ function actualizarContador() {
 }
 
 /* ── INICIAR JUEGO ── */
+var _canvasListo = false;
+
 function iniciarJuego() {
   FamiliaStorage.setUltimoJuego('constructor');
   resetGrilla();
-  canvas  = document.getElementById('canvas-iso');
-  ctx     = canvas.getContext('2d');
-  buildPaleta();
+
+  if (!_canvasListo) {
+    canvas = document.getElementById('canvas-iso');
+    ctx    = canvas.getContext('2d');
+    buildPaleta();
+    window.addEventListener('resize', resizeCanvas);
+    canvas.addEventListener('click', function(e) {
+      handleClick(e.clientX, e.clientY);
+    });
+    canvas.addEventListener('touchend', function(e) {
+      e.preventDefault();
+      var t = e.changedTouches[0];
+      handleClick(t.clientX, t.clientY);
+    });
+    _canvasListo = true;
+  }
+
   resizeCanvas();
-  window.addEventListener('resize', resizeCanvas);
-
-  /* Mouse */
-  canvas.addEventListener('click', function(e) {
-    handleClick(e.clientX, e.clientY);
-  });
-  /* Touch */
-  canvas.addEventListener('touchend', function(e) {
-    e.preventDefault();
-    var t = e.changedTouches[0];
-    handleClick(t.clientX, t.clientY);
-  });
-
   FamiliaJugadores.renderTurnBanner('turn-banner');
   FamiliaJugadores.renderChips('players-bar');
   FamiliaAudio.renderBotonSonido('contenedor-sonido');

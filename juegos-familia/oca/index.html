@@ -182,8 +182,8 @@ var CARAS_DADO = ['⚀','⚁','⚂','⚃','⚄','⚅'];
 /* ── CASILLAS ESPECIALES ── */
 var ESPECIALES = {
   1:  { tipo:'inicio',    emoji:'🏁', cls:'cell-inicio'  },
-  6:  { tipo:'puente',   emoji:'🌉', cls:'cell-puente',   txt:'¡Puente! Salts al 12',    destino:12 },
-  12: { tipo:'puente',   emoji:'🌉', cls:'cell-puente',   txt:'¡Puente! Salts al 6',     destino:6  },
+  6:  { tipo:'puente',   emoji:'🌉', cls:'cell-puente',   txt:'¡Puente! Saltás al 12',   destino:12 },
+  12: { tipo:'puente',   emoji:'🌉', cls:'cell-puente',   txt:'¡Puente! Saltás al 6',    destino:6  },
   19: { tipo:'posada',   emoji:'🏠', cls:'cell-posada',   txt:'¡Posada! Perdés 1 turno', espera:1   },
   26: { tipo:'dados',    emoji:'🎲', cls:'cell-dados',    txt:'¡Dados! Tirá de nuevo',   doble:true },
   42: { tipo:'laberinto',emoji:'🌀', cls:'cell-laberinto',txt:'¡Laberinto! Volvés al 30',destino:30 },
@@ -455,7 +455,6 @@ function scrollACasilla(n) {
 }
 
 /* ── INIT ── */
-FamiliaAudio.cargarPreferencia();
 FamiliaAudio.cargarPreferencia();
 mostrarPantalla('pantalla-selector');
 FamiliaJugadores.renderSelector('contenedor-selector', { min: 2, max: 4 }, function() {
