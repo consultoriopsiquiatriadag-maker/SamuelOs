@@ -1,7 +1,7 @@
 # JUEGOS FAMILIARES — ESTADO DEL PROYECTO
 
 ## FASE ACTUAL
-Fase 3 — Memotest completo (lotes 3.1–3.4 en un solo archivo).
+Fase 8 completada — Offline/kiosco. Listo para Fase 9 (pruebas) y Fase 10 (deploy).
 
 ## LOTE TERMINADO
 Lote 3 — `juegos-familia/memotest/index.html` completo:

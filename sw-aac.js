@@ -1,5 +1,5 @@
 /* Aplicación de Samuel - Service Worker */
-const CACHE_VERSION = 'samuel-app-v92-jenga-v2';
+const CACHE_VERSION = 'samuel-app-v93-offline';
 const CACHE_NAME = CACHE_VERSION;
 
 const ASSETS = [
@@ -23,6 +23,8 @@ const ASSETS = [
   './juegos-familia/oca/index.html',
   './juegos-familia/constructor/index.html',
   './juegos-familia/jenga-v2/index.html',
+  // Three.js r128 — pre-cacheado para Jenga V2 offline
+  'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',
   './app.js',
   './flags-data.js',
   './manifest.webmanifest',
