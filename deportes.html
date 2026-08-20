@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#2563eb" />
+  <title>Juegos de Deportes — Samuel OS</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, -apple-system, 'Segoe UI', Arial, sans-serif; background: #0f172a; color: #f1f5f9; min-height: 100svh; padding-bottom: 32px; }
+    .header { background: #1e293b; padding: 14px 18px; display: flex; align-items: center; gap: 14px; border-bottom: 2px solid #334155; position: sticky; top: 0; z-index: 10; }
+    .btn-volver { background: #334155; color: #f1f5f9; border: none; border-radius: 12px; padding: 10px 16px; font-size: 15px; font-weight: 900; cursor: pointer; text-decoration: none; flex-shrink: 0; }
+    .btn-volver:hover { background: #475569; }
+    .header-titulo { font-size: 22px; font-weight: 950; display: flex; align-items: center; gap: 10px; }
+    .header-sub { font-size: 13px; color: #94a3b8; font-weight: 700; margin-top: 2px; }
+    .aviso { background: #1e293b; border: 1.5px solid #334155; border-radius: 14px; padding: 12px 16px; margin: 16px 18px 0; font-size: 13px; color: #94a3b8; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+    .aviso-icon { font-size: 20px; flex-shrink: 0; }
+    .seccion-titulo { font-size: 14px; font-weight: 900; color: #64748b; text-transform: uppercase; letter-spacing: .08em; padding: 22px 18px 10px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 14px; padding: 0 18px; }
+    @media (max-width: 420px) { .grid { grid-template-columns: repeat(2, 1fr); gap: 10px; } }
+    .card { background: #1e293b; border-radius: 18px; border: 2px solid #334155; overflow: hidden; cursor: pointer; transition: transform .13s, border-color .13s, box-shadow .13s; user-select: none; position: relative; }
+    .card:hover { transform: translateY(-4px); border-color: #2563eb; box-shadow: 0 16px 32px rgba(37,99,235,.25); }
+    .card:active { transform: scale(.96); }
+    .card-thumb { width: 100%; aspect-ratio: 16/9; background: #334155; object-fit: cover; display: block; font-size: 0; }
+    .card-thumb-placeholder { width: 100%; aspect-ratio: 16/9; background: linear-gradient(135deg, #334155, #1e293b); display: flex; align-items: center; justify-content: center; font-size: 36px; }
+    .card-body { padding: 10px 12px 12px; }
+    .card-nombre { font-size: 13px; font-weight: 950; line-height: 1.25; color: #f1f5f9; margin-bottom: 4px; }
+    .card-tag { display: inline-block; padding: 2px 8px; border-radius: 99px; font-size: 10px; font-weight: 900; background: #334155; color: #94a3b8; }
+    .card-tag.top { background: #1e3a5f; color: #93c5fd; }
+    .card-tag.touch { background: #14532d; color: #86efac; }
+    .card-tag.clasico { background: #3b1f6f; color: #c4b5fd; }
+    .card-play { position: absolute; inset: 0; background: rgba(37,99,235,.0); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity .15s, background .15s; }
+    .card:hover .card-play { opacity: 1; background: rgba(37,99,235,.18); }
+    .card-play-icon { width: 52px; height: 52px; border-radius: 50%; background: #2563eb; display: flex; align-items: center; justify-content: center; font-size: 22px; box-shadow: 0 4px 20px rgba(37,99,235,.5); }
+    #popup-bloqueado { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.8); z-index: 100; align-items: center; justify-content: center; }
+    #popup-bloqueado.show { display: flex; }
+    .popup-card { background: #1e293b; border-radius: 20px; padding: 28px; max-width: 340px; width: 90%; text-align: center; border: 2px solid #334155; }
+    .popup-card h2 { font-size: 18px; margin-bottom: 10px; }
+    .popup-card p { font-size: 14px; color: #94a3b8; font-weight: 700; margin-bottom: 20px; }
+    .popup-btns { display: flex; flex-direction: column; gap: 10px; }
+    .btn-primary { background: #2563eb; color: #fff; border: none; border-radius: 12px; padding: 14px; font-size: 15px; font-weight: 900; cursor: pointer; width: 100%; }
+    .btn-ghost { background: transparent; color: #94a3b8; border: 2px solid #334155; border-radius: 12px; padding: 12px; font-size: 14px; font-weight: 800; cursor: pointer; width: 100%; }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <a class="btn-volver" href="./juegos.html">◀ Juegos</a>
+    <div>
+      <div class="header-titulo">⚽ Deportes</div>
+      <div class="header-sub">Tocá un juego para jugar</div>
+    </div>
+  </div>
+
+  <div class="aviso">
+    <span class="aviso-icon">🔒</span>
+    <span>El juego se abre en ventana separada. Para volver, cerrá esa ventana con la ✕.</span>
+  </div>
+
+  <div class="seccion-titulo">⭐ Los más populares</div>
+  <div class="grid" id="grid-top"></div>
+
+  <div class="seccion-titulo">📱 Buenos para tablet</div>
+  <div class="grid" id="grid-touch"></div>
+
+  <div class="seccion-titulo">🎮 Más juegos</div>
+  <div class="grid" id="grid-mas"></div>
+
+  <div id="popup-bloqueado">
+    <div class="popup-card">
+      <h2>🔒 Ventana bloqueada</h2>
+      <p>El navegador bloqueó la ventana del juego. Tocá "Abrir de todos modos" para continuar.</p>
+      <div class="popup-btns">
+        <button class="btn-primary" id="btn-abrir-igual">▶ Abrir de todos modos</button>
+        <button class="btn-ghost" onclick="cerrarOverlay()">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+var JUEGOS_TOP = [
+  { nombre: 'Basketball Stars',       slug: 'basketball-stars',          tag: 'top',     emoji: '🏀' },
+  { nombre: 'Penalty Shooters 2',     slug: 'penalty-shooters-2',        tag: 'top',     emoji: '⚽' },
+  { nombre: 'Football Legends 2021',  slug: 'football-legends-2021',     tag: 'top',     emoji: '⚽' },
+  { nombre: '8 Ball Pool',            slug: '8-ball-pool',               tag: 'top',     emoji: '🎱' },
+  { nombre: 'Tennis Masters',         slug: 'tennis-masters',            tag: 'top',     emoji: '🎾' },
+  { nombre: 'Touchdowners 2',         slug: 'touchdowners-2',            tag: 'top',     emoji: '🏈' },
+  { nombre: 'Boxing Random',          slug: 'boxing-random',             tag: 'top',     emoji: '🥊' },
+  { nombre: 'Goalkeeper Challenge',   slug: 'goalkeeper-challenge',      tag: '',        emoji: '🧤' },
+];
+
+var JUEGOS_TOUCH = [
+  { nombre: 'Puppet Soccer 2014',     slug: 'puppet-soccer-2014',        tag: 'touch',   emoji: '🤸' },
+  { nombre: 'Head Soccer',            slug: 'head-soccer',               tag: 'touch',   emoji: '⚽' },
+  { nombre: 'Football Heads',         slug: 'football-heads',            tag: 'touch',   emoji: '⚽' },
+  { nombre: 'Table Tennis World Tour',slug: 'table-tennis-world-tour',   tag: 'touch',   emoji: '🏓' },
+  { nombre: 'Volley Random',          slug: 'volley-random',             tag: 'touch',   emoji: '🏐' },
+  { nombre: 'Golf Battle',            slug: 'golf-battle',               tag: 'touch',   emoji: '⛳' },
+];
+
+var JUEGOS_MAS = [
+  { nombre: 'Billiard Blitz',         slug: 'billiard-blitz-hustle',     tag: '',        emoji: '🎱' },
+  { nombre: 'Penalty Kick Online',    slug: 'penalty-kick-online',       tag: '',        emoji: '⚽' },
+  { nombre: 'Basket Random',          slug: 'basket-random',             tag: '',        emoji: '🏀' },
+  { nombre: 'Baseball Pro',           slug: 'baseball-pro',              tag: '',        emoji: '⚾' },
+  { nombre: 'Run 3',                  slug: 'run-3',                     tag: 'clasico', emoji: '🏃' },
+  { nombre: 'Jetski Rush',            slug: 'jetski-rush',               tag: '',        emoji: '🌊' },
+  { nombre: 'Soccer Skills World Cup',slug: 'soccer-skills-world-cup',   tag: '',        emoji: '🏆' },
+  { nombre: 'Ping Pong Fury',         slug: 'ping-pong-fury',            tag: '',        emoji: '🏓' },
+];
+
+var TAG_LABELS = { top: 'Popular', clasico: 'Clásico', touch: 'Tablet' };
+
+function urlJuego(slug) { return 'https://www.crazygames.com/es/game/' + slug; }
+function thumbUrl(slug) { return 'https://imgs.crazygames.com/' + slug + '_16x9?metadata=none&width=480&height=270&fit=crop&format=webp'; }
+
+var urlPendiente = '';
+function abrirJuego(slug) {
+  var url = urlJuego(slug);
+  urlPendiente = url;
+  var ancho = Math.min(window.screen.width, 1280), alto = Math.min(window.screen.height, 800);
+  var left = Math.round((window.screen.width - ancho) / 2), top = Math.round((window.screen.height - alto) / 2);
+  var opts = 'width='+ancho+',height='+alto+',left='+left+',top='+top+',toolbar=no,location=no,menubar=no,scrollbars=no,status=no,resizable=yes';
+  var win = window.open(url, '_blank', opts);
+  if (!win || win.closed || typeof win.closed === 'undefined') mostrarOverlay();
+}
+function mostrarOverlay() {
+  document.getElementById('popup-bloqueado').classList.add('show');
+  document.getElementById('btn-abrir-igual').onclick = function() { window.open(urlPendiente, '_blank'); cerrarOverlay(); };
+}
+function cerrarOverlay() { document.getElementById('popup-bloqueado').classList.remove('show'); urlPendiente = ''; }
+
+function crearCard(juego) {
+  var card = document.createElement('div');
+  card.className = 'card';
+  card.setAttribute('role', 'button');
+  card.setAttribute('tabindex', '0');
+  card.setAttribute('aria-label', 'Jugar ' + juego.nombre);
+  var tagHtml = juego.tag ? '<span class="card-tag ' + juego.tag + '">' + (TAG_LABELS[juego.tag] || juego.tag) + '</span>' : '';
+  card.innerHTML =
+    '<div class="card-thumb-placeholder" id="tw-' + juego.slug + '"><span>' + juego.emoji + '</span></div>' +
+    '<div class="card-body"><div class="card-nombre">' + juego.nombre + '</div>' + tagHtml + '</div>' +
+    '<div class="card-play"><div class="card-play-icon">▶</div></div>';
+  var img = new Image();
+  img.onload = function() {
+    var w = document.getElementById('tw-' + juego.slug);
+    if (w) { w.className = ''; w.innerHTML = ''; img.className = 'card-thumb'; img.alt = juego.nombre; w.appendChild(img); }
+  };
+  img.src = thumbUrl(juego.slug);
+  card.addEventListener('click', function() { abrirJuego(juego.slug); });
+  card.addEventListener('keydown', function(e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); abrirJuego(juego.slug); } });
+  return card;
+}
+
+function poblarGrid(id, juegos) {
+  var g = document.getElementById(id);
+  juegos.forEach(function(j) { g.appendChild(crearCard(j)); });
+}
+
+poblarGrid('grid-top',   JUEGOS_TOP);
+poblarGrid('grid-touch', JUEGOS_TOUCH);
+poblarGrid('grid-mas',   JUEGOS_MAS);
+</script>
+</body>
+</html>

@@ -1,5 +1,5 @@
 /* Aplicación de Samuel - Service Worker */
-const CACHE_VERSION = 'samuel-app-v95-conduccion';
+const CACHE_VERSION = 'samuel-app-v96-portales';
 const CACHE_NAME = CACHE_VERSION;
 
 const ASSETS = [
@@ -14,6 +14,9 @@ const ASSETS = [
   './escuela.html',
   './jenga.html',
   './conduccion.html',
+  './arcade.html',
+  './puzzles.html',
+  './deportes.html',
   './juegos-familia/index.html',
   './juegos-familia/shared/family-game.css',
   './juegos-familia/shared/players.js',
