@@ -136,7 +136,8 @@
 
   <!-- HEADER -->
   <header class="header">
-    <a class="btn-volver" href="../juegos.html">◀ Volver a Juegos</a>
+    <a class="btn-volver" href="../juegos.html"
+       onclick="if(window.parent!==window&&typeof window.parent.cerrarPortal==='function'){event.preventDefault();window.parent.cerrarPortal();}">◀ Volver a Juegos</a>
     <div class="header-text">
       <h1>👨‍👩‍👧‍👦 Juegos en Familia</h1>
       <p>Turnos, cooperación y diversión compartida</p>

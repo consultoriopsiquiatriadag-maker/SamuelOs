@@ -575,6 +575,15 @@
 
     /* Accessibility */
     :focus-visible{outline:4px solid rgba(37,99,235,.35); outline-offset:3px;}
+
+    /* ── PORTAL OVERLAY (iframe interno para portales externos) ── */
+    #portal-overlay { display:none; position:fixed; inset:0; z-index:600; background:#0f172a; flex-direction:column; }
+    #portal-overlay.show { display:flex; }
+    #portal-bar { background:#1e293b; padding:10px 14px; display:flex; align-items:center; gap:12px; flex-shrink:0; border-bottom:2px solid #334155; }
+    #btn-cerrar-portal { background:#ef4444; color:#fff; border:none; border-radius:14px; padding:14px 22px; font-size:17px; font-weight:900; cursor:pointer; flex-shrink:0; white-space:nowrap; box-shadow:0 4px 14px rgba(239,68,68,.45); }
+    #btn-cerrar-portal:active { transform:scale(.95); }
+    #portal-titulo { font-size:15px; font-weight:900; color:#f1f5f9; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    #portal-frame { flex:1; border:none; width:100%; height:100%; }
   </style>
 </head>
 <body>
@@ -667,8 +676,7 @@
         </button>
 
         <!-- JUEGOS EN FAMILIA -->
-        <button class="home-hub-card" id="goFamilia" style="--hub-color:#7c3aed" aria-label="Juegos en Familia"
-                onclick="window.location.href='./juegos-familia/index.html'">
+        <button class="home-hub-card" id="goFamilia" style="--hub-color:#7c3aed" aria-label="Juegos en Familia">
           <svg width="80" height="80" viewBox="0 0 80 80" fill="none" aria-hidden="true">
             <rect width="80" height="80" rx="20" fill="#EDE9FE"/>
             <!-- personas: adulto izq, niño centro, adulto der -->
@@ -686,8 +694,7 @@
           <div class="hub-accent-bar" style="background:#7c3aed"></div>
         </button>
 
-        <button class="home-hub-card" id="goConduccion" style="--hub-color:#dc2626" aria-label="Juegos de Conducción"
-                onclick="window.location.href='./conduccion.html'">
+        <button class="home-hub-card" id="goConduccion" style="--hub-color:#dc2626" aria-label="Juegos de Conducción">
           <svg width="80" height="80" viewBox="0 0 80 80" fill="none" aria-hidden="true">
             <rect width="80" height="80" rx="20" fill="#FEE2E2"/>
             <!-- auto de perfil -->
@@ -710,8 +717,7 @@
         </button>
 
         <!-- ARCADE -->
-        <button class="home-hub-card" id="goArcade" style="--hub-color:#16a34a" aria-label="Juegos Arcade"
-                onclick="window.location.href='./arcade.html'">
+        <button class="home-hub-card" id="goArcade" style="--hub-color:#16a34a" aria-label="Juegos Arcade">
           <svg width="80" height="80" viewBox="0 0 80 80" fill="none" aria-hidden="true">
             <rect width="80" height="80" rx="20" fill="#DCFCE7"/>
             <!-- joystick base -->
@@ -739,8 +745,7 @@
         </button>
 
         <!-- PUZZLES -->
-        <button class="home-hub-card" id="goPuzzles" style="--hub-color:#7c3aed" aria-label="Juegos de Puzzles"
-                onclick="window.location.href='./puzzles.html'">
+        <button class="home-hub-card" id="goPuzzles" style="--hub-color:#7c3aed" aria-label="Juegos de Puzzles">
           <svg width="80" height="80" viewBox="0 0 80 80" fill="none" aria-hidden="true">
             <rect width="80" height="80" rx="20" fill="#EDE9FE"/>
             <!-- pieza puzzle -->
@@ -761,8 +766,7 @@
         </button>
 
         <!-- DEPORTES -->
-        <button class="home-hub-card" id="goDeportes" style="--hub-color:#2563eb" aria-label="Juegos de Deportes"
-                onclick="window.location.href='./deportes.html'">
+        <button class="home-hub-card" id="goDeportes" style="--hub-color:#2563eb" aria-label="Juegos de Deportes">
           <svg width="80" height="80" viewBox="0 0 80 80" fill="none" aria-hidden="true">
             <rect width="80" height="80" rx="20" fill="#DBEAFE"/>
             <!-- pelota de fútbol -->
@@ -6606,6 +6610,34 @@
         speak('Básquet. Tocá la pelota o el botón para encestar.');
       };
     })();
+
+    /* ── PORTALES EXTERNOS EN IFRAME ── */
+    function abrirPortal(url, titulo) {
+      document.getElementById('portal-frame').src = url;
+      document.getElementById('portal-titulo').textContent = titulo || '';
+      document.getElementById('portal-overlay').classList.add('show');
+    }
+    function cerrarPortal() {
+      document.getElementById('portal-overlay').classList.remove('show');
+      document.getElementById('portal-frame').src = '';  // detiene audio del portal
+    }
+    // Exponer para que iframes hijos puedan llamar window.parent.cerrarPortal()
+    window.cerrarPortal = cerrarPortal;
+
+    document.getElementById('goFamilia').addEventListener('click',    () => abrirPortal('./juegos-familia/index.html', '👨‍👩‍👧‍👦 En Familia'));
+    document.getElementById('goConduccion').addEventListener('click', () => abrirPortal('./conduccion.html', '🚗 Conducción'));
+    document.getElementById('goArcade').addEventListener('click',     () => abrirPortal('./arcade.html', '🕹️ Arcade'));
+    document.getElementById('goPuzzles').addEventListener('click',    () => abrirPortal('./puzzles.html', '🧩 Puzzles'));
+    document.getElementById('goDeportes').addEventListener('click',   () => abrirPortal('./deportes.html', '⚽ Deportes'));
   </script>
+
+  <!-- ── PORTAL OVERLAY ── -->
+  <div id="portal-overlay">
+    <div id="portal-bar">
+      <button id="btn-cerrar-portal" onclick="cerrarPortal()">✕ Volver al inicio</button>
+      <div id="portal-titulo"></div>
+    </div>
+    <iframe id="portal-frame" src="" allow="autoplay; fullscreen; gamepad" allowfullscreen></iframe>
+  </div>
 </body>
 </html>

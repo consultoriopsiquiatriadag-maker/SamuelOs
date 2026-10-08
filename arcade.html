@@ -118,7 +118,8 @@
 <body>
 
   <div class="header">
-    <a class="btn-volver" href="./juegos.html">◀ Juegos</a>
+    <a class="btn-volver" href="./juegos.html"
+       onclick="if(window.parent!==window&&typeof window.parent.cerrarPortal==='function'){event.preventDefault();window.parent.cerrarPortal();}">◀ Juegos</a>
     <div>
       <div class="header-titulo">🕹️ Arcade</div>
       <div class="header-sub">Tocá un juego para jugar</div>
