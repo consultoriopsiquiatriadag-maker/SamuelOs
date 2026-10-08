@@ -1,5 +1,5 @@
 /* Aplicación de Samuel - Service Worker */
-const CACHE_VERSION = 'samuel-app-v100-pronunciar-hablar';
+const CACHE_VERSION = 'samuel-app-v101-grid-uniforme';
 const CACHE_NAME = CACHE_VERSION;
 
 const ASSETS = [
