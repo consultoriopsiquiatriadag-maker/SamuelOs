@@ -32,13 +32,17 @@
     .card-play { position: absolute; inset: 0; background: rgba(124,58,237,.0); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity .15s, background .15s; }
     .card:hover .card-play { opacity: 1; background: rgba(124,58,237,.18); }
     .card-play-icon { width: 52px; height: 52px; border-radius: 50%; background: #7c3aed; display: flex; align-items: center; justify-content: center; font-size: 22px; box-shadow: 0 4px 20px rgba(124,58,237,.5); }
-    #game-overlay { display: none; position: fixed; inset: 0; z-index: 500; background: #0f172a; flex-direction: column; }
-    #game-overlay.show { display: flex; }
-    #game-bar { background: #1e293b; padding: 10px 14px; display: flex; align-items: center; gap: 12px; flex-shrink: 0; border-bottom: 2px solid #334155; }
-    #btn-cerrar-juego { background: #ef4444; color: #fff; border: none; border-radius: 14px; padding: 14px 22px; font-size: 17px; font-weight: 900; cursor: pointer; flex-shrink: 0; white-space: nowrap; box-shadow: 0 4px 14px rgba(239,68,68,.45); }
+    #game-overlay { display: none; position: fixed; inset: 0; z-index: 500; background: #0f172a; }
+    #game-overlay.show { display: block; }
+    #game-frame { position: absolute; inset: 0; border: none; width: 100%; height: 100%; }
+    #game-bar { position: absolute; top: 0; left: 0; right: 0; z-index: 10; background: rgba(15,23,42,.92); backdrop-filter: blur(8px); padding: 8px 12px; display: flex; align-items: center; gap: 12px; border-bottom: 2px solid #334155; transition: transform .3s ease; }
+    #game-bar.oculta { transform: translateY(-100%); }
+    #game-tab { position: absolute; top: 0; left: 0; right: 0; height: 6px; z-index: 11; background: rgba(239,68,68,.6); cursor: pointer; display: none; transition: height .2s; }
+    #game-tab.visible { display: block; }
+    #game-tab:hover, #game-tab:active { height: 14px; background: rgba(239,68,68,.9); }
+    #btn-cerrar-juego { background: #ef4444; color: #fff; border: none; border-radius: 12px; padding: 10px 18px; font-size: 15px; font-weight: 900; cursor: pointer; flex-shrink: 0; white-space: nowrap; }
     #btn-cerrar-juego:active { transform: scale(.95); }
-    #game-nombre { font-size: 15px; font-weight: 900; color: #f1f5f9; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    #game-frame { flex: 1; border: none; width: 100%; height: 100%; }
+    #game-nombre { font-size: 13px; font-weight: 900; color: #94a3b8; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   </style>
 </head>
 <body>
@@ -67,6 +71,7 @@
   <div class="grid" id="grid-mas"></div>
 
   <div id="game-overlay">
+    <div id="game-tab" onclick="mostrarGameBar()" title="Mostrar menú"></div>
     <div id="game-bar">
       <button id="btn-cerrar-juego" onclick="cerrarJuego()">✕ Volver a Samuel</button>
       <div id="game-nombre"></div>
@@ -111,14 +116,30 @@ var TAG_LABELS = { top: 'Popular', clasico: 'Clásico', touch: 'Tablet' };
 function urlJuego(slug) { return 'https://www.crazygames.com/es/game/' + slug; }
 function thumbUrl(slug) { return 'https://imgs.crazygames.com/' + slug + '_16x9?metadata=none&width=480&height=270&fit=crop&format=webp'; }
 
+var _gameBarTimer;
+function mostrarGameBar() {
+  var bar = document.getElementById('game-bar');
+  var tab = document.getElementById('game-tab');
+  bar.classList.remove('oculta');
+  tab.classList.remove('visible');
+  clearTimeout(_gameBarTimer);
+  _gameBarTimer = setTimeout(function() {
+    bar.classList.add('oculta');
+    tab.classList.add('visible');
+  }, 3000);
+}
 function abrirJuego(slug, nombre) {
   document.getElementById('game-frame').src = 'https://www.crazygames.com/embed/' + slug;
   document.getElementById('game-nombre').textContent = nombre || '';
   document.getElementById('game-overlay').classList.add('show');
+  mostrarGameBar();
 }
 function cerrarJuego() {
   document.getElementById('game-overlay').classList.remove('show');
   document.getElementById('game-frame').src = '';
+  clearTimeout(_gameBarTimer);
+  document.getElementById('game-bar').classList.remove('oculta');
+  document.getElementById('game-tab').classList.remove('visible');
 }
 
 function crearCard(juego) {

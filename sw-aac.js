@@ -1,5 +1,5 @@
 /* Aplicación de Samuel - Service Worker */
-const CACHE_VERSION = 'samuel-app-v97-iframe-kiosk';
+const CACHE_VERSION = 'samuel-app-v98-autohide-bars';
 const CACHE_NAME = CACHE_VERSION;
 
 const ASSETS = [
