@@ -937,7 +937,25 @@
         let _lastSaidText = null;
         let _lastSaidEmoji = null;
 
-        // --- Frase elegida por Samuel (suma estrella + registra actividad) ---
+        // --- Descripciones guiadas para cada frase ---
+        // Cada descripción sigue el patrón: "Elegiste X. Esta tarjeta Y. Ahora decí:"
+        // y luego la frase se lee más despacio para que Samuel pueda repetirla.
+        const PHRASE_DESCRIPTIONS = {
+            'Tengo hambre':      'Elegiste Tengo hambre. Esta tarjeta le avisa a mamá o papá que querés comer algo rico. Ahora decí:',
+            'Tengo sed':         'Elegiste Tengo sed. Esta tarjeta dice que querés tomar algo, como agua o jugo. Ahora decí:',
+            'Quiero ir al baño': 'Elegiste Quiero ir al baño. Esta tarjeta avisa que necesitás usar el baño ahora. Ahora decí:',
+            'Quiero descansar':  'Elegiste Quiero descansar. Esta tarjeta dice que querés parar un rato y tranquilizarte. Ahora decí:',
+            'Me duele':          'Elegiste Me duele. Esta tarjeta le dice a mamá o papá que algo en tu cuerpo te duele. Ahora decí:',
+            'Necesito ayuda':    'Elegiste Necesito ayuda. Esta tarjeta pide ayuda a alguien cercano que está con vos. Ahora decí:',
+            'Quiero jugar':      'Elegiste Quiero jugar. Esta tarjeta dice que tenés ganas de jugar y divertirte. Ahora decí:',
+            'Estoy cansado':     'Elegiste Estoy cansado. Esta tarjeta dice que tu cuerpo está muy cansado y necesitás descansar. Ahora decí:',
+            'Estoy contento':    'Elegiste Estoy contento. Esta tarjeta dice que estás feliz y que te sentís bien. Ahora decí:',
+            'Estoy enojado':     'Elegiste Estoy enojado. Esta tarjeta dice que algo te molestó y estás enojado. Ahora decí:',
+            'Quiero agua':       'Elegiste Quiero agua. Esta tarjeta dice que querés tomar agua. Ahora decí:',
+            'Te quiero mucho':   'Elegiste Te quiero mucho. Esta tarjeta le manda un abrazo y mucho cariño a alguien especial. Ahora decí:'
+        };
+
+        // --- Frase elegida por Samuel: explicación guiada + pronunciación lenta ---
         function say(text, emoji) {
             playTapSound();
             registerActivity('hablar');
@@ -945,17 +963,57 @@
             _lastSaidText = text;
             _lastSaidEmoji = emoji;
             try { localStorage.setItem('samuel_last_phrase', text); } catch (e) { /* ignore */ }
-            speak(text, emoji);
-            // mostrar botón Repetir
+
+            // Mostrar botón Repetir y actualizar barra de estado
+            document.getElementById('lastText').innerText = text;
             const btn = document.getElementById('btnRepetir');
             if (btn) { btn.style.display = ''; btn.textContent = '🔁 Repetir: ' + text; }
+
+            // Flash visual del emoji en el avatar
+            if (emoji) {
+                const flash = document.querySelector('.avatar-emoji');
+                if (flash) {
+                    flash.innerText = emoji;
+                    flash.classList.add('show');
+                    setTimeout(() => flash.classList.remove('show'), 5000);
+                }
+            }
+
+            window.speechSynthesis.cancel();
+
+            const guia = PHRASE_DESCRIPTIONS[text];
+            if (guia) {
+                // Paso 1 — Descripción guiada (velocidad normal)
+                const u1 = new SpeechSynthesisUtterance(guia);
+                u1.lang = 'es-ES';
+                u1.rate = 0.88;
+                u1.pitch = 1.1;
+                u1.onend = () => {
+                    // Paso 2 — La frase, lenta y clara para que Samuel la repita
+                    setTimeout(() => {
+                        const u2 = new SpeechSynthesisUtterance(text);
+                        u2.lang = 'es-ES';
+                        u2.rate = 0.72;
+                        u2.pitch = 1.2;
+                        window.speechSynthesis.speak(u2);
+                    }, 350);
+                };
+                window.speechSynthesis.speak(u1);
+            } else {
+                speak(text, emoji);
+            }
         }
 
-        // --- Repetir la última frase ---
+        // --- Repetir la última frase (solo la frase, lenta, sin re-explicar) ---
         function repeatLastSaid() {
             if (!_lastSaidText) return;
             playTapSound();
-            speak(_lastSaidText, _lastSaidEmoji);
+            window.speechSynthesis.cancel();
+            const u = new SpeechSynthesisUtterance(_lastSaidText);
+            u.lang = 'es-ES';
+            u.rate = 0.72;
+            u.pitch = 1.2;
+            window.speechSynthesis.speak(u);
         }
 
         // --- Audios Parentales Grabados ---
