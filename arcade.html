@@ -106,31 +106,13 @@
       font-size: 22px; box-shadow: 0 4px 20px rgba(22,163,74,.5);
     }
 
-    #popup-bloqueado {
-      display: none; position: fixed; inset: 0;
-      background: rgba(0,0,0,.8); z-index: 100;
-      align-items: center; justify-content: center;
-    }
-    #popup-bloqueado.show { display: flex; }
-    .popup-card {
-      background: #1e293b; border-radius: 20px; padding: 28px;
-      max-width: 340px; width: 90%; text-align: center;
-      border: 2px solid #334155;
-    }
-    .popup-card h2 { font-size: 18px; margin-bottom: 10px; }
-    .popup-card p { font-size: 14px; color: #94a3b8; font-weight: 700; margin-bottom: 20px; }
-    .popup-btns { display: flex; flex-direction: column; gap: 10px; }
-    .btn-primary {
-      background: #16a34a; color: #fff; border: none;
-      border-radius: 12px; padding: 14px; font-size: 15px;
-      font-weight: 900; cursor: pointer; width: 100%;
-    }
-    .btn-ghost {
-      background: transparent; color: #94a3b8;
-      border: 2px solid #334155; border-radius: 12px;
-      padding: 12px; font-size: 14px; font-weight: 800;
-      cursor: pointer; width: 100%;
-    }
+    #game-overlay { display: none; position: fixed; inset: 0; z-index: 500; background: #0f172a; flex-direction: column; }
+    #game-overlay.show { display: flex; }
+    #game-bar { background: #1e293b; padding: 10px 14px; display: flex; align-items: center; gap: 12px; flex-shrink: 0; border-bottom: 2px solid #334155; }
+    #btn-cerrar-juego { background: #ef4444; color: #fff; border: none; border-radius: 14px; padding: 14px 22px; font-size: 17px; font-weight: 900; cursor: pointer; flex-shrink: 0; white-space: nowrap; box-shadow: 0 4px 14px rgba(239,68,68,.45); }
+    #btn-cerrar-juego:active { transform: scale(.95); }
+    #game-nombre { font-size: 15px; font-weight: 900; color: #f1f5f9; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    #game-frame { flex: 1; border: none; width: 100%; height: 100%; }
   </style>
 </head>
 <body>
@@ -145,7 +127,7 @@
 
   <div class="aviso">
     <span class="aviso-icon">🔒</span>
-    <span>El juego se abre en ventana separada. Para volver, cerrá esa ventana con la ✕.</span>
+    <span>Tocá un juego — se abre aquí adentro. Usá el botón <strong>✕ Volver a Samuel</strong> para salir.</span>
   </div>
 
   <div class="seccion-titulo">⭐ Los más populares</div>
@@ -157,15 +139,12 @@
   <div class="seccion-titulo">🎮 Más juegos</div>
   <div class="grid" id="grid-mas"></div>
 
-  <div id="popup-bloqueado">
-    <div class="popup-card">
-      <h2>🔒 Ventana bloqueada</h2>
-      <p>El navegador bloqueó la ventana del juego. Tocá "Abrir de todos modos" para continuar.</p>
-      <div class="popup-btns">
-        <button class="btn-primary" id="btn-abrir-igual">▶ Abrir de todos modos</button>
-        <button class="btn-ghost" onclick="cerrarOverlay()">Cancelar</button>
-      </div>
+  <div id="game-overlay">
+    <div id="game-bar">
+      <button id="btn-cerrar-juego" onclick="cerrarJuego()">✕ Volver a Samuel</button>
+      <div id="game-nombre"></div>
     </div>
+    <iframe id="game-frame" src="" allow="autoplay; fullscreen; gamepad" allowfullscreen></iframe>
   </div>
 
 <script>
@@ -205,30 +184,14 @@ var TAG_LABELS = { top: 'Popular', clasico: 'Clásico', touch: 'Tablet' };
 function urlJuego(slug) { return 'https://www.crazygames.com/es/game/' + slug; }
 function thumbUrl(slug) { return 'https://imgs.crazygames.com/' + slug + '_16x9?metadata=none&width=480&height=270&fit=crop&format=webp'; }
 
-var urlPendiente = '';
-
-function abrirJuego(slug) {
-  var url = urlJuego(slug);
-  urlPendiente = url;
-  var ancho = Math.min(window.screen.width, 1280);
-  var alto  = Math.min(window.screen.height, 800);
-  var left  = Math.round((window.screen.width  - ancho) / 2);
-  var top   = Math.round((window.screen.height - alto)  / 2);
-  var opts  = 'width='+ancho+',height='+alto+',left='+left+',top='+top+',toolbar=no,location=no,menubar=no,scrollbars=no,status=no,resizable=yes';
-  var win = window.open(url, '_blank', opts);
-  if (!win || win.closed || typeof win.closed === 'undefined') mostrarOverlay();
+function abrirJuego(slug, nombre) {
+  document.getElementById('game-frame').src = 'https://www.crazygames.com/embed/' + slug;
+  document.getElementById('game-nombre').textContent = nombre || '';
+  document.getElementById('game-overlay').classList.add('show');
 }
-
-function mostrarOverlay() {
-  document.getElementById('popup-bloqueado').classList.add('show');
-  document.getElementById('btn-abrir-igual').onclick = function() {
-    window.open(urlPendiente, '_blank');
-    cerrarOverlay();
-  };
-}
-function cerrarOverlay() {
-  document.getElementById('popup-bloqueado').classList.remove('show');
-  urlPendiente = '';
+function cerrarJuego() {
+  document.getElementById('game-overlay').classList.remove('show');
+  document.getElementById('game-frame').src = '';
 }
 
 function crearCard(juego) {
@@ -254,8 +217,8 @@ function crearCard(juego) {
   };
   img.src = thumbUrl(juego.slug);
 
-  card.addEventListener('click', function() { abrirJuego(juego.slug); });
-  card.addEventListener('keydown', function(e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); abrirJuego(juego.slug); } });
+  card.addEventListener('click', function() { abrirJuego(juego.slug, juego.nombre); });
+  card.addEventListener('keydown', function(e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); abrirJuego(juego.slug, juego.nombre); } });
   return card;
 }
 
