@@ -282,6 +282,29 @@
     .triciclo-banner .triciclo-title { font-size: 19px; letter-spacing: -.02em; }
     .triciclo-banner .triciclo-desc { font-size: 13px; font-weight: 700; opacity: .9; margin-top: 2px; }
 
+    /* ====== Banner "Pronunciar y hablar" ====== */
+    .pronunciar-banner {
+      margin-top: 12px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      border: none;
+      border-radius: 24px;
+      padding: 18px 22px;
+      cursor: pointer;
+      color: #fff;
+      font-weight: 950;
+      text-align: left;
+      background: linear-gradient(135deg, #7c3aed, #a78bfa);
+      box-shadow: 0 16px 36px rgba(124,58,237,.28), inset 0 1px 0 rgba(255,255,255,.22);
+      transition: transform .10s ease;
+    }
+    .pronunciar-banner:active { transform: scale(.96) translateY(3px); }
+    .pronunciar-banner .pronunciar-emoji { font-size: 44px; line-height: 1; flex-shrink: 0; }
+    .pronunciar-banner .pronunciar-title { font-size: 19px; letter-spacing: -.02em; }
+    .pronunciar-banner .pronunciar-desc { font-size: 13px; font-weight: 700; opacity: .9; margin-top: 2px; }
+
     /* ====== VIEW: CATEGORY — grilla de videos ====== */
     .cat-header {
       margin-top: 16px;
@@ -609,6 +632,15 @@
       </div>
     </button>
 
+    <!-- Banner "Pronunciar y hablar" -->
+    <button class="pronunciar-banner" onclick="openCategory('pronunciar')" aria-label="Pronunciar y hablar">
+      <div class="pronunciar-emoji">🗣️</div>
+      <div>
+        <div class="pronunciar-title">Pronunciar y hablar</div>
+        <div class="pronunciar-desc">Letras, palabras y cuentos para practicar la voz</div>
+      </div>
+    </button>
+
     <div class="cat-grid">
 
       <button class="cat-card cat-canciones" onclick="openCategory('canciones')" aria-label="Canciones infantiles">
@@ -899,6 +931,18 @@
       ]
     },
     // ============================================================
+    // PRONUNCIAR Y HABLAR
+    // ============================================================
+    {
+      id: 'pronunciar',
+      nombre: 'Pronunciar y hablar',
+      emoji: '🗣️',
+      claseColor: 'cat-pronunciar',
+      badgeStyle: 'background:linear-gradient(135deg,#7c3aed,#a78bfa)',
+      // Se construye a partir de videosPronunciar (ver más abajo).
+      videos: []
+    },
+    // ============================================================
     // TRICICLETA (Fase 3 nuevo plan)
     // ✅ Todos los IDs verificados vía YouTube oEmbed API
     // ============================================================
@@ -1021,6 +1065,51 @@
   };
 
   // ============================================================
+  // videosPronunciar — Letras, palabras y cuentos para pronunciar
+  //
+  // Organizado en 3 sub-secciones:
+  //   1. Vocales y letras
+  //   2. Sílabas y palabras
+  //   3. Cuentos y frases
+  //
+  // ✅ = verificado | sin marca = pendiente de verificar con YouTube oEmbed
+  // Para cambiar videos, editar este array.
+  // ============================================================
+  const videosPronunciar = [
+    // ✅ Vocales y letras
+    { titulo: 'Las Vocales',              categoria: 'Vocales y letras',   youtubeId: 'FwoulzCrwDM', descripcion: 'Aprendemos las 5 vocales cantando',   canal: 'Bichikids en Español' },
+    { titulo: 'La Ronda de las Vocales',  categoria: 'Vocales y letras',   youtubeId: 'SYY357gVkSg', descripcion: 'Cantamos las vocales con movimiento', canal: 'El Reino Infantil' },
+    { titulo: 'Aprende las Vocales',      categoria: 'Vocales y letras',   youtubeId: 'HjOOGujV-LU', descripcion: 'A E I O U con ejercicios de voz',     canal: 'Canciones Infantiles' },
+    { titulo: 'El Abecedario 🔤',         categoria: 'Vocales y letras',   youtubeId: 'po5tCXKmvoo', descripcion: 'El alfabeto completo en español',      canal: 'Pinkfong en español' }, // ✅ verificado Fase 26
+    // Sílabas y palabras
+    { titulo: 'Palabras Fáciles de Aprender', categoria: 'Sílabas y palabras', youtubeId: 'As2iRmqel5o', descripcion: 'Primeras palabras para practicar', canal: 'Aprendo con vídeos' },
+    { titulo: 'Palabras básicas en español',  categoria: 'Sílabas y palabras', youtubeId: 'HecobysFp6U', descripcion: 'Vocabulario básico para niños',     canal: 'Aprendo español para niños' },
+    { titulo: 'Aprendo con Peque e Isa',      categoria: 'Sílabas y palabras', youtubeId: 'CYjTlLJ1w04', descripcion: 'Palabras nuevas juntos',            canal: 'Peque e Isa' },
+    // Cuentos y frases (reemplazar IDs si no funcionan)
+    { titulo: 'Los Tres Cerditos',        categoria: 'Cuentos y frases',   youtubeId: 'V8ZP8O8PEAs', descripcion: 'Cuento clásico narrado en español',   canal: 'Smile and Learn Español' },
+    { titulo: 'Caperucita Roja',          categoria: 'Cuentos y frases',   youtubeId: 'OJrBmhPyVAM', descripcion: 'Cuento con frases para repetir',      canal: 'Cuentos Infantiles' },
+    { titulo: 'El Patito Feo',            categoria: 'Cuentos y frases',   youtubeId: 'JTm5mJNhbM0', descripcion: 'Historia narrada despacio y clara',   canal: 'Pinkfong en español' },
+  ];
+
+  CATEGORIAS.find(c => c.id === 'pronunciar').videos = videosPronunciar.map(v => ({
+    id: v.youtubeId,
+    titulo: v.titulo,
+    canal: v.canal,
+    categoria: v.categoria
+  }));
+
+  const PRONUNCIAR_CAT_EMOJI = {
+    'Vocales y letras':   '🔤',
+    'Sílabas y palabras': '📝',
+    'Cuentos y frases':   '📖'
+  };
+  const PRONUNCIAR_CAT_PHRASE = {
+    'Vocales y letras':   'Vamos a practicar las vocales y las letras',
+    'Sílabas y palabras': 'Vamos a practicar palabras nuevas',
+    'Cuentos y frases':   'Vamos a escuchar un cuento para practicar'
+  };
+
+  // ============================================================
   // Estado de navegación
   // ============================================================
   let catActual = null;  // objeto de categoría actual
@@ -1104,9 +1193,13 @@
     const grid = document.getElementById('videoGrid');
     grid.innerHTML = '';
 
-    // Fase 42: mapa de emoji/clic según la categoría actual (Argentina o Aprender)
-    const emojiMapActual = catActual.id === 'aprender' ? APRENDER_CAT_EMOJI : ARG_CAT_EMOJI;
-    const abrirVideoTag = catActual.id === 'aprender' ? openAprendVideo : openArgVideo;
+    // Fase 42/100: mapa de emoji/clic según la categoría actual
+    const emojiMapActual = catActual.id === 'aprender'    ? APRENDER_CAT_EMOJI
+                         : catActual.id === 'pronunciar'  ? PRONUNCIAR_CAT_EMOJI
+                         : ARG_CAT_EMOJI;
+    const abrirVideoTag  = catActual.id === 'aprender'    ? openAprendVideo
+                         : catActual.id === 'pronunciar'  ? openPronunciarVideo
+                         : openArgVideo;
 
     catActual.videos.forEach(v => {
       const card = document.createElement('button');
@@ -1155,12 +1248,13 @@
 
     showView('viewCategory');
 
-    // Fase 28: voz de bienvenida al entrar a Videos Argentina
+    // Voz de bienvenida según categoría
     if (catId === 'argentina') {
       speak('Vamos a ver un video de Argentina');
     } else if (catId === 'aprender') {
-      // Fase 42: voz de bienvenida al entrar a Aprender con videos
       speak('Vamos a aprender con un video');
+    } else if (catId === 'pronunciar') {
+      speak('Vamos a practicar pronunciación');
     }
   }
 
@@ -1180,13 +1274,21 @@
 
   // ============================================================
   // Fase 42: abrir un video de "Aprender con videos"
-  // Mismo patrón que openArgVideo (frase corta + estrella + reproductor).
-  // Reusa addArgStar() porque su lógica es genérica (no es específica
-  // de Argentina, solo suma estrella y marca progreso del día).
   // ============================================================
   function openAprendVideo(v) {
     if (!navigator.onLine) { openPlayer(v); return; }
     const frase = APRENDER_CAT_PHRASE[v.categoria] || 'Vamos a aprender con un video';
+    speak(frase);
+    addArgStar();
+    setTimeout(() => openPlayer(v), 900);
+  }
+
+  // ============================================================
+  // Fase 100: abrir un video de "Pronunciar y hablar"
+  // ============================================================
+  function openPronunciarVideo(v) {
+    if (!navigator.onLine) { openPlayer(v); return; }
+    const frase = PRONUNCIAR_CAT_PHRASE[v.categoria] || 'Vamos a practicar pronunciación';
     speak(frase);
     addArgStar();
     setTimeout(() => openPlayer(v), 900);
