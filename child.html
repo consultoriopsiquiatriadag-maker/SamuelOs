@@ -362,19 +362,48 @@
             gap: 10px;
         }
 
-        /* --- Misión del día / Estrellas --- */
+        /* --- Misión del día / Estrellas — ACORDEÓN --- */
         .mission-bar {
             margin: 0 40px 10px 40px;
-            padding: 12px 20px;
             background: white;
             border-radius: 20px;
             box-shadow: var(--shadow-soft);
+            overflow: hidden;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        /* Cabecera siempre visible — toca para desplegar */
+        .mission-toggle {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 14px;
-            flex-wrap: wrap;
-            animation: fadeInDown 0.8s ease-out;
+            padding: 11px 20px;
+            cursor: pointer;
+            gap: 10px;
+            user-select: none;
+        }
+
+        .mission-toggle-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .mission-toggle-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .mission-toggle-arrow {
+            font-size: 0.65rem;
+            color: #bbb;
+            transition: transform 0.3s ease;
+            line-height: 1;
+        }
+
+        .mission-bar.expanded .mission-toggle-arrow {
+            transform: rotate(180deg);
         }
 
         .mission-title {
@@ -382,6 +411,25 @@
             font-size: 0.95rem;
             color: var(--text-color);
             white-space: nowrap;
+        }
+
+        /* Contenido colapsable */
+        .mission-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.35s ease-out, padding 0.32s ease-out;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            padding: 0 20px;
+            border-top: 0px solid #E5E7EB;
+        }
+
+        .mission-bar.expanded .mission-content {
+            max-height: 100px;
+            padding: 10px 20px 13px;
+            border-top-width: 1px;
         }
 
         .mission-items {
@@ -409,10 +457,10 @@
         }
 
         .stars-badge {
-            font-size: 1.1rem;
+            font-size: 1.0rem;
             font-weight: 900;
             background: #FFF7E0;
-            padding: 8px 16px;
+            padding: 6px 14px;
             border-radius: 30px;
             transition: transform 0.25s ease;
             white-space: nowrap;
@@ -438,7 +486,7 @@
         }
 
         @media (max-width: 768px) {
-            .mission-bar { margin: 0 20px 10px 20px; padding: 10px 14px; }
+            .mission-bar { margin: 0 20px 10px 20px; }
             .mission-title { font-size: 0.8rem; }
             .mission-item { font-size: 0.85rem; padding: 8px 14px; }
         }
@@ -765,15 +813,26 @@
         <button onclick="toggleFullscreen()" class="btn-parents">📺 Pantalla Completa</button>
     </header>
 
-    <div class="mission-bar">
-        <div class="mission-title">🎯 Misiones de hoy</div>
-        <div class="mission-items">
-            <span class="mission-item" id="mission-jugar">⬜ Jugar</span>
-            <span class="mission-item" id="mission-hablar">⬜ Hablar</span>
-            <span class="mission-item" id="mission-aprender">⬜ Aprender</span>
+    <div class="mission-bar" id="missionBar">
+        <!-- Cabecera siempre visible -->
+        <div class="mission-toggle" onclick="toggleMission()">
+            <div class="mission-toggle-left">
+                <span class="mission-title">🎯 Misiones de hoy</span>
+            </div>
+            <div class="mission-toggle-right">
+                <span class="stars-badge" id="starsBadge">⭐ 0</span>
+                <span class="mission-toggle-arrow">▼</span>
+            </div>
         </div>
-        <div class="level-badge" id="levelBadge">🌱 Explorador</div>
-        <div class="stars-badge" id="starsBadge">⭐ 0</div>
+        <!-- Contenido colapsable -->
+        <div class="mission-content">
+            <div class="mission-items">
+                <span class="mission-item" id="mission-jugar">⬜ Jugar</span>
+                <span class="mission-item" id="mission-hablar">⬜ Hablar</span>
+                <span class="mission-item" id="mission-aprender">⬜ Aprender</span>
+            </div>
+            <div class="level-badge" id="levelBadge">🌱 Explorador</div>
+        </div>
     </div>
 
     <main>
@@ -1272,6 +1331,12 @@
                 });
             }
         });
+
+        // --- Acordeón Misiones ---
+        function toggleMission() {
+            const bar = document.getElementById('missionBar');
+            bar.classList.toggle('expanded');
+        }
 
         // --- Kiosco / Pantalla Completa ---
         function toggleFullscreen() {

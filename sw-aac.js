@@ -1,5 +1,5 @@
 /* Aplicación de Samuel - Service Worker */
-const CACHE_VERSION = 'samuel-app-v102-botones-3d';
+const CACHE_VERSION = 'samuel-app-v103-mision-acordeon';
 const CACHE_NAME = CACHE_VERSION;
 
 const ASSETS = [
