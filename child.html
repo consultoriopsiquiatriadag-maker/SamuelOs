@@ -66,6 +66,14 @@
             font-size: 30px;
             position: relative;
             overflow: hidden;
+            cursor: pointer;
+            transition: transform .22s ease, box-shadow .22s ease;
+        }
+
+        .avatar:hover {
+            transform: scale(2.2);
+            box-shadow: 0 8px 28px rgba(0,0,0,.28);
+            z-index: 10;
         }
 
         .avatar img {
