@@ -126,11 +126,12 @@
         }
 
         .card:hover {
-            transform: scale(1.03) translateY(-5px);
+            transform: scale(1.04) translateY(-10px);
         }
 
         .card:active {
-            transform: scale(0.95);
+            transform: scale(0.97) translateY(6px);
+            transition: transform 0.07s ease, box-shadow 0.07s ease;
         }
 
         .card-jugar { animation: cardIn 0.6s ease-out backwards; animation-delay: 0s; }
@@ -141,7 +142,9 @@
         .card-icon {
             font-size: 80px;
             margin-bottom: 10px;
-            filter: drop-shadow(0 10px 10px rgba(0,0,0,0.1));
+            filter: drop-shadow(0 5px 10px rgba(0,0,0,0.30));
+            position: relative;
+            z-index: 1;
         }
 
         .card-label {
@@ -149,25 +152,131 @@
             font-size: 2rem;
             letter-spacing: 1px;
             text-transform: uppercase;
+            position: relative;
+            z-index: 1;
         }
 
-        /* Colores Específicos */
-        .card-jugar { border-bottom: 12px solid var(--color-jugar); color: var(--color-jugar); }
-        .card-videos { border-bottom: 12px solid var(--color-videos); color: var(--color-videos); }
-        .card-hablar { border-bottom: 12px solid var(--color-hablar); color: var(--color-hablar); }
-        .card-ayuda { border-bottom: 12px solid var(--color-ayuda); color: var(--color-ayuda); }
-        .card-escuela { border-bottom: 12px solid #10b981; color: #10b981;
-            animation: cardIn 0.6s ease-out backwards; animation-delay: 0.24s; }
+        /* ======================================================
+           Botones 3D — gradiente + espesor (raised) + gloss
+           Técnica: box-shadow con offset-y positivo = "canto"
+           visible del botón; al presionar (active) translateY
+           consume el canto y la sombra se achica.
+           ====================================================== */
+
+        /* Capa de gloss compartida: brillo en la mitad superior */
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 55%;
+            background: linear-gradient(to bottom, rgba(255,255,255,.26), rgba(255,255,255,0));
+            border-radius: inherit;
+            pointer-events: none;
+        }
+
+        /* 🎮 Jugar — violeta */
+        .card-jugar {
+            background: linear-gradient(165deg, #9699fe 0%, #6168fb 100%);
+            color: #fff;
+            border-bottom: none;
+            box-shadow:
+              0 9px 0 #4349c9,
+              0 16px 32px rgba(124,131,253,.55),
+              inset 0 1px 0 rgba(255,255,255,.45);
+        }
+        .card-jugar:active {
+            box-shadow:
+              0 2px 0 #4349c9,
+              0 5px 14px rgba(124,131,253,.35),
+              inset 0 1px 0 rgba(255,255,255,.45);
+        }
+
+        /* ▶️ Videos — coral */
+        .card-videos {
+            background: linear-gradient(165deg, #ff9898 0%, #ff5f5f 100%);
+            color: #fff;
+            border-bottom: none;
+            box-shadow:
+              0 9px 0 #cc3f3f,
+              0 16px 32px rgba(255,100,100,.55),
+              inset 0 1px 0 rgba(255,255,255,.45);
+        }
+        .card-videos:active {
+            box-shadow:
+              0 2px 0 #cc3f3f,
+              0 5px 14px rgba(255,100,100,.35),
+              inset 0 1px 0 rgba(255,255,255,.45);
+        }
+
+        /* 🗣️ Hablar — celeste */
+        .card-hablar {
+            background: linear-gradient(165deg, #7dd4ff 0%, #38b8ff 100%);
+            color: #fff;
+            border-bottom: none;
+            box-shadow:
+              0 9px 0 #1a90d4,
+              0 16px 32px rgba(92,200,255,.55),
+              inset 0 1px 0 rgba(255,255,255,.45);
+        }
+        .card-hablar:active {
+            box-shadow:
+              0 2px 0 #1a90d4,
+              0 5px 14px rgba(92,200,255,.35),
+              inset 0 1px 0 rgba(255,255,255,.45);
+        }
+
+        /* Verde (reserva para .card-ayuda) */
+        .card-ayuda {
+            background: linear-gradient(165deg, #95e37a 0%, #6ccf4a 100%);
+            color: #fff;
+            border-bottom: none;
+            box-shadow:
+              0 9px 0 #4a9e2f,
+              0 16px 32px rgba(126,217,87,.55),
+              inset 0 1px 0 rgba(255,255,255,.45);
+        }
+        .card-ayuda:active {
+            box-shadow:
+              0 2px 0 #4a9e2f,
+              0 5px 14px rgba(126,217,87,.35),
+              inset 0 1px 0 rgba(255,255,255,.45);
+        }
+
+        /* 📚 Escuela — esmeralda */
+        .card-escuela {
+            background: linear-gradient(165deg, #34d399 0%, #059669 100%);
+            color: #fff;
+            border-bottom: none;
+            box-shadow:
+              0 9px 0 #047857,
+              0 16px 32px rgba(16,185,129,.55),
+              inset 0 1px 0 rgba(255,255,255,.45);
+            animation: cardIn 0.6s ease-out backwards; animation-delay: 0.24s;
+        }
+        .card-escuela:active {
+            box-shadow:
+              0 2px 0 #047857,
+              0 5px 14px rgba(16,185,129,.35),
+              inset 0 1px 0 rgba(255,255,255,.45);
+        }
 
         /* --- Hablar: carta ancha en portada --- */
         .card-hablar-wide {
             grid-column: 1 / -1;
-            background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
+            background: linear-gradient(135deg, #9d55ff 0%, #5b21b6 100%);
             color: #fff;
             border-bottom: none;
             min-height: 150px;
-            box-shadow: 0 12px 38px rgba(124,58,237,0.45);
+            box-shadow:
+              0 9px 0 #3b0d8d,
+              0 16px 36px rgba(124,58,237,.60),
+              inset 0 1px 0 rgba(255,255,255,.35);
             animation: cardIn 0.6s ease-out backwards 0.32s, hablarGlow 3s ease-in-out infinite 2s;
+        }
+        .card-hablar-wide:active {
+            box-shadow:
+              0 2px 0 #3b0d8d,
+              0 6px 14px rgba(124,58,237,.35),
+              inset 0 1px 0 rgba(255,255,255,.35);
         }
         .card-hablar-wide .card-icon { font-size: 60px; margin-bottom: 4px; }
         .card-hablar-wide .card-label { font-size: 2.4rem; }
@@ -179,10 +288,17 @@
             margin-top: 4px;
             letter-spacing: 0;
             text-transform: none;
+            position: relative;
+            z-index: 1;
         }
         @keyframes hablarGlow {
-            0%, 100% { box-shadow: 0 12px 38px rgba(124,58,237,0.45); }
-            50% { box-shadow: 0 18px 55px rgba(124,58,237,0.75); transform: translateY(-3px) scale(1.01); }
+            0%, 100% {
+              box-shadow: 0 9px 0 #3b0d8d, 0 16px 36px rgba(124,58,237,.60), inset 0 1px 0 rgba(255,255,255,.35);
+            }
+            50% {
+              box-shadow: 0 9px 0 #3b0d8d, 0 24px 55px rgba(124,58,237,.88), inset 0 1px 0 rgba(255,255,255,.35);
+              transform: translateY(-4px) scale(1.01);
+            }
         }
 
         /* --- Ayuda: botón de emergencia bajo el grid --- */
@@ -195,18 +311,34 @@
         }
         .ayuda-strip-btn {
             width: 100%;
-            background: #fff5f5;
-            border: 3px solid #ff4757;
-            color: #ff4757;
+            background: linear-gradient(165deg, #ff6b6b 0%, #ff4757 100%);
+            border: none;
+            color: #fff;
             border-radius: 22px;
             font-size: 1.15rem;
             font-weight: 900;
             padding: 14px 20px;
             cursor: pointer;
-            transition: background .15s, transform .12s;
+            box-shadow:
+              0 7px 0 #c0252e,
+              0 12px 22px rgba(255,71,87,.45),
+              inset 0 1px 0 rgba(255,255,255,.35);
+            transition: transform .15s ease, box-shadow .15s ease;
         }
-        .ayuda-strip-btn:hover { background: #ffe0e3; transform: translateY(-2px); }
-        .ayuda-strip-btn:active { transform: scale(.95); }
+        .ayuda-strip-btn:hover {
+            transform: translateY(-4px);
+            box-shadow:
+              0 11px 0 #c0252e,
+              0 18px 28px rgba(255,71,87,.55),
+              inset 0 1px 0 rgba(255,255,255,.35);
+        }
+        .ayuda-strip-btn:active {
+            transform: translateY(5px);
+            box-shadow:
+              0 2px 0 #c0252e,
+              0 4px 10px rgba(255,71,87,.30),
+              inset 0 1px 0 rgba(255,255,255,.35);
+        }
 
         /* --- Footer --- */
         footer {
