@@ -168,27 +168,70 @@
       cursor: pointer;
       color: #fff;
       font-weight: 950;
-      box-shadow: 0 20px 44px rgba(0,0,0,.15), inset 0 1px 0 rgba(255,255,255,.22);
+      /* sombra base neutra — cada cat-* la sobreescribe */
+      box-shadow:
+        0 9px 0 rgba(0,0,0,.35),
+        0 18px 36px rgba(0,0,0,.18),
+        inset 0 1px 0 rgba(255,255,255,.26);
       transition: transform .10s ease, box-shadow .10s ease;
       position: relative;
       overflow: hidden;
     }
 
-    /* Gloss en cat-card */
+    .cat-card:hover {
+      transform: translateY(-8px) scale(1.02);
+    }
+
+    /* Gloss en cat-card — franja diagonal → gradiente top-down */
     .cat-card::before {
       content: '';
       position: absolute;
-      inset: -80px -80px auto -80px;
-      height: 140px;
-      background: rgba(255,255,255,.16);
-      transform: rotate(-14deg);
+      top: 0; left: 0; right: 0; height: 52%;
+      background: linear-gradient(to bottom, rgba(255,255,255,.26), rgba(255,255,255,0));
+      border-radius: inherit;
       pointer-events: none;
     }
 
     .cat-card:active {
-      transform: scale(.93) translateY(4px);
-      box-shadow: 0 6px 14px rgba(0,0,0,.12);
+      transform: scale(.96) translateY(5px);
+      box-shadow:
+        0 2px 0 rgba(0,0,0,.35),
+        0 5px 14px rgba(0,0,0,.14),
+        inset 0 1px 0 rgba(255,255,255,.26);
     }
+
+    /* ── Depth shadows 3D por categoría ── */
+    .cat-canciones  { box-shadow: 0 9px 0 #9d1256, 0 18px 36px rgba(190,24,93,.40), inset 0 1px 0 rgba(255,255,255,.26); }
+    .cat-canciones:hover  { box-shadow: 0 14px 0 #9d1256, 0 26px 44px rgba(190,24,93,.48), inset 0 1px 0 rgba(255,255,255,.26); }
+    .cat-canciones:active { box-shadow: 0 2px 0 #9d1256, 0 5px 14px rgba(190,24,93,.28), inset 0 1px 0 rgba(255,255,255,.26); }
+
+    .cat-dibujos    { box-shadow: 0 9px 0 #9a3412, 0 18px 36px rgba(194,65,12,.40), inset 0 1px 0 rgba(255,255,255,.26); }
+    .cat-dibujos:hover    { box-shadow: 0 14px 0 #9a3412, 0 26px 44px rgba(194,65,12,.48), inset 0 1px 0 rgba(255,255,255,.26); }
+    .cat-dibujos:active   { box-shadow: 0 2px 0 #9a3412, 0 5px 14px rgba(194,65,12,.28), inset 0 1px 0 rgba(255,255,255,.26); }
+
+    .cat-autos      { box-shadow: 0 9px 0 #1e3a8a, 0 18px 36px rgba(29,78,216,.40), inset 0 1px 0 rgba(255,255,255,.26); }
+    .cat-autos:hover      { box-shadow: 0 14px 0 #1e3a8a, 0 26px 44px rgba(29,78,216,.48), inset 0 1px 0 rgba(255,255,255,.26); }
+    .cat-autos:active     { box-shadow: 0 2px 0 #1e3a8a, 0 5px 14px rgba(29,78,216,.28), inset 0 1px 0 rgba(255,255,255,.26); }
+
+    .cat-lavado     { box-shadow: 0 9px 0 #155e75, 0 18px 36px rgba(14,116,144,.40), inset 0 1px 0 rgba(255,255,255,.26); }
+    .cat-lavado:hover     { box-shadow: 0 14px 0 #155e75, 0 26px 44px rgba(14,116,144,.48), inset 0 1px 0 rgba(255,255,255,.26); }
+    .cat-lavado:active    { box-shadow: 0 2px 0 #155e75, 0 5px 14px rgba(14,116,144,.28), inset 0 1px 0 rgba(255,255,255,.26); }
+
+    .cat-argentina  { box-shadow: 0 9px 0 #1e3a8a, 0 18px 36px rgba(29,78,216,.40), inset 0 1px 0 rgba(255,255,255,.26); }
+    .cat-argentina:hover  { box-shadow: 0 14px 0 #1e3a8a, 0 26px 44px rgba(29,78,216,.48), inset 0 1px 0 rgba(255,255,255,.26); }
+    .cat-argentina:active { box-shadow: 0 2px 0 #1e3a8a, 0 5px 14px rgba(29,78,216,.28), inset 0 1px 0 rgba(255,255,255,.26); }
+
+    .cat-aprender   { box-shadow: 0 9px 0 #134e4a, 0 18px 36px rgba(15,118,110,.40), inset 0 1px 0 rgba(255,255,255,.26); }
+    .cat-aprender:hover   { box-shadow: 0 14px 0 #134e4a, 0 26px 44px rgba(15,118,110,.48), inset 0 1px 0 rgba(255,255,255,.26); }
+    .cat-aprender:active  { box-shadow: 0 2px 0 #134e4a, 0 5px 14px rgba(15,118,110,.28), inset 0 1px 0 rgba(255,255,255,.26); }
+
+    .cat-triciclo   { box-shadow: 0 9px 0 #92400e, 0 18px 36px rgba(217,119,6,.40), inset 0 1px 0 rgba(255,255,255,.26); }
+    .cat-triciclo:hover   { box-shadow: 0 14px 0 #92400e, 0 26px 44px rgba(217,119,6,.48), inset 0 1px 0 rgba(255,255,255,.26); }
+    .cat-triciclo:active  { box-shadow: 0 2px 0 #92400e, 0 5px 14px rgba(217,119,6,.28), inset 0 1px 0 rgba(255,255,255,.26); }
+
+    .cat-pronunciar { box-shadow: 0 9px 0 #4c1d95, 0 18px 36px rgba(124,58,237,.40), inset 0 1px 0 rgba(255,255,255,.26); }
+    .cat-pronunciar:hover { box-shadow: 0 14px 0 #4c1d95, 0 26px 44px rgba(124,58,237,.48), inset 0 1px 0 rgba(255,255,255,.26); }
+    .cat-pronunciar:active{ box-shadow: 0 2px 0 #4c1d95, 0 5px 14px rgba(124,58,237,.28), inset 0 1px 0 rgba(255,255,255,.26); }
 
     @keyframes catPop {
       0%   { transform: scale(1); }
@@ -1349,13 +1392,16 @@
   // ============================================================
   document.querySelectorAll('.cat-card').forEach(card => {
     card.addEventListener('pointerdown', () => {
-      card.style.transform = 'scale(.93) translateY(4px)';
+      card.style.transform = 'scale(.96) translateY(5px)';
+      card.style.boxShadow = '0 2px 0 rgba(0,0,0,.35), 0 5px 14px rgba(0,0,0,.14), inset 0 1px 0 rgba(255,255,255,.26)';
     });
     card.addEventListener('pointerup', () => {
       card.style.transform = '';
+      card.style.boxShadow = '';
     });
     card.addEventListener('pointercancel', () => {
       card.style.transform = '';
+      card.style.boxShadow = '';
     });
   });
 

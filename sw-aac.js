@@ -1,5 +1,5 @@
 /* Aplicación de Samuel - Service Worker */
-const CACHE_VERSION = 'samuel-app-v104-juegos-3d';
+const CACHE_VERSION = 'samuel-app-v105-youtube-3d';
 const CACHE_NAME = CACHE_VERSION;
 
 const ASSETS = [
